@@ -1,10 +1,11 @@
 ---
 tags: readme-file, github-repository, read-me, script-repository, command-line
 date: 2022-10-28
-type: Article
+type: Readme
 author: Justin Hitt
-status: Draft
-workflow: Pending
+status: Publish
+workflow: Approved
+
 ---
 
 # Useful Scripts and Tools
@@ -19,6 +20,6 @@ Under the main directory will be a project folder specific to the tool. Under th
 
 ## Warning
 
-Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for the office environment.
+Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. Some scripts were for one time use and may not function as expected anymore.
 
 /EOF/
