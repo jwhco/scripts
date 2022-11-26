@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# Version: $Id$
+# Add YAML Text to Markdown Conversion
 #
 # Purpose: Create YAML header for text file then convert to Markdown
-# Platform: MacOS
+# Platform: MacOS, Git Bash
+# Author: Justin Hitt
 # Usage: Run in location you want files to show up, feeding it names.
 #
 #   find S0-IDEA -name "*.txt" -type f -print | while read file; do ./addYAMLtxt2md.sh "$file" ; done

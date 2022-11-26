@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# Version: $Id:$
+# Aweber To Markdown Conversion
 #
 # Purpose: Create YAML header for text file then convert to Markdown
-# Platform: MacOS
+# Platform: MacOS, Git Bash
+# Author: Justin Hitt
 # Usage: Run in target output directory. One time use.
 #
 
