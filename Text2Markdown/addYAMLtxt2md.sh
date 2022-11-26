@@ -31,20 +31,21 @@ BaseFile=`basename "$InputFile" `
 OutputFile=$RANDOM-"${BaseFile%.*}".md
 echo DEBUG: "$OutputFile"
 
-# Build out YAML Markdown header
+# Build out YAML Markdown header (CUSTOM)
 cat > $HeaderFile  << EOF
 ---
 tags:
-type: Message
+type: Social
 EOF
 
 # Print last modified date
 echo "date:" `date -r "$InputFile" "+%Y-%m-%d" ` >> $HeaderFile
 
+# Update YAML Markdown header (CUSTOM)
 cat >> $HeaderFile << EOF
 author: Justin Hitt
-status: Idea
-workflow: Requested
+status: Publish
+workflow: Approved
 ---
 EOF
 
