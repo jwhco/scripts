@@ -24,8 +24,8 @@ fi
 echo DEBUG: InputFile = "$InputFile"
 
 # Extract Root Path
-FullPath=`readlink -f $InputFile`
-RootPath=`dirname $FullPath`
+FullPath=`readlink -f "$InputFile" `
+RootPath=`dirname "$FullPath" `
 echo DEBUG: RootPath = "$RootPath"
 
 # Build output file name
@@ -39,20 +39,20 @@ echo DEBUG: OutputFile = "$OutputFile"
 
 # START: Build YAML Markdown Header
 tmpHeaderFile=/tmp/"$HeaderFile"
-cat > $tmpHeaderFile  << EOF
+cat > "$tmpHeaderFile"  << EOF
 ---
 tags:
 type: 
 EOF
 
 ## Print last modified date
-echo "date:" `date -r "$InputFile" "+%Y-%m-%d" ` >> $tmpHeaderFile
+echo "date:" `date -r "$InputFile" "+%Y-%m-%d" ` >> "$tmpHeaderFile"
 
 ## Capture original fielname
-echo "original:" $BaseFile >> $tmpHeaderFile
+echo "original: $BaseFile" >> "$tmpHeaderFile"
 
 ## Update YAML Markdown header (CUSTOM)
-cat >> $tmpHeaderFile << EOF
+cat >> "$tmpHeaderFile" << EOF
 author: Justin Hitt
 status: Draft
 workflow: Received
@@ -60,10 +60,10 @@ workflow: Received
 EOF
 
 # Move header to sidecar
-cp $tmpHeaderFile $OutputFile
+cp "$tmpHeaderFile" "$OutputFile"
 
 # Clean up Temporary
-rm $tmpHeaderFile
+rm "$tmpHeaderFile"
 
 # Reset values
 IFS="$OIFS"
