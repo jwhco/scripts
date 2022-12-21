@@ -36,7 +36,7 @@ echo DEBUG: "$OutputFile"
 cat > $HeaderFile  << EOF
 ---
 tags:
-type: Social
+type: Notes
 EOF
 
 # Print last modified date
@@ -45,8 +45,8 @@ echo "date:" `date -r "$InputFile" "+%Y-%m-%d" ` >> $HeaderFile
 # Update YAML Markdown header (CUSTOM)
 cat >> $HeaderFile << EOF
 author: Justin Hitt
-status: Publish
-workflow: Approved
+status: Draft
+workflow: Pending
 ---
 EOF
 
