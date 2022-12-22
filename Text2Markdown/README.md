@@ -14,4 +14,12 @@ workflow: Approved
 
 Add YAML Metadata Header To Text, Make Markdown for Obsidian.
 
+## Process
+
+### Convert {docx,html} to Markdown
+
+1. Run, `createYAMLsidecar.sh`
+2. Run, `Docx2Markdown.sh`
+3. Run, `MarkdownPlusYAML.sh`
+
 /EOF/

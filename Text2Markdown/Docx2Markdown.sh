@@ -5,7 +5,7 @@
 # Purpose: Receive a filename, check docx, convert.
 # Platform: Git Bash
 # Author: Justin Hitt
-# Usage: Only works with DOCX files.
+# Usage: Will works with DOCX and HTML files.
 #
 #   find . -name "*.docx" -type f -print | while read file; do $0 "$file" ; done
 #
