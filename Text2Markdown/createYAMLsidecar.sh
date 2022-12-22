@@ -47,6 +47,7 @@ EOF
 
 ## Print last modified date
 echo "date:" `date -r "$InputFile" "+%Y-%m-%d" ` >> "$tmpHeaderFile"
+echo "serial:" `date -r "$InputFile" "+%Y%m%d%H%M" ` >> "$tmpHeaderFile"
 
 ## Capture original fielname
 echo "original: $BaseFile" >> "$tmpHeaderFile"

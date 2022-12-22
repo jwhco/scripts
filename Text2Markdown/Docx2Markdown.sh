@@ -29,9 +29,12 @@ RootPath=`dirname "$FullPath" `
 echo DEBUG: FullPath = "$FullPath"
 echo DEBUG: RootPath = "$RootPath"
 
+# Determine Unique ID Serial
+SERIAL=`date -r "$InputFile" "+%Y%m%d%H%M" `
+
 # Build output file name
 BaseFile=`basename "$InputFile" `
-NewFile="${BaseFile%.*}".md
+NewFile=$SERIAL-"${BaseFile%.*}".md
 echo DEBUG: BaseFile = "$BaseFile"
 echo DEBUG: NewFile = "$NewFile"
 

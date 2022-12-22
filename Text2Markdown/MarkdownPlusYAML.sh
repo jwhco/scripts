@@ -5,9 +5,9 @@
 # Purpose: If a YAML exists and Markdown, then merge to Output.
 # Platform: Git Bash
 # Author: Justin Hitt
-# Usage: Feed it Markdown files, finished files drop locally.
+# Usage: Feed it original files, finished files drop locally.
 #
-#   find . -name "*.md" -type f -print | while read file; do $0 "$file" ; done
+#   find . -name "*.docx" -type f -print | while read file; do $0 "$file" ; done
 #
 
 echo DEBUG: START
@@ -29,10 +29,13 @@ RootPath=`dirname "$FullPath" `
 echo DEBUG: FullPath = "$FullPath"
 echo DEBUG: RootPath = "$RootPath"
 
+# Determine Unique ID Serial
+SERIAL=`date -r "$InputFile" "+%Y%m%d%H%M" `
+
 # Build output file name
 BaseFile=`basename "$InputFile" `
 YAMLFile="${BaseFile%.*}".yml
-NewFile=$RANDOM-"${BaseFile%.*}".md
+NewFile=$SERIAL-"${BaseFile%.*}".md
 echo DEBUG: BaseFile = "$BaseFile"
 echo DEBUG: YAMLFile = "$YAMLFile"
 echo DEBUG: NewFile = "$NewFile"
@@ -51,7 +54,17 @@ fi
 ## Read Files Into Output
 cat "$RootPath/$YAMLFile" > "$OutputFile"
 echo "" >> "$OutputFile"
-cat "$FullPath" >> "$OutputFile"
+
+### Only Process Text Files - Feed Markdown
+if file "$FullPath" | grep -iq ASCII;
+then
+  cat "$FullPath" >> "$OutputFile"
+fi
+### Not Feed Markdown, but It Exists
+if [ -f "$RootPath/$NewFile" ]
+then
+  cat "$RootPath/$NewFile" >> "$OutputFile"
+fi
 echo "" >> "$OutputFile"
 echo "/EOF/" >> "$OutputFile"
 
