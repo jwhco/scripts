@@ -14,6 +14,10 @@
 
 # Caveat: Best to use in one directory at a time. It can blow up and open the Word application. Makes a huge mess but doesn't harm the original.
 
+# Credits:
+# Knutson, Steve. ShaerPoint Lightbulb Moments. Convertiing Word Document Format With PowerShell. (2021 JUne 9). https://steveknutson.blog/2021/06/09/converting-word-document-format-with-powershell/
+#
+
 # Read Command Line Arguments
 param (
     [string]$path
