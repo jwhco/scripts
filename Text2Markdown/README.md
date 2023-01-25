@@ -20,6 +20,6 @@ Add YAML Metadata Header To Text, Make Markdown for Obsidian.
 
 1. Run, `createYAMLsidecar.sh`
 2. Run, `Docx2Markdown.sh`
-3. Run, `MarkdownPlusYAML.sh`
+3. Run, `addYAMLtext2md.sh`
 
 /EOF/
