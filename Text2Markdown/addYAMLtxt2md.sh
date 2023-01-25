@@ -64,9 +64,9 @@ fi
 
 # Assemble sidecar files to output
 ## Start with YAML header and Markdown
-cat "$RootPath/$YamlHeader" > $OutputFile
-printf "\n\n" >> $OutputFile # Friendly spacing
-cat "$RootPath/$MarkdownBody" >> $OutputFile
+cat "$RootPath/$YamlHeader" > "$OutputFile"
+printf "\n\n" >> "$OutputFile" # Friendly spacing
+cat "$RootPath/$MarkdownBody" >> "$OutputFile"
 
 ## Add EOF Marker
 printf "\n\n/EOF/\n" >> "$OutputFile"
