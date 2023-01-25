@@ -12,6 +12,8 @@
 #   powershell.exe -File "C:\path\to\script\Doc2Docx.ps1" "C:\fully\qualified\path\"
 #
 
+# Caveat: Best to use in one directory at a time. It can blow up and open the Word application. Makes a huge mess but doesn't harm the original.
+
 # Read Command Line Arguments
 param (
     [string]$path
