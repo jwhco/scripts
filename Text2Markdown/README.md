@@ -12,7 +12,7 @@ workflow: Approved
 
 ## Summary
 
-Add YAML Metadata Header To Text, Make Markdown for Obsidian.
+This project facilitiates the conversion of {.docx, .rtf, .odt, .txt, .doc} to Markdown for use in Machine Learning (ML) or knowledge management toolsl ike Obsidian. It converts binary into Markdown with YAML front matter.
 
 ## Process
 
@@ -32,8 +32,26 @@ find . -name "*.docx" -type f -print | while read file; do /d/WORKING-JustinHitt
 
 I've tested this on {.docx,.rtf}. May need to use [pptx2md](https://github.com/ssine/pptx2md) for PowerPoint.
 
-## Future
+### Post Text2Markdown Toolkit Cleanup
 
-- Be able to convert, {.doc, .odt, .htm*} historically. For `.doc` use `Doc2Docx.ps1` PowerScript.
+Use instructions in `Text2Markdown` documentation. Migration isn't perfect, but most of the changes can be made in bulk if you have the patience to save your work. Otherwise, manual corrections and editing in Markdown can be doen as you use the files.
+
+## Enhancements
+
+- Be able to convert, {.doc, .odt, .htm*} historically. For `.doc` use `Doc2Docx.ps1` PowerScript. Execution instructions pending.
+- Write scripts in `Python` to use libraries instead of secondary software packages. This will also make standardization and formatting easier.
+- Add tools to digest Markdown to prepare for Text Mining, Machine Learning, and Knowledge Management. See Jupyter files for details.
+
+## How to Support
+
+- If you use the scripts, Watch the repository.
+
+- If you see a bug or problem, Open an Issue.
+
+- If you like the work, Star to show support.
+  
+  
+
+After 100 watching, I'll spin it off as a Toolkit. That means it's own repository, a development plan, and scripts to install as standalone product.  All donations go towards GitHub subscription and future releases. Paypal = paypal@jwhco.com
 
 /EOF/
