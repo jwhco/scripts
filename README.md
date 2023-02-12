@@ -22,4 +22,6 @@ Under the main directory will be a project folder specific to the tool. Under th
 
 Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. Some scripts were for one time use and may not function as expected anymore.
 
+> Copyright 2023 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=jwhco-scripts-readme) All rights reserved.
+
 /EOF/

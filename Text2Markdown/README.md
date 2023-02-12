@@ -54,4 +54,6 @@ Use instructions in `Text2Markdown` documentation. Migration isn't perfect, but 
 
 After 100 watching, I'll spin it off as a Toolkit. That means it's own repository, a development plan, and scripts to install as standalone product.  Paypal email is paypal(at)jwhco.com -- Any support goes towards GitHub subscription and future releases. 
 
+> Copyright 2023 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=jwhco-scripts-readme) All rights reserved.
+
 /EOF/
