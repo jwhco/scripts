@@ -9,6 +9,16 @@ Python tools ran in the operating system to check for quality issues in an [Obsi
 - User runs script to check for similar repository file names, then checks for similarities within those files. Identify notes that are significantly similar, use Jaccard or BoW.
 - List all files with special characters in filename, seek to standardize filenames with [0-9,a-z] or space. The use of `-` dash and `_` underscore fine. Avoid special characters. Understand that space and `_` will HTML URL encode. Find a blend between OS file system, human readable, and usage in scripts. A more automated way than entering characters `,` comma, `$` dollar, and `;` semicolin inside Obsidian search.
 - Scripts have an option to produce a Obsidian Markdown report, complete with links to documents that need work. Script makes a table and output Markdown, then deposits it in the Obsidian vault root.
+- Script to check general syntax of Markdown to identify files in a folder that are NOT Markdown. Identify the problem, throw an error code according to defect. Find corrupt files.
+- Script to determine if Markdown file in a repository conforms to file standard. Including filename "{SERIAL} {KEYWORD PHRASE}", file contains YAML front matter, header structure, and file contains `## Related ` header that is complete. 
+- Identify duplicate images that may have different or the same names. Do this by hashing files, then comparing all hashes, finally printing a report. End user will be able to bulk corrections, linking to primary file, then deleting all duplicate images. Sugguest the oldest original image as survivor.
+
+## Methodology
+
+- Do not make these an Obsidian plug-in. Keep them in the realm of Markdown centric tools. If there is a flag, then make them more Obsidian aware. 
+- Primary objective is to use these scripts to keep a directory of Markdown clean. Primary compatibility with flags to [GitHub Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github) [Obsidian Markdown](https://www.markdownguide.org/tools/obsidian/), and [Leanpub Markua](https://leanpub.com/markua/read).
+- Use [Jupyter Notebook](https://jupyter.org/) to build scripts while documenting them. Focus on scripts that can report inside the Jupyter interface before breaking them out into stand alond command-line scripts.
+- If it doesn't work on the command line, then it isn't worth trying to put an interface on it. Make scripts clean enough to run in a Terminal window, or feed out to a cluster to run in parallel.
 
 ## Distribution
 
