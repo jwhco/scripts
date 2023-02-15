@@ -14,6 +14,12 @@ workflow: Approved
 
 Automation scripts for Utilities indicated by subdirectories. The goal is to make these scripts platform independent, however, the majority of command-line will be MacOS and Linux.
 
+## Tools
+
+- [Python3](https://www.python.org/)
+- [Visual Studio Code](https://code.visualstudio.com/Download)
+- [Jupyter Notebook](https://jupyter.org/install)
+
 ## Organization
 
 Under the main directory will be a project folder specific to the tool. Under that folder each script set will have its own README. In the best case the script itself will have documentation embedded.
