@@ -3,9 +3,8 @@ tags: readme-file, github-repository, read-me, script-repository, command-line
 date: 2022-10-28
 type: Readme
 author: Justin Hitt
-status: Publish
+status: S4-Publish
 workflow: Approved
-
 ---
 
 # Useful Scripts and Tools
