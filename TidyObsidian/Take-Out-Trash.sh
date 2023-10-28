@@ -11,15 +11,17 @@ RootDir=`pwd`
 if [ ! -d "$RootDir/.trash" ];
 then
     echo "ERROR: Missing \`.trash\` -- Not Obsidian Root"
-    exit;
+    exit 1;
 fi
 
 OIFS="$IFS"
 IFS=$'\n'
 for i in `find .trash -type f -mtime +90 -print`  
 do
-     echo rm "$RootDir/$i"
+     rm "$RootDir/$i"
 done
 IFS="$OIFS"
+
+exit 0;
 
 ###
