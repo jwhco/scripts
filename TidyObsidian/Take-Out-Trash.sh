@@ -16,9 +16,9 @@ fi
 
 OIFS="$IFS"
 IFS=$'\n'
-for i in `find .trash -type f -print`  
+for i in `find .trash -type f -mtime +90 -print`  
 do
-     echo rm "~/Documents/GitHub/obsidian/$i"
+     echo rm "$RootDir/$i"
 done
 IFS="$OIFS"
 
