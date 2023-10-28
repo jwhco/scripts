@@ -11,19 +11,19 @@ workflow: Approved
 
 ## Overview
 
-My Obsidian vault lives in GitHub. When files are deleted, they stick around. GitHub lets me sync between devices. But Obsidian doesn't purge trash folder without a plug-in.
+My Obsidian vault lives in GitHub. When files are deleted, they stick around. GitHub lets me sync between devices. But Obsidian doesn't purge trash folders without a plug-in.
 
 ## Tools
 
-- [GitHub](https://www.github.com/). Used for notes related project management and version control.
-- [Visual Studio Code](https://code.visualstudio.com/Download). Development environment for maintenance, uses a `bash` shell for Terminal.
-- [Obsidian.md](https://obsidian.md/). Note-taking application that is the front end of Markdown based notes repository.
+- [GitHub](https://www.github.com/). Used for notes related to project management and version control.
+- [Visual Studio Code](https://code.visualstudio.com/Download). The development environment for maintenance uses a `bash` shell for the Terminal.
+- [Obsidian.md](https://obsidian.md/). Note-taking application that is the front end of Markdown-based notes repository.
 
 ## Purpose
 
-- Purge `.trash` files with modification older than 90 days.
-- (Future #2) Delete files from `git` repository upon complete.
-- (Future #3) Issue command `git clean` to reduce size.
+- Purge `.trash` files with modifications older than 90 days.
+- (Future #2 ) Delete files from `git` repository upon completion.
+- (Future #3 ) Issue command `git clean` to reduce size.
 
 ## Warning
 
