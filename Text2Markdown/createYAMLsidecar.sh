@@ -55,7 +55,7 @@ echo "original: $BaseFile" >> "$tmpHeaderFile"
 ## Update YAML Markdown header (CUSTOM)
 cat >> "$tmpHeaderFile" << EOF
 author: Justin Hitt
-status: Draft
+status: S1-Draft
 workflow: Received
 ---
 EOF
