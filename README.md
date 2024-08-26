@@ -9,6 +9,13 @@ workflow: Approved
 
 # Useful Scripts and Tools
 
+## Index
+
+- Opml2RSSList. Dump a OPML file into RSS feed.
+- SeoHelpers. Help with Search Engine Optimization (SEO).
+- Text2Markdown. Support migration into Obsidian.
+- TidyObsidian. Quality assurance scripts for Obsidian.
+
 ## Overview
 
 Automation scripts for Utilities indicated by subdirectories. The goal is to make these scripts platform independent, however, the majority of command-line will be MacOS and Linux.
