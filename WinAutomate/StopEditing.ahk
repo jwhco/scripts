@@ -1,12 +1,18 @@
+;
+; Stop Editing Environment
+;
+
 ; Close Obsidian
+; ----
 if WinExist("Obsidian")
-	WinClose
-else
-	WinClose "Obsidian"
-	
+    WinClose
+
 ; Close VsCode
+; ----
 if WinExist("Visual Studio")
-	WinClose 
-else 
-	WinClose "Visual Studio"
-	
+    WinClose
+
+
+Exit
+
+;;;
