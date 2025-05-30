@@ -23,14 +23,14 @@ try {
 ; Open VsCode
 ; ----
 try
-    RunWait '"C:\Users\User\AppData\Local\Programs\Microsoft VS Code\Code.exe" "C:\Users\User\GitHub\obsidian"', , "Min"
+    Run '"C:\Users\User\AppData\Local\Programs\Microsoft VS Code\Code.exe" "C:\Users\User\GitHub\obsidian"', , "Min"
 catch
     MsgBox "VsCode, Failed to Start"
 
 ; Open Obsidian
 ; ----
 try
-    RunWait '"C:\Users\User\AppData\Local\Obsidian\Obsidian.exe" "C:\Users\User\GitHub\obsidian"', , "Min"
+    Run '"C:\Users\User\AppData\Local\Obsidian\Obsidian.exe" "C:\Users\User\GitHub\obsidian"', , "Min"
 catch
     MsgBox "Obsidian, Failed to Start"
 
