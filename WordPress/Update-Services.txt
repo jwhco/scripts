@@ -1,5 +1,4 @@
 http://api.feedster.com/ping
-http://api.moreover.com/ping
 http://api.moreover.com/RPC2
 http://bing.com/webmaster/ping.aspx
 http://blo.gs/ping.php
