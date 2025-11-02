@@ -21,7 +21,6 @@ workflow: Approved
 python Opml2RssList.py feedly-12345-export.opml > rss-list-output.txt
 ```
 
-
 > Copyright 2023 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=jwhco-scripts-readme) All rights reserved.
 
 /EOF/
