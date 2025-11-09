@@ -30,7 +30,7 @@
 
 ## Front Matter
 
-Where:
+When `source/notes.json` mentions `tags`, those convey to the related note in an Obsidian compatible format. In the `source/notes.json` it looks like:
 
 ```json
 "tags": [
@@ -40,7 +40,7 @@ Where:
 ]
 ```
 
-Becomes:
+Which would become the following Obsidian front matter compatible tags.
 
 ```
 tags:
@@ -49,14 +49,14 @@ tags:
 - customers-want
 ```
 
-Values:
+When there is a creation date in `source/notes.json` for a specific note it will looke like this:
 
 ```json
 "creationDate": "2025-08-06T19:39:11.000Z",
 "lastModified": "2025-10-30T01:50:25.901Z",
 ```
 
-Becomes:
+That becomes the following in the resulting zettelkasten formatted document:
 
 ```
 date: YYYY-MM-DD

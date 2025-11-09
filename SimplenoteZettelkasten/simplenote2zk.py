@@ -57,8 +57,10 @@ def sanitize_title(title: str) -> str:
     title = title.strip()
     # replace newlines with space
     title = re.sub(r"\s+", " ", title)
-    # remove slashes and other path chars
+    # replace slashes with dash
     title = title.replace("/", "-")
+    # remove characters typically disallowed in filenames: ?<>\\:*|"\n\r\t
+    title = re.sub(r"[\\\\\?:<>\*\|\"]+", "", title)
     # limit length
     if len(title) > 80:
         title = title[:80].rstrip()
@@ -74,16 +76,18 @@ def note_to_filename(creation_iso: str, title: str) -> str:
 def write_note(outdir: Path, filename: str, tags: Optional[List[str]], creation_iso: str, modified_iso: Optional[str], body: str):
     path = outdir / filename
     with path.open("w", encoding="utf-8") as f:
-        # front matter
-        if tags:
-            f.write("tags:\n")
-            for t in tags:
-                f.write(f"- {t}\n")
+        # fenced YAML front matter for Obsidian compatibility
+        f.write("---\n")
+        # tags: ensure we write a list (empty list if None)
+        tag_list = tags or []
+        f.write("tags:\n")
+        for t in tag_list:
+            f.write(f"  - {t}\n")
         # dates
         f.write(f"date: {iso_to_ymd(creation_iso)}\n")
         if modified_iso:
             f.write(f"modified: {iso_to_ymd(modified_iso)}\n")
-        f.write("\n")
+        f.write("---\n\n")
         # body
         f.write(body.lstrip('\n'))
 
