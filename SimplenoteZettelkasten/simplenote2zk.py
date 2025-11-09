@@ -61,6 +61,12 @@ def sanitize_title(title: str) -> str:
     title = title.replace("/", "-")
     # remove characters typically disallowed in filenames: ?<>\\:*|"\n\r\t
     title = re.sub(r"[\\\\\?:<>\*\|\"]+", "", title)
+    # replace any remaining filesystem-unfriendly characters with hyphen
+    title = re.sub(r"[\x00-\x1f]+", "", title)
+    # collapse multiple spaces to single
+    title = re.sub(r" +", " ", title)
+    # remove leading/trailing dots and spaces that can be problematic on some filesystems
+    title = title.strip(" .")
     # limit length
     if len(title) > 80:
         title = title[:80].rstrip()
@@ -70,6 +76,9 @@ def sanitize_title(title: str) -> str:
 def note_to_filename(creation_iso: str, title: str) -> str:
     prefix = iso_to_datepart(creation_iso)
     safe = sanitize_title(title)
+    # if title ends up empty, fall back to a safe id fragment
+    if not safe:
+        safe = "untitled"
     return f"{prefix} {safe}.md"
 
 
