@@ -24,6 +24,10 @@
 6. End.
 
 
+
+- Front matter will be bound with `---` YAML Front matter like in Obsidian. Front matter `---` always starts on the first line of the file. Containing all converted meta values.
+- File names will have any special characters removed. Keep only `0-9a-zA-Z -` characters. Simply remove special characters.
+
 ## Front Matter
 
 Where:
