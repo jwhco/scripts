@@ -1,0 +1,19 @@
+{
+	"recommendations": [
+		"github.copilot",
+		"github.copilot-chat",
+		"github.vscode-pull-request-github",
+		"mark-wiemer.vscode-autohotkey-plus-plus",
+		"janisdd.vscode-edit-csv",
+		"ltex-plus.vscode-ltex-plus",
+		"ms-vscode.makefile-tools",
+		"ms-vscode-remote.remote-wsl",
+		"ms-toolsai.jupyter",
+		"ms-toolsai.jupyter-keymap",
+		"ms-toolsai.jupyter-renderers",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-python.vscode-python-envs",
+		"yzhang.markdown-all-in-one"
+	]
+}
