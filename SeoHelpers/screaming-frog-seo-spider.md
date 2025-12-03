@@ -18,7 +18,7 @@ apt install ./screamingfrogspider_*_.deb
 
 ```base
 cd $WORKINGDIR/domain.tld/
-screamingfrogseospider --crawl https://www.jwhco.com/ --headless --save-crawl
+screamingfrogseospider --crawl https://www.jwhco.com/ --headless
 ```
 
 ## Use Case
