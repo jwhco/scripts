@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "github.copilot-chat",
+    "github.vscode-pull-request-github",
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "ms-python.debugpy",
+    "ms-python.vscode-python-envs",
+    "ms-vscode.makefile-tools",
+    "yzhang.markdown-all-in-one"
+  ]
+}
