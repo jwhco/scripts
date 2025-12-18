@@ -1,6 +1,5 @@
 {
 	"recommendations": [
-		"github.copilot",
 		"github.copilot-chat",
 		"github.vscode-pull-request-github",
 		"mark-wiemer.vscode-autohotkey-plus-plus",
