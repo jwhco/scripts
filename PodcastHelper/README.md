@@ -1,5 +1,13 @@
-# Podcast Helper
+---
+tags:
+- podcast-syndication
+- podcast-publishing
+date: 2025-12-23
+author: Justin Hitt
+status: S1-Draft
+---
 
+# Podcast Helper
 
 ## Purpose
 
@@ -10,8 +18,8 @@
 
 ## Files
 
-- `Requirements.md` a list of requirements and examples.
-- `Makefile` use `make` to improve file efficiency.
+- `Requirements.md` is a list of requirements and examples.
+- `Makefile` uses `make` to improve file efficiency.
 
 
 > Copyright 2025 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=jwhco-scripts-readme) All rights reserved.
