@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+#
+# Find similar files in a directory tree
+# and group them by their normalized names. 
+#
+
 import re
 import sys
 from pathlib import Path
