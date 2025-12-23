@@ -5,15 +5,24 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 
+ZETTEL_RE = re.compile(r'^(\d{12})[\s_-]+(.+)$')
+
 def normalize(name: str) -> str:
     stem, dot, ext = name.lower().rpartition(".")
     if not dot:
         return ""
 
-    # Remove leading numbers and separators
-    stem = re.sub(r'^[\d\W_]+', '', stem)
+    zettel_match = ZETTEL_RE.match(stem)
 
-    # Normalize separators to spaces
+    if zettel_match:
+        # Preserve full Zettelkasten key
+        zettel_id, rest = zettel_match.groups()
+        stem = f"{zettel_id} {rest}"
+    else:
+        # Remove non-zettel numeric prefixes
+        stem = re.sub(r'^[\d\W_]+', '', stem)
+
+    # Normalize separators
     stem = re.sub(r'[\s\-_]+', ' ', stem)
 
     # Remove remaining punctuation
@@ -39,4 +48,3 @@ def main(root="."):
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else "."
     main(root)
-
