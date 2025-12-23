@@ -31,11 +31,12 @@ Steps:
 - Give priority to files that are in right directory structure.
 - Script doesn't modify anything. Check your work before commit.
 - The "running on one machine, fixing on another" is for quality.
-
+- Use text formatting if necessary, clean up resuling file.
 
 ## Requirements
 
 - Ignore all `.obsidian*` configuration directories.
 - Ignore similar names with different zettelkasten keys.
+- Ignore similar names in `.trash` folder.
 
 /EOF/
