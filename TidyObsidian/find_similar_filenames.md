@@ -35,9 +35,9 @@ Steps:
 
 ## Requirements
 
-- Ignore all `.obsidian*` configuration directories. May want to ignore all hidden folders.
-- Ignore similar names with different zettelkasten keys. It is possible the text phrase after a zettelkasten key is the same because it is the same set project. Contents will be different.
-- Ignore similar names in `.trash` folder. These files are the result of merges already complete. Safe to ignore.
-- Allow name match when high similar but different extension. This will catch images in multiple formats as well as {.txt,.md,.html} pairs.
+- [x] Ignore all `.obsidian*` configuration directories. May want to ignore all hidden folders.
+- [ ]  Ignore similar names with different zettelkasten keys. It is possible the text phrase after a zettelkasten key is the same because it is the same set project. Contents will be different.
+- [x] Ignore similar names in `.trash` folder. These files are the result of merges already complete. Safe to ignore.
+- [ ] Allow name match when high similar but different extension. This will catch images in multiple formats as well as {.txt,.md,.html} pairs.
 
 /EOF/

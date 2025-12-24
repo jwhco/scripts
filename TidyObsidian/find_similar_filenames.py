@@ -12,6 +12,9 @@ from collections import defaultdict
 
 ZETTEL_RE = re.compile(r'^(\d{12})[\s_-]+(.+)$')
 
+def is_in_hidden_dir(path: Path) -> bool:
+    return any(part.startswith(".") for part in path.parts)
+
 def normalize(name: str) -> str:
     stem, dot, ext = name.lower().rpartition(".")
     if not dot:
@@ -39,6 +42,8 @@ def main(root="."):
     groups = defaultdict(list)
 
     for path in Path(root).rglob("*"):
+        if is_in_hidden_dir(path):
+            continue
         if path.is_file():
             key = normalize(path.name)
             if key:
