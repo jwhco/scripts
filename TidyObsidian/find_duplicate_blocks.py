@@ -2,84 +2,111 @@
 """
 Find duplicate or near-duplicate blocks of text in Markdown files within a Git repo.
 
-Features:
-- Shows progress while scanning files.
-- Only reports duplicates across different files.
-- Completely ignores YAML front matter (--- ... ---).
-- Ignores subheadings (##, ###).
-- Configurable block size and similarity threshold.
+Optimized version:
+- Hashes whole files first to avoid expensive block comparisons.
+- Groups identical files and reports them immediately.
+- Only performs block-level duplicate detection on non-identical files.
 """
 
 import subprocess
 import sys
 import difflib
+import hashlib
 from collections import defaultdict
 
 # ---------------- CONFIGURATION ----------------
-BLOCK_SIZE = 3        # Number of consecutive lines to treat as a block
-SIMILARITY_THRESHOLD = 0.9  # 1.0 = exact match, 0.9 = near match
+BLOCK_SIZE = 3
+SIMILARITY_THRESHOLD = 0.9
 # ------------------------------------------------
 
 def get_markdown_files():
-    """Get a list of tracked Markdown files in the Git repo."""
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.md", "*.markdown"],
             capture_output=True, text=True, check=True
         )
-        files = [f.strip() for f in result.stdout.splitlines() if f.strip()]
-        return files
+        return [f.strip() for f in result.stdout.splitlines() if f.strip()]
     except subprocess.CalledProcessError:
         print("Error: Not a Git repository or Git command failed.")
         sys.exit(1)
 
 def strip_yaml_front_matter(lines):
-    """
-    Remove YAML front matter if present at the start of the file.
-    YAML front matter starts with '---' on the first line and ends with '---'.
-    """
     if lines and lines[0].strip() == "---":
         for idx in range(1, len(lines)):
             if lines[idx].strip() == "---":
-                return lines[idx + 1:]  # return everything after closing ---
-        # If no closing marker found, skip entire file content
+                return lines[idx + 1:]
         return []
     return lines
 
 def filter_lines(lines):
-    """Remove empty lines, YAML front matter, and subheadings."""
     lines = strip_yaml_front_matter(lines)
     filtered = []
     for line in lines:
         stripped = line.strip()
         if not stripped:
-            continue  # skip empty lines
-        if stripped.startswith("##"):  # skip subheadings (##, ###, etc.)
+            continue
+        if stripped.startswith("##"):
             continue
         filtered.append(stripped)
     return filtered
 
-def read_blocks(file_path, block_size):
-    """Yield (block_text, start_line) tuples from a file."""
-    blocks = []
+def read_filtered_file(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            raw_lines = f.readlines()
-        lines = filter_lines(raw_lines)
-        for i in range(len(lines) - block_size + 1):
-            block = "\n".join(lines[i:i + block_size])
-            blocks.append((block, i + 1))
-    except (OSError, UnicodeDecodeError) as e:
+            raw = f.readlines()
+        return filter_lines(raw)
+    except Exception as e:
         print(f"Warning: Could not read {file_path}: {e}")
+        return []
+
+def hash_file(lines):
+    """Hash the entire filtered file content."""
+    joined = "\n".join(lines)
+    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
+
+def read_blocks(lines, block_size):
+    blocks = []
+    for i in range(len(lines) - block_size + 1):
+        block = "\n".join(lines[i:i + block_size])
+        blocks.append((block, i + 1))
     return blocks
 
 def find_duplicates(files, block_size, similarity_threshold):
-    """Find duplicate or near-duplicate blocks across different files."""
-    seen_blocks = defaultdict(list)  # block_text -> list of (file, line)
+    print("Hashing files to detect whole-file duplicates...\n")
 
-    for idx, file in enumerate(files, start=1):
-        print(f"[{idx}/{len(files)}] Scanning {file}...")
-        for block, line_num in read_blocks(file, block_size):
+    file_contents = {}
+    file_hashes = defaultdict(list)
+
+    # Step 1: Read + hash files
+    for f in files:
+        lines = read_filtered_file(f)
+        file_contents[f] = lines
+        h = hash_file(lines)
+        file_hashes[h].append(f)
+
+    # Step 2: Report whole-file duplicates
+    whole_file_dupes = {h: flist for h, flist in file_hashes.items() if len(flist) > 1}
+
+    if whole_file_dupes:
+        print("=== Whole-file duplicates detected ===")
+        for h, flist in whole_file_dupes.items():
+            print("\nGroup:")
+            for f in flist:
+                print(f"  {f}")
+        print("\nSkipping block-level scanning for these identical files.\n")
+
+    # Step 3: Only scan unique files
+    unique_files = [f for h, flist in file_hashes.items() if len(flist) == 1 for f in flist]
+
+    print(f"Proceeding with block-level scanning on {len(unique_files)} unique files...\n")
+
+    seen_blocks = defaultdict(list)
+
+    for idx, file in enumerate(unique_files, start=1):
+        print(f"[{idx}/{len(unique_files)}] Scanning {file}...")
+        blocks = read_blocks(file_contents[file], block_size)
+
+        for block, line_num in blocks:
             found_match = False
             for existing_block in seen_blocks.keys():
                 ratio = difflib.SequenceMatcher(None, block, existing_block).ratio()
@@ -90,14 +117,14 @@ def find_duplicates(files, block_size, similarity_threshold):
             if not found_match:
                 seen_blocks[block].append((file, line_num))
 
-    # Keep only blocks that appear in more than one file
+    # Step 4: Keep only blocks appearing in >1 file
     duplicates = []
     for block, locations in seen_blocks.items():
         unique_files = {f for f, _ in locations}
         if len(unique_files) > 1:
             duplicates.append((block, locations))
 
-    return duplicates
+    return whole_file_dupes, duplicates
 
 def main():
     files = get_markdown_files()
@@ -105,16 +132,20 @@ def main():
         print("No Markdown files found in this Git repository.")
         return
 
-    print(f"Scanning {len(files)} Markdown files for duplicate blocks...\n")
-    duplicates = find_duplicates(files, BLOCK_SIZE, SIMILARITY_THRESHOLD)
+    print(f"Scanning {len(files)} Markdown files...\n")
+    whole_file_dupes, block_dupes = find_duplicates(files, BLOCK_SIZE, SIMILARITY_THRESHOLD)
 
-    print("\n--- Scan Complete ---")
-    if not duplicates:
-        print("No duplicate blocks found across different files.")
+    print("\n--- Scan Complete ---\n")
+
+    if not whole_file_dupes:
+        print("No whole-file duplicates found.\n")
+
+    if not block_dupes:
+        print("No duplicate/near-duplicate blocks found across different files.")
         return
 
-    print(f"Found {len(duplicates)} duplicate/near-duplicate blocks across files:\n")
-    for idx, (block, locations) in enumerate(duplicates, start=1):
+    print(f"Found {len(block_dupes)} duplicate/near-duplicate blocks:\n")
+    for idx, (block, locations) in enumerate(block_dupes, start=1):
         print(f"--- Duplicate Block #{idx} ---")
         print(block)
         print("Locations:")
