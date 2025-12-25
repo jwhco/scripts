@@ -22,6 +22,7 @@
 - Use of parallel scanning with multiprocessing. For file reading, filtering, hashing, and block extraction.
 - Near-duplicate whole-file detection (e.g., 90% simliar entire files.) 
 - Token-based Jaccard similarity for fast near-duplicate detection. 
+- Reduce lines that include wikilink, option to ignore wikilink all together.
 
 ## Usuage
 

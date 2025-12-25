@@ -6,13 +6,15 @@ Features:
 - Whole-file hashing to skip redundant block comparisons.
 - Multiprocessing for file reading/filtering/hashing and block extraction.
 - Token-based Jaccard similarity for fast near-duplicate detection.
-- Inverted index on "signature tokens" to aggressively prune comparisons.
+- Inverted index on signature tokens to aggressively prune comparisons.
+- Optional --ignore-wikilink flag to strip wikilinks and drop low-value lines.
 """
 
 import subprocess
 import sys
 import hashlib
 import re
+import argparse
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 
@@ -21,10 +23,15 @@ BLOCK_SIZE = 3                  # lines per block
 SIMILARITY_THRESHOLD = 0.9      # Jaccard token similarity
 SIGNATURE_TOKENS_PER_BLOCK = 5  # how many tokens to index per block
 LENGTH_RATIO_TOLERANCE = 0.3    # +/- 30% length window for candidates
+LOW_VALUE_LINE_THRESHOLD = 20   # drop lines shorter than this after wikilink removal
 # ------------------------------------------------
 
 WORD_RE = re.compile(r"\w+")
+WIKILINK_RE = re.compile(r"\[\[.*?\]\]")
 
+def remove_wikilinks(text):
+    """Remove any [[wikilink]] from a line but keep the rest."""
+    return WIKILINK_RE.sub("", text)
 
 def get_markdown_files():
     try:
@@ -49,16 +56,27 @@ def strip_yaml_front_matter(lines):
     return lines
 
 
-def filter_lines(lines):
+def filter_lines(lines, ignore_wikilink=False):
+    """Filter lines: remove YAML, headings, wikilinks, and low-value lines."""
     lines = strip_yaml_front_matter(lines)
     filtered = []
+
     for line in lines:
         stripped = line.strip()
         if not stripped:
             continue
         if stripped.startswith("##"):
             continue
+
+        if ignore_wikilink:
+            stripped = remove_wikilinks(stripped).strip()
+            if not stripped:
+                continue
+            if len(stripped) < LOW_VALUE_LINE_THRESHOLD:
+                continue
+
         filtered.append(stripped)
+
     return filtered
 
 
@@ -77,12 +95,13 @@ def jaccard(tokens_a, tokens_b):
     return inter / union
 
 
-def read_and_hash_file(file_path):
+def read_and_hash_file(args):
     """Read file, filter it, and return (file_path, filtered_lines, sha256_hash)."""
+    file_path, ignore_wikilink = args
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             raw = f.readlines()
-        lines = filter_lines(raw)
+        lines = filter_lines(raw, ignore_wikilink)
         joined = "\n".join(lines)
         h = hashlib.sha256(joined.encode("utf-8")).hexdigest()
         return (file_path, lines, h)
@@ -102,10 +121,7 @@ def extract_blocks(args):
 
 
 def effective_cpu_count():
-    """
-    Try to respect cgroup CPU quota (Kubernetes) if present.
-    Fallback to os cpu_count().
-    """
+    """Respect Kubernetes CPU quota if present."""
     try:
         quota_path = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
         period_path = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
@@ -120,14 +136,14 @@ def effective_cpu_count():
     return cpu_count()
 
 
-def find_duplicates(files, block_size, similarity_threshold):
+def find_duplicates(files, block_size, similarity_threshold, ignore_wikilink=False):
     worker_count = effective_cpu_count()
     print(f"Using up to {worker_count} CPU workers for parallel scanning...\n")
 
     # Step 1: Parallel read + filter + hash
     print("Hashing files in parallel...")
     with Pool(processes=worker_count) as pool:
-        results = pool.map(read_and_hash_file, files)
+        results = pool.map(read_and_hash_file, [(f, ignore_wikilink) for f in files])
 
     file_contents = {f: lines for f, lines, h in results}
     file_hashes = defaultdict(list)
@@ -159,16 +175,10 @@ def find_duplicates(files, block_size, similarity_threshold):
     print(f"Collected {len(all_blocks)} blocks from unique files.\n")
 
     # Step 5: Aggressive, indexed block-level duplicate detection
-
-    # Canonical blocks: each entry is a dict with:
-    #   "text", "tokens", "length", "locations" (list of (file, line))
     canonical_blocks = []
-
-    # token -> set(canonical_block_index)
     token_index = defaultdict(set)
 
     def select_signature_tokens(tokens):
-        """Choose a stable small subset of tokens to index per block."""
         if not tokens:
             return []
         sorted_tokens = sorted(tokens)
@@ -180,15 +190,10 @@ def find_duplicates(files, block_size, similarity_threshold):
 
         sig_tokens = select_signature_tokens(tokens)
         if not sig_tokens:
-            # No meaningful tokens; just create its own canonical block
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {
-                    "text": block_text,
-                    "tokens": tokens,
-                    "length": length,
-                    "locations": [(file_path, line_num)],
-                }
+                {"text": block_text, "tokens": tokens, "length": length,
+                 "locations": [(file_path, line_num)]}
             )
             continue
 
@@ -199,9 +204,7 @@ def find_duplicates(files, block_size, similarity_threshold):
         matched = False
         for idx in candidate_indices:
             cb = canonical_blocks[idx]
-            # Fast length filter
-            if cb["length"] == 0 or length == 0:
-                continue
+
             shorter = min(cb["length"], length)
             longer = max(cb["length"], length)
             if longer == 0:
@@ -216,17 +219,11 @@ def find_duplicates(files, block_size, similarity_threshold):
                 break
 
         if not matched:
-            # New canonical block
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {
-                    "text": block_text,
-                    "tokens": tokens,
-                    "length": length,
-                    "locations": [(file_path, line_num)],
-                }
+                {"text": block_text, "tokens": tokens, "length": length,
+                 "locations": [(file_path, line_num)]}
             )
-            # Index by signature tokens
             for t in sig_tokens:
                 token_index[t].add(cb_idx)
 
@@ -241,6 +238,14 @@ def find_duplicates(files, block_size, similarity_threshold):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--ignore-wikilink",
+        action="store_true",
+        help="Strip wikilinks [[...]] and drop low-value lines (<20 chars)",
+    )
+    args = parser.parse_args()
+
     files = get_markdown_files()
     if not files:
         print("No Markdown files found in this Git repository.")
@@ -248,7 +253,7 @@ def main():
 
     print(f"Scanning {len(files)} Markdown files...\n")
     whole_file_dupes, block_dupes = find_duplicates(
-        files, BLOCK_SIZE, SIMILARITY_THRESHOLD
+        files, BLOCK_SIZE, SIMILARITY_THRESHOLD, ignore_wikilink=args.ignore_wikilink
     )
 
     print("\n--- Scan Complete ---\n")
