@@ -4,6 +4,7 @@
 
 - Sus out blocks of duplicate text across an entire directory tree. 
 - Script works very well with any directory full of Markdown. Any file based note-taking.
+- Find thin content. Files that are pretty much empty will show up as dupliate.
 
 ## Issues
 
