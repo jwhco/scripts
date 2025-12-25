@@ -23,11 +23,21 @@
 - Near-duplicate whole-file detection (e.g., 90% simliar entire files.) 
 - Token-based Jaccard similarity for fast near-duplicate detection. 
 - Reduce lines that include wikilink, option to ignore wikilink all together.
+- A `--limit-results <n>` option, list "whole-file duplicates" then quite after result count. This way I'm comparing flew blocks. Have a default being all blocks, with limis being {500, 1K, 10K, 1M} type format.
+  - The rational is you've got to fix what it finds. So if the script runs, finds the first 100, then you can fix the first 100 and run it again. Not wait for it to run 78K hashes.
+  - It still may need to hash the entire site before it does a certain number of checks. Limit the length of results presented because the represents work to do.
 
 ## Usuage
 
+Go to working directlry. Call script by full path.
+
+```bash
+python3 find_duplicate_blocks.py --ignore-wikilink --ignore-short-lines 20
+```
+
+Wait for report. Script will use as much processor as possible to finish quickly.
+
 - When a duplicate is found, search for it globally in your note-taking applications. Address on case-by-case basis.
 - Understand it is possible there are false positive matches. Unable to avoid when working with large files.
-
 
 /EOF/

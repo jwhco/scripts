@@ -56,8 +56,7 @@ def strip_yaml_front_matter(lines):
     return lines
 
 
-def filter_lines(lines, ignore_wikilink=False):
-    """Filter lines: remove YAML, headings, wikilinks, and low-value lines."""
+def filter_lines(lines, ignore_wikilink=False, short_line_threshold=20):
     lines = strip_yaml_front_matter(lines)
     filtered = []
 
@@ -68,12 +67,13 @@ def filter_lines(lines, ignore_wikilink=False):
         if stripped.startswith("##"):
             continue
 
+        # Remove wikilinks if enabled
         if ignore_wikilink:
             stripped = remove_wikilinks(stripped).strip()
-            if not stripped:
-                continue
-            if len(stripped) < LOW_VALUE_LINE_THRESHOLD:
-                continue
+
+        # Drop low-value lines (unified rule)
+        if len(stripped) < short_line_threshold:
+            continue
 
         filtered.append(stripped)
 
@@ -136,7 +136,13 @@ def effective_cpu_count():
     return cpu_count()
 
 
-def find_duplicates(files, block_size, similarity_threshold, ignore_wikilink=False):
+def find_duplicates(
+    files,
+    block_size,
+    similarity_threshold,
+    ignore_wikilink=False,
+    short_line_threshold=20,
+):
     worker_count = effective_cpu_count()
     print(f"Using up to {worker_count} CPU workers for parallel scanning...\n")
 
@@ -240,6 +246,12 @@ def find_duplicates(files, block_size, similarity_threshold, ignore_wikilink=Fal
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+    "--ignore-short-lines",
+    type=int,
+    default=20,
+    help="Ignore any line shorter than N characters after processing (default: 20)",
+    )
+    parser.add_argument(
         "--ignore-wikilink",
         action="store_true",
         help="Strip wikilinks [[...]] and drop low-value lines (<20 chars)",
@@ -253,8 +265,13 @@ def main():
 
     print(f"Scanning {len(files)} Markdown files...\n")
     whole_file_dupes, block_dupes = find_duplicates(
-        files, BLOCK_SIZE, SIMILARITY_THRESHOLD, ignore_wikilink=args.ignore_wikilink
+        files,
+        BLOCK_SIZE,
+        SIMILARITY_THRESHOLD,
+        ignore_wikilink=args.ignore_wikilink,
+        short_line_threshold=args.ignore_short_lines,
     )
+
 
     print("\n--- Scan Complete ---\n")
 
