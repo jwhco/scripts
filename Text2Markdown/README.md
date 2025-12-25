@@ -12,7 +12,10 @@ workflow: Approved
 
 ## Summary
 
-This project facilitiates the conversion of {.docx, .rtf, .odt, .txt, .doc} to Markdown for use in Machine Learning (ML) or knowledge management toolsl ike Obsidian. It converts binary into Markdown with YAML front matter.
+- This project facilitiates the conversion of {.docx, .rtf, .odt, .txt, .doc} to Markdown.
+- For use in Machine Learning (ML) or knowledge management toolsl ike Obsidian. 
+- It converts binary into Markdown with YAML front matter.
+- Scripts in this directory are supportive of converting from one note-taking platform to another.
 
 ## Process
 
@@ -49,8 +52,6 @@ Use instructions in `Text2Markdown` documentation. Migration isn't perfect, but 
 - If you see a bug or problem, Open an Issue.
 
 - If you like the work, Star to show support.
-  
-  
 
 After 100 watching, I'll spin it off as a Toolkit. That means it's own repository, a development plan, and scripts to install as standalone product.  Paypal email is paypal(at)jwhco.com -- Any support goes towards GitHub subscription and future releases. 
 
