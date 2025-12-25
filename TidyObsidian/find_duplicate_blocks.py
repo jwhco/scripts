@@ -2,11 +2,10 @@
 """
 Find duplicate or near-duplicate blocks of text in Markdown files within a Git repo.
 
-Features:
-- Scans only tracked Markdown files in the current Git repository.
-- Configurable block size (number of consecutive lines).
-- Detects exact and near-duplicate blocks using similarity ratio.
-- Ignores empty lines and trims whitespace.
+Changes from previous version:
+- Shows progress while scanning files.
+- Only reports duplicates that occur in more than one file.
+- Still supports configurable block size and similarity threshold.
 """
 
 import subprocess
@@ -47,11 +46,11 @@ def read_blocks(file_path, block_size):
     return blocks
 
 def find_duplicates(files, block_size, similarity_threshold):
-    """Find duplicate or near-duplicate blocks."""
+    """Find duplicate or near-duplicate blocks across different files."""
     seen_blocks = defaultdict(list)  # block_text -> list of (file, line)
-    duplicates = []
 
-    for file in files:
+    for idx, file in enumerate(files, start=1):
+        print(f"[{idx}/{len(files)}] Scanning {file}...")
         for block, line_num in read_blocks(file, block_size):
             found_match = False
             for existing_block in seen_blocks.keys():
@@ -63,9 +62,11 @@ def find_duplicates(files, block_size, similarity_threshold):
             if not found_match:
                 seen_blocks[block].append((file, line_num))
 
-    # Collect only blocks that appear more than once
+    # Keep only blocks that appear in more than one file
+    duplicates = []
     for block, locations in seen_blocks.items():
-        if len(locations) > 1:
+        unique_files = {f for f, _ in locations}
+        if len(unique_files) > 1:
             duplicates.append((block, locations))
 
     return duplicates
@@ -76,13 +77,15 @@ def main():
         print("No Markdown files found in this Git repository.")
         return
 
+    print(f"Scanning {len(files)} Markdown files for duplicate blocks...\n")
     duplicates = find_duplicates(files, BLOCK_SIZE, SIMILARITY_THRESHOLD)
 
+    print("\n--- Scan Complete ---")
     if not duplicates:
-        print("No duplicate blocks found.")
+        print("No duplicate blocks found across different files.")
         return
 
-    print(f"Found {len(duplicates)} duplicate/near-duplicate blocks:\n")
+    print(f"Found {len(duplicates)} duplicate/near-duplicate blocks across files:\n")
     for idx, (block, locations) in enumerate(duplicates, start=1):
         print(f"--- Duplicate Block #{idx} ---")
         print(block)
