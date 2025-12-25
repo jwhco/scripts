@@ -2,14 +2,15 @@
 """
 Find duplicate or near-duplicate blocks of text in Markdown files within a Git repo.
 
-Changes from previous version:
+Features:
 - Shows progress while scanning files.
-- Only reports duplicates that occur in more than one file.
-- Still supports configurable block size and similarity threshold.
+- Only reports duplicates across different files.
+- Completely ignores YAML front matter (--- ... ---).
+- Ignores subheadings (##, ###).
+- Configurable block size and similarity threshold.
 """
 
 import subprocess
-import os
 import sys
 import difflib
 from collections import defaultdict
@@ -32,12 +33,39 @@ def get_markdown_files():
         print("Error: Not a Git repository or Git command failed.")
         sys.exit(1)
 
+def strip_yaml_front_matter(lines):
+    """
+    Remove YAML front matter if present at the start of the file.
+    YAML front matter starts with '---' on the first line and ends with '---'.
+    """
+    if lines and lines[0].strip() == "---":
+        for idx in range(1, len(lines)):
+            if lines[idx].strip() == "---":
+                return lines[idx + 1:]  # return everything after closing ---
+        # If no closing marker found, skip entire file content
+        return []
+    return lines
+
+def filter_lines(lines):
+    """Remove empty lines, YAML front matter, and subheadings."""
+    lines = strip_yaml_front_matter(lines)
+    filtered = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue  # skip empty lines
+        if stripped.startswith("##"):  # skip subheadings (##, ###, etc.)
+            continue
+        filtered.append(stripped)
+    return filtered
+
 def read_blocks(file_path, block_size):
     """Yield (block_text, start_line) tuples from a file."""
     blocks = []
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            lines = [line.strip() for line in f if line.strip()]  # remove empty lines
+            raw_lines = f.readlines()
+        lines = filter_lines(raw_lines)
         for i in range(len(lines) - block_size + 1):
             block = "\n".join(lines[i:i + block_size])
             blocks.append((block, i + 1))
