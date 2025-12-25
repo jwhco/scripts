@@ -19,8 +19,9 @@
 - Report of possible duplicate files, or percent duplicate. Report with "=== Similar files: %% match ===" then list of markdown files. That's enough for an operator to search on strings to find files.
 - Ignores headers `##` and `##` because those are likely to be similar in note-taking templates. 
 - Completely ignore YAML front matter materials. Metadata contained is highly likely to be duplicate across many files.
-- Use of parallel scanning with multiprocessing. 
+- Use of parallel scanning with multiprocessing. For file reading, filtering, hashing, and block extraction.
 - Near-duplicate whole-file detection (e.g., 90% simliar entire files.) 
+- Token-based Jaccard similarity for fast near-duplicate detection. 
 
 ## Usuage
 
