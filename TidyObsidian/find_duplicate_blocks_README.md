@@ -12,6 +12,11 @@
 - It's hard to tell if the script is running. Using a debugger it is running, however, there are no command line indicators that something started or is happening.
 - Script grinds out a lot of CPU and memory. Need a more incremental way of processing. Maybe read blocks into blocks on disk, then come back and compare. There are 38K files in this Obsidian vault. That's too many.
 - Make more command line friendly. Return any non-zero number of duplicate blocks. Have a `--silent` mode which writes the output to a local file in the root directory.
+- It looks like the script does scanning, then checking, and only shows output after all the blocks are checked. It needs to show output as it is checking.
+  -  For later to add a limit in the number of finds, the reporting of finds needs to be done as the checks go on.
+  - Don't wait till the scanning is done to start showing some results.
+- The checking of files seems to be in parallel, however, the block checking is not in parallel or using multiple processors.
+  - Check larger blocks of hash. Check four or eight at a time. Sort through everything to check fasster.
 
 
 ## Requirements
