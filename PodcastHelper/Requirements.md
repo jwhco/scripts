@@ -2,20 +2,47 @@
 tags:
 - podcast-syndication
 - podcast-publishing
+- youtube-publishing
+- podcast-content
+- business-requirements
 date: 2025-12-23
+title: "YouTube Podcast Helper"
+manager: Justin Hitt
 author: Justin Hitt
-status: S1-Draft
+status: S2-Review
 ---
 
-# YouTube Podcast Helper
 
-## Tools
+# Business Requirements Document (BRD) for YouTube Podcast Helper
 
-- Make
-- Python3
-- ffmpeg
+## Summary
+
+Support the finding and selection of YouTube content from media source directory. 
+
+Speed up the upload (via third-party) of podcast duration media while maintaining metadata for tracking progress.
+
+Make it easier to publish all relevant media and handling large files associated with podcast.
+
+## Objectives
+
+- Find podcast duration files, flag them with sidecar, then be able to export them to media for uploading.
+- Once uploaded to YouTube use sidecar to track permalink to later use for AI description generation.
+- Feed published videos to Fabric for description, meta, and social media generation. Thumbnail description.
+
+## Scope
+
+- Focus on "from laptop to published" workflow. Get initial ingested content ready to upload then create metadata.
+- Don't create final descriptions. Only background necessary to write descriptions. Use Obsidian for final.
+- Try to speed up process, gathering as much support details as possible with some search optimization.
+- Use AI to extract transcripts, write summaries, and initial social posts. Enough to manully finalize.
+- For every podcast, have five clips, ten social media, and two thumbnails. Have the script do the majority of the heavy lifting.
+- In the case of select podcasts, convert video to audio based on the sidecar designation. Use sidecar as configuration.
+
 
 ## Requirements
+
+
+- Use different scripts so steps can be taken manually. Each script has a specific single purpose. All scripts read-write the sidecar following the same specifications.
 
 - Scripts run under Make. This way, if sidecar or files exist, the work will be skipped.
 - Video content recorded on Google Pixel 7a, stored in REPO by Adobe Bridge,
@@ -33,60 +60,20 @@ status: S1-Draft
   - Be able to rebuild the index with the sidecar files. Never modify the index manually; it's a reference.
 - When editing the sidecar, use markdown to change out sections. For example, after a transcript is downloaded, it is put in the sidecar, or saved in a directory as `{BASENAME}_transcript.md`, then flagged as complete in the sidecar. 
 
-## Goals
+## Stakeholders
 
-- For every podcast, have five clips, ten social media, and two thumbnails. Have the script do the majority of the heavy lifting.
-- In the case of select podcasts, convert video to audio based on the sidecar designation. Use sidecar as configuration.
+- Subject-matter expert,
+- YouTube platform,
+- Channel manager,
+- Channel subscriber,
 
-## Steps
+## Constraints
 
-1. Find podcast-length media files,
-   1. Build a list in the media root,
-   2. Capture full relative path,
-2. Create a sidecar with YAML meta,
-   1. Meta includes creation date,
-   2. Includes duration,
-3. Place the sidecar next to the media,
-   1. Name sidecar basename `.md`
-4. END
+- Bulk uploads need to be done on-site with high upload speeds using external media.
+- Storage location for media is located on latop hosted on external drive. NAS would be better.
+- Need kubernetes cluster running Fabric deployment and recipies. Access for analysis. If Fabric is slow batching may not be an option.
+- Limited AI credits, while bulk finding of podcasts is good, processing by AI may need to be on a case by case basis. Limit initial inputs and outputs to single file.
+- Podcasts may be uploaded out of order, or get out of sync with supporting documents. Make sure side car include the basename of the media file.
 
-## Commands
-
-### Determine Duration of Mp4
-
-```bash
-ffprobe -i PXL_20250301_191304585.mp4 -show_format -v quiet | grep duration
-```
-
-- Extracts duration in seconds,
-- Works with `ffmpeg` installed,
-
-## Sidecar Example
-
-```markdown
----
-type: Sidecar
-date: {YYYY-MM-DD -- From date created.}
-created: {YYYY-MM-DD -- From source media.}
-published:
-updated:
-
-channel:
-catalog:
-duration: {Obtain with ffmpeg}
-
-media: {FILENAME}.mp4
----
-
-# Transcript
-
-# Summary
-
-```
-
-- Much of the front matter is borrowed from the `Podcast` template in Obsidian.
-
-
-/EOF/
 
 /EOF/
