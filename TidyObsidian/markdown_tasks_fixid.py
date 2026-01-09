@@ -27,10 +27,7 @@ def audit_file_for_ids(file_path):
     return found_ids
 
 def process_file(file_path, existing_ids, live=False):
-    """
-    Standardizes tasks and adds unique IDs. 
-    existing_ids is used to prevent duplicates.
-    """
+    """Standardizes tasks and adds unique IDs while preserving indentation."""
     task_pattern = re.compile(r'^(\s*-\s*\[ \]\s*)(.*)')
     meta_pattern = re.compile(r'\[(\w+)::\s*([^\]]+)\]')
     modified_count = 0
@@ -47,7 +44,6 @@ def process_file(file_path, existing_ids, live=False):
                 meta = {m[0]: m[1].strip() for m in meta_pattern.findall(body)}
                 
                 if 'id' not in meta:
-                    # Generate and register the new unique ID
                     new_id = generate_short_id(existing_ids)
                     meta['id'] = new_id
                     existing_ids.add(new_id) 
@@ -72,7 +68,7 @@ def process_file(file_path, existing_ids, live=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Renegade Task Manipulator: Unique ID Generator",
+        description="Renegade Task Manipulator: Unique ID Generator (Hidden Dir Aware)",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("dir", nargs="?", help="Vault directory")
@@ -86,29 +82,29 @@ def main():
     args = parser.parse_args()
     target_dir = args.dir if args.dir else "."
 
-    # 1. THE GLOBAL AUDIT (Scan all files for existing IDs)
-    print("--- Phase 1: Global ID Audit (Scanning all files) ---", file=sys.stderr)
+    # 1. THE GLOBAL AUDIT (Excluding hidden directories)
+    print("--- Phase 1: Global ID Audit (Ignoring hidden dirs) ---", file=sys.stderr)
     all_files = []
-    for root, _, fs in os.walk(target_dir):
+    for root, dirs, fs in os.walk(target_dir):
+        # Modify dirs in-place to ignore hidden directories (like .obsidian, .git, .logseq)
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        
         for f in fs:
             if f.endswith('.md'):
                 all_files.append(os.path.join(root, f))
     
+    print(f"Discovered {len(all_files)} markdown files.", file=sys.stderr)
+    
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         id_sets = pool.map(audit_file_for_ids, all_files)
     
-    # Flatten all found IDs into one master set
     master_id_registry = set().union(*id_sets)
     print(f"Audit Complete. {len(master_id_registry)} existing IDs registered.", file=sys.stderr)
 
-    # 2. SELECTION (Apply limit for modification phase)
+    # 2. SELECTION & MODIFICATION
     files_to_modify = all_files[:args.limit] if args.limit else all_files
     is_live = (args.fix_id == 'true')
 
-    # 3. THE MODIFICATION PHASE
-    # Note: We don't use multiprocessing for the write phase here because 
-    # generate_short_id needs to update the master_id_registry to prevent 
-    # two workers from picking the same new ID simultaneously.
     print(f"--- Phase 2: Processing {len(files_to_modify)} files ---", file=sys.stderr)
     
     total_modified = 0

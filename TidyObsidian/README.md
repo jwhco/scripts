@@ -16,7 +16,11 @@ workflow: Approved
 
 ## Overview
 
-My Obsidian vault lives in GitHub. When files are deleted, they stick around. GitHub lets me sync between devices. But Obsidian doesn't purge trash folders without a plug-in.
+- Over time large repositories of markdown files have problems. Especially those directories that represent note-taking applications.
+- Over time errors lead to automation and scripting in note-taking applications to not function well. Need to identify problems quickly.
+- Scripts are intended to work with Obsidian, Zettlr, and LogSeq repositories hosted on Github, or some other version control system.
+- Most of my heavy lifting is done in a Kubernetes environment. Use an Unix philosophy for scripts. Have filter or manipulation function not both.
+- If script can be ran in nightly batches, they can provide log file reports about what is automatically fixed. Autofix carefully.
 
 ## Tools
 
