@@ -5,16 +5,32 @@ import multiprocessing
 import uuid
 import sys
 
-def generate_short_id():
-    """Generates a unique 6-character ID."""
-    return uuid.uuid4().hex[:6]
+def generate_short_id(existing_ids):
+    """Generates a 6-char ID that is guaranteed not to be in existing_ids."""
+    while True:
+        new_id = uuid.uuid4().hex[:6]
+        if new_id not in existing_ids:
+            return new_id
 
-def process_file(file_path, live=False):
+def audit_file_for_ids(file_path):
+    """Fast scan of a file to extract all existing [id:: value] strings."""
+    found_ids = set()
+    id_pattern = re.compile(r'\[id::\s*([^\]]+)\]')
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            for line in f:
+                matches = id_pattern.findall(line)
+                for m in matches:
+                    found_ids.add(m.strip())
+    except Exception:
+        pass
+    return found_ids
+
+def process_file(file_path, existing_ids, live=False):
     """
-    Reads a file, identifies tasks missing IDs, and optionally fixes them.
-    Preserves exact indentation for outlines and nested lists.
+    Standardizes tasks and adds unique IDs. 
+    existing_ids is used to prevent duplicates.
     """
-    # Pattern captures: 1. Indentation/Marker, 2. The rest of the line
     task_pattern = re.compile(r'^(\s*-\s*\[ \]\s*)(.*)')
     meta_pattern = re.compile(r'\[(\w+)::\s*([^\]]+)\]')
     modified_count = 0
@@ -28,23 +44,21 @@ def process_file(file_path, live=False):
             match = task_pattern.match(line)
             if match:
                 indent, body = match.groups()
-                # Parse existing metadata into a dict
                 meta = {m[0]: m[1].strip() for m in meta_pattern.findall(body)}
                 
-                # Logic: If ID is missing, we create one and trigger standardization
                 if 'id' not in meta:
-                    meta['id'] = generate_short_id()
+                    # Generate and register the new unique ID
+                    new_id = generate_short_id(existing_ids)
+                    meta['id'] = new_id
+                    existing_ids.add(new_id) 
                     modified_count += 1
                     
-                    # Standardize: Extract pure description and append metadata to end
                     description = meta_pattern.sub('', body).strip()
                     meta_str = " ".join([f"[{k}:: {v}]" for k, v in meta.items()])
                     new_lines.append(f"{indent}{description} {meta_str}".rstrip() + "\n")
                 else:
-                    # If ID exists, we leave the line exactly as it was found
                     new_lines.append(line)
             else:
-                # Non-task lines remain untouched (preserves outlines/notes)
                 new_lines.append(line)
 
         if live and modified_count > 0:
@@ -52,65 +66,57 @@ def process_file(file_path, live=False):
                 f.writelines(new_lines)
                 
     except Exception as e:
-        # Standard error for issues so it doesn't pollute piped output
         print(f"Error processing {file_path}: {e}", file=sys.stderr)
         
     return modified_count
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Renegade Task Manipulator: Idempotently add IDs and standardize tasks.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Example Usage:
-  python markdown_tasks_fixid.py . --fix-id dry    # Scan and report potential changes
-  python markdown_tasks_fixid.py . --fix-id true   # EXECUTE: Modify files on disk
-  python markdown_tasks_fixid.py . --limit 10      # Test against a small subset of files
-        """
+        description="Renegade Task Manipulator: Unique ID Generator",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("dir", nargs="?", help="The directory/vault to process")
-    parser.add_argument("--fix-id", type=str, choices=['dry', 'true'], 
-                        help="Mode: 'dry' (report only) or 'true' (write to disk)")
-    parser.add_argument("--limit", type=int, help="Limit scanning to the first N files found")
+    parser.add_argument("dir", nargs="?", help="Vault directory")
+    parser.add_argument("--fix-id", type=str, choices=['dry', 'true'], help="Mode: dry or true")
+    parser.add_argument("--limit", type=int, help="Limit number of files modified")
 
-    # If no arguments are provided, print help and exit
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     args = parser.parse_args()
-    
-    # Validation: Ensure a directory was provided if we got past the help check
     target_dir = args.dir if args.dir else "."
 
-    # 1. Collect Files
-    files = []
+    # 1. THE GLOBAL AUDIT (Scan all files for existing IDs)
+    print("--- Phase 1: Global ID Audit (Scanning all files) ---", file=sys.stderr)
+    all_files = []
     for root, _, fs in os.walk(target_dir):
         for f in fs:
             if f.endswith('.md'):
-                files.append(os.path.join(root, f))
-                if args.limit and len(files) >= args.limit:
-                    break
-        if args.limit and len(files) >= args.limit:
-            break
-
-    if not files:
-        print("No markdown files found in the specified directory.", file=sys.stderr)
-        return
-
-    # 2. Execute with Multiprocessing
-    is_live = (args.fix_id == 'true')
-    print(f"--- Processing {len(files)} files ({'LIVE MODE' if is_live else 'DRY RUN'}) ---", file=sys.stderr)
+                all_files.append(os.path.join(root, f))
     
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-        counts = pool.starmap(process_file, [(f, is_live) for f in files])
-
-    total_modified = sum(counts)
+        id_sets = pool.map(audit_file_for_ids, all_files)
     
-    # 3. Final Report
+    # Flatten all found IDs into one master set
+    master_id_registry = set().union(*id_sets)
+    print(f"Audit Complete. {len(master_id_registry)} existing IDs registered.", file=sys.stderr)
+
+    # 2. SELECTION (Apply limit for modification phase)
+    files_to_modify = all_files[:args.limit] if args.limit else all_files
+    is_live = (args.fix_id == 'true')
+
+    # 3. THE MODIFICATION PHASE
+    # Note: We don't use multiprocessing for the write phase here because 
+    # generate_short_id needs to update the master_id_registry to prevent 
+    # two workers from picking the same new ID simultaneously.
+    print(f"--- Phase 2: Processing {len(files_to_modify)} files ---", file=sys.stderr)
+    
+    total_modified = 0
+    for f in files_to_modify:
+        total_modified += process_file(f, master_id_registry, is_live)
+
     status = "MODIFIED" if is_live else "WOULD REQUIRE FIX"
-    print(f"--- Task Summary ---", file=sys.stderr)
-    print(f"{status}: {total_modified} tasks.", file=sys.stderr)
+    print(f"--- Summary ---\n{status}: {total_modified} tasks.", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
