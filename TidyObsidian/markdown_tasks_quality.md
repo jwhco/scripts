@@ -7,6 +7,10 @@
 ## Automation
 
 - Find non-standard spacing. Look for Regex `-\t\[ \]` OR `-\s+\[\t\]` OR `- \[ \]\t` then replace with `- [ ] `, making standard format `- [ ] Description.`
-- Clean up odd spacing, okay to be done with multiple passes. Regex `-\s{2}\[ \]\s` OR `- \[ \]\s{2}` would become `- [ ] ` on replacement
+- Clean up odd spacing, okay to be done with multiple passes. Regex `-\s{2}\[ \]\s` OR `- \[ \]\s{2}` would become `- [ ] ` on replacement.
+
+## Requirements
+
+- When cleaning up a task, don't change layout. Don't change indentation, tab spacing in front of bullet list. The task could have sub-tasks for details in a list.
 
 /EOF/
