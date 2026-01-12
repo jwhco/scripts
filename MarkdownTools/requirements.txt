@@ -1,8 +1,2 @@
-# Requirements for scripts/extract_names_ner.py
-# Core Python library dependencies
+# extract_names_ner.py
 spacy>=3.5
-
-# Note: the English pipeline model is typically installed via spaCy's download command:
-#   python -m spacy download en_core_web_sm
-# If you prefer to install the model via pip, you can add a model wheel line here
-# (version-specific). The recommended approach is the download command above.

@@ -1,7 +1,12 @@
+# Git Ignore
 .ipynb_checkpoints
+
+# (Text2Markdown) Simplenote2Zettelkasten.py 
 */notes.zip
 */notes
 */notes_zk
+
+# (SeoHelper)
 *.deb
 
 # Python Virtual Environment
