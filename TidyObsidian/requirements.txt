@@ -1,3 +1,6 @@
-pandas
-multiprocessing
-argparse
+# Markdown Tasks Extraction
+pandas>=2.3.3
+multiprocessing>=2.6.2
+
+# Markdown Corkboard
+PySide6>=6.10.1
