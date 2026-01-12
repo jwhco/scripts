@@ -15,12 +15,17 @@ workflow: Approved
 
 # Useful Scripts and Tools
 
-## Index
+## Modules
 
-- Opml2RSSList. Dump an OPML file into an RSS feed.
-- SeoHelpers. Help with Search Engine Optimization (SEO).
-- Text2Markdown. Support migration into Obsidian.
-- TidyObsidian. Quality assurance scripts for Obsidian.
+- **Opml2RSSList**. Dump an OPML file into an RSS feed. Playlist migration.
+- **SeoHelpers**. Help with technical Search Engine Optimization (SEO).
+- **Text2Markdown**. Support migration to markdown from common formats and tools.
+- **TidyObsidian**. Quality assurance scripts for Obsidian, Zettlr, and LogSeq.
+- **MarkdownTools**. Data extraction from markdown files using text analysis.
+- **winAutomate**. Scripts to setup environment in Windows using one-click.
+- **WordPressOpt**. Reference and optimization concepts for WordPress hosting.
+
+As these tools mature, they may be forked off into standalone libraries and modules. Until then, each are managed here. When opening an issue, mention module in description.
 
 ## Overview
 
@@ -28,9 +33,10 @@ Subdirectories indicate automation scripts for Utilities. The goal is to make th
 
 ## Tools
 
-- [Python3](https://www.python.org/)
-- [Visual Studio Code](https://code.visualstudio.com/Download)
-- [Jupyter Notebook](https://jupyter.org/install)
+- [Python3](https://www.python.org/). Scripting language with access to NLP and ML.
+- [Visual Studio Code](https://code.visualstudio.com/Download). Primary editing environment.
+- [Jupyter Notebook](https://jupyter.org/install). Combining documentation with Python development.
+- [Canonical Kubernetes](https://ubuntu.com/kubernetes/). Containerized development environment.
 
 ## Organization
 
