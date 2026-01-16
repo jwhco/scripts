@@ -34,7 +34,9 @@ ffprobe -i PXL_20250301_191304585.mp4 -show_format -v quiet | grep duration
 
 ### Creation of Sidecar 
 
-- See [[Example_sidecar.md]] for details about sidecar.
+- See [[Example_sidecar.md]] for details about sidecar. It looks very much like a note for Obsidian or Zettlr.
 - Much of the front matter is borrowed from the `Podcast` template in Obsidian.
+- Don't put too much in this that is beyond describing the media file. If there is social content, headlines, or other materials, think about putting that in a different sidecar. 
+  - Don't clutter up the file. Make it easy to go from scanning of media to publishing of materials. Especially if {Social, Description, Featured Image, Metadata, Transcript} can be generated individually.
 
 /EOF/
