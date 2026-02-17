@@ -89,13 +89,13 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
     COMMON_MEDIA_EXTENSIONS = {'.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.mp3', '.wav', '.aac', '.flac', '.ogg', '.m4a'}
 
     # Initialize cached_files to avoid NameError
-    cached_files = set()
+    cached_files = {}
 
     # Load existing cache if not rebuilding
     if not rebuild_cache and index_file.exists():
         with index_file.open('r', newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            cached_files = {row['path'] for row in reader}
+            cached_files = {row['path']: row for row in reader}
 
     for root, dirs, files in os.walk(media_root):
         for fn in files:
@@ -128,16 +128,20 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
         if limit is not None and count >= limit:
             break
 
-    # write index CSV (overwrite unless append)
-    mode = 'a' if append and index_file.exists() else 'w'
-    with index_file.open(mode, newline='', encoding='utf-8') as f:
+    # Write new rows to a temporary file
+    tmp_index_file = index_file.with_suffix('.tmp')
+    with tmp_index_file.open('w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
-        if mode == 'w':
-            w.writerow(['path', 'minutes', 'sidecar'])
+        w.writerow(['path', 'minutes', 'sidecar'])  # Write header
+        for row in cached_files.values():
+            w.writerow([row['path'], row['minutes'], row['sidecar']])
         for r in rows:
             w.writerow(r)
 
-    print(f"Discovered {len(rows)} media files (index: {index_file})")
+    # Replace the original index file with the updated one
+    tmp_index_file.replace(index_file)
+
+    print(f"Discovered {len(rows)} new media files (index: {index_file})")
     return 0
 
 
