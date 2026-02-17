@@ -80,7 +80,7 @@ def write_sidecar(sidecar_path: Path, rel_media: str, duration: int):
     sidecar_path.write_text(header + body, encoding="utf-8")
 
 
-def discover(media_root: Path, min_duration: int, index_file: Path, append: bool = False, limit: Optional[int] = None):
+def discover(media_root: Path, min_duration: int, index_file: Path, append: bool = False, limit: Optional[int] = None, rebuild_cache: bool = False):
     rows = []
     media_root = media_root.resolve()
     count = 0  # Counter to track the number of processed files
@@ -88,12 +88,27 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
     # Define a set of common audio and video file extensions
     COMMON_MEDIA_EXTENSIONS = {'.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.mp3', '.wav', '.aac', '.flac', '.ogg', '.m4a'}
 
+    # Initialize cached_files to avoid NameError
+    cached_files = set()
+
+    # Load existing cache if not rebuilding
+    if not rebuild_cache and index_file.exists():
+        with index_file.open('r', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            cached_files = {row['path'] for row in reader}
+
     for root, dirs, files in os.walk(media_root):
         for fn in files:
             # Check if the file has a common media extension (case-insensitive)
             if not any(fn.lower().endswith(ext) for ext in COMMON_MEDIA_EXTENSIONS):
                 continue
             full = Path(root) / fn
+            rel = str(full.relative_to(media_root))
+
+            # Skip files already in the cache
+            if rel in cached_files:
+                continue
+
             try:
                 dur = ffprobe_duration(full)
             except RuntimeError as e:
@@ -102,7 +117,6 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
             if dur is None:
                 dur = 0
             if dur >= min_duration:
-                rel = str(full.relative_to(media_root))
                 sidecar = full.with_suffix('.md')
                 write_sidecar(sidecar, rel, dur)
                 rows.append((rel, str(dur), str(sidecar.relative_to(media_root))))
@@ -114,15 +128,12 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
         if limit is not None and count >= limit:
             break
 
-    # Update the index_file path to be in the root of the media folder
-    index_file = media_root / index_file.name
-
-    # Ensure the index file is written in the correct location
+    # write index CSV (overwrite unless append)
     mode = 'a' if append and index_file.exists() else 'w'
     with index_file.open(mode, newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         if mode == 'w':
-            w.writerow(['path', 'minutes', 'sidecar'])  # Updated column name from 'duration' to 'minutes'
+            w.writerow(['path', 'minutes', 'sidecar'])
         for r in rows:
             w.writerow(r)
 
@@ -184,6 +195,7 @@ def main():
     p.add_argument('--min-duration', type=int, default=600)
     p.add_argument('--index', default='index.csv')
     p.add_argument('--limit', type=int, help="Limit the number of media files to process")
+    p.add_argument('--rebuild-cache', action='store_true', help="Rebuild the cache and process all media files")
     args = p.parse_args()
 
     media_root = Path(args.media_root)
@@ -193,7 +205,7 @@ def main():
         print(f"Media root {media_root} does not exist")
         raise SystemExit(2)
 
-    raise SystemExit(discover(media_root, args.min_duration, index_file, limit=args.limit))
+    raise SystemExit(discover(media_root, args.min_duration, index_file, limit=args.limit, rebuild_cache=args.rebuild_cache))
 
 
 if __name__ == '__main__':
