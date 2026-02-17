@@ -18,8 +18,10 @@
 
 - (discovery.py) Find media eligible for podcast.
   - `discovery.py {MEDIA_SOURCE} {MINUTES}`
+  - Returns any media at this length or longer.
 - (export.py) Copy specific media to external disk.
   - `export.py {MEDIA_SOURCE} {DESTINATION_DIR}`
+  - (inventory.py) Use to determine, with insight from sidecar, what files are available. `inventory.py --catalog=A1234B` returns anything flagged for that catalog code, prints a list like `ls -l` to screen.
 
 ## Technical
 

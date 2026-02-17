@@ -1,0 +1,10 @@
+{
+	"environment": "WSL",
+	"mediaRoot": "/mnt/e/Media",
+	"obsidianRoot": "/mnt/c/Users/User/GitHub/obsidian",
+	"threads": 4,
+	"settings": {
+		"logLevel": "info",
+		"timeout": 30
+	}
+}
