@@ -80,9 +80,11 @@ def write_sidecar(sidecar_path: Path, rel_media: str, duration: int):
     sidecar_path.write_text(header + body, encoding="utf-8")
 
 
-def discover(media_root: Path, min_duration: int, index_file: Path, append: bool = False):
+def discover(media_root: Path, min_duration: int, index_file: Path, append: bool = False, limit: Optional[int] = None):
     rows = []
     media_root = media_root.resolve()
+    count = 0  # Counter to track the number of processed files
+
     for root, dirs, files in os.walk(media_root):
         for fn in files:
             if not fn.lower().endswith('.mp4'):
@@ -100,6 +102,13 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
                 sidecar = full.with_suffix('.md')
                 write_sidecar(sidecar, rel, dur)
                 rows.append((rel, str(dur), str(sidecar.relative_to(media_root))))
+
+                count += 1
+                if limit is not None and count >= limit:
+                    print(f"Limit of {limit} media files reached. Stopping discovery.")
+                    break
+        if limit is not None and count >= limit:
+            break
 
     # write index CSV (overwrite unless append)
     mode = 'a' if append and index_file.exists() else 'w'
@@ -167,6 +176,7 @@ def main():
     p.add_argument('--media-root', required=True)
     p.add_argument('--min-duration', type=int, default=600)
     p.add_argument('--index', default='index.csv')
+    p.add_argument('--limit', type=int, help="Limit the number of media files to process")
     args = p.parse_args()
 
     media_root = Path(args.media_root)
@@ -176,7 +186,7 @@ def main():
         print(f"Media root {media_root} does not exist")
         raise SystemExit(2)
 
-    raise SystemExit(discover(media_root, args.min_duration, index_file))
+    raise SystemExit(discover(media_root, args.min_duration, index_file, limit=args.limit))
 
 
 if __name__ == '__main__':
