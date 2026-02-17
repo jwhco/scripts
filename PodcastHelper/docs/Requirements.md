@@ -77,6 +77,7 @@ Make it easier to publish all relevant media and handling large files associated
 - Storage location for media is located on laptop hosted on external drive. NAS would be better.
 - Need Kubernetes cluster running Fabric deployment and recipes. Access for analysis. If Fabric is slow batching may not be an option.
 - Limited AI credits, while bulk finding of podcasts is good, processing by AI may need to be on a case by case basis. Limit initial inputs and outputs to single file.
+- All commands have a `--limit` option to quit after the first X changes. That way scripts can be tested faster, they won't run for hours, and less impact on resources. Works like SQL LIMIT option.
 - Podcasts may be uploaded out of order, or get out of sync with supporting documents. Make sure side-car include the base name of the media file.
 - Video files typically don't have EXIF specific data. Python can pull EXIF from images and audio, but something else will be needed for video. 
   - To reach from image and audion, use Python `Pillow` for EXIF data.

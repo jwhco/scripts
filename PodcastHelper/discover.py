@@ -14,6 +14,7 @@ import csv
 import os
 import shlex
 import subprocess
+from datetime import timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -72,7 +73,10 @@ def write_sidecar(sidecar_path: Path, rel_media: str, duration: int):
     else:
         body = ""
 
-    header = f"---\nfilename: \"{rel_media}\"\nduration: {duration}\n---\n\n"
+    # Convert duration to HH:mm:ss format
+    duration_human_readable = str(timedelta(seconds=duration))
+
+    header = f"---\nfilename: \"{rel_media}\"\nduration: {duration_human_readable}\n---\n\n"
     sidecar_path.write_text(header + body, encoding="utf-8")
 
 
