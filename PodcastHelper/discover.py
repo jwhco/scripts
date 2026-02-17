@@ -110,7 +110,10 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
         if limit is not None and count >= limit:
             break
 
-    # write index CSV (overwrite unless append)
+    # Update the index_file path to be in the root of the media folder
+    index_file = media_root / index_file.name
+
+    # Ensure the index file is written in the correct location
     mode = 'a' if append and index_file.exists() else 'w'
     with index_file.open(mode, newline='', encoding='utf-8') as f:
         w = csv.writer(f)
@@ -180,7 +183,7 @@ def main():
     args = p.parse_args()
 
     media_root = Path(args.media_root)
-    index_file = Path(args.index)
+    index_file = media_root / args.index  # Place index.csv in the media root
 
     if not media_root.exists():
         print(f"Media root {media_root} does not exist")
