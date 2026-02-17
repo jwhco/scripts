@@ -85,9 +85,13 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
     media_root = media_root.resolve()
     count = 0  # Counter to track the number of processed files
 
+    # Define a set of common audio and video file extensions
+    COMMON_MEDIA_EXTENSIONS = {'.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.mp3', '.wav', '.aac', '.flac', '.ogg', '.m4a'}
+
     for root, dirs, files in os.walk(media_root):
         for fn in files:
-            if not fn.lower().endswith('.mp4'):
+            # Check if the file has a common media extension (case-insensitive)
+            if not any(fn.lower().endswith(ext) for ext in COMMON_MEDIA_EXTENSIONS):
                 continue
             full = Path(root) / fn
             try:
@@ -131,8 +135,8 @@ def discover_file(file_path: Path, min_duration: int, index_file: Optional[Path]
     if not full.exists():
         print(f"File not found: {full}")
         return 2
-    if not full.suffix.lower() == '.mp4':
-        print(f"Skipping non-mp4 file: {full}")
+    if not any(full.suffix.lower() == ext for ext in COMMON_MEDIA_EXTENSIONS):
+        print(f"Skipping non-media file: {full}")
         return 3
     try:
         dur = ffprobe_duration(full)
