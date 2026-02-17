@@ -2,6 +2,7 @@
 	"environment": "WSL",
 	"mediaRoot": "/mnt/e/Media",
 	"obsidianRoot": "/mnt/c/Users/User/GitHub/obsidian",
+	"minDuration": 600,
 	"threads": 4,
 	"settings": {
 		"logLevel": "info",

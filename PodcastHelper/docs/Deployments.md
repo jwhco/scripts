@@ -35,5 +35,6 @@
 - `environment`, Are you running in WSL, Local, or K8S?
 - `mediaRoot`, Where do podcast media files life? Audio and video in the same tree. Typically in date subdirectories like "YYYYMMDD" or "YYYY-MM-DD", as imported by Adobe Bridge, Adobe Lightroom, or other media management.
 - `obsidianRoot`, Where does your Obsidian or markdown notes life? Used to audit media against what has been published.
+- `minDuration`, How many minutes in seconds is the smallest media duration to be considered podcast?
 
 /EF/
