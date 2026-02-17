@@ -60,6 +60,9 @@ Make it easier to publish all relevant media and handling large files associated
   - Be able to rebuild the index with the sidecar files. Never modify the index manually; it's a reference.
 - When editing the sidecar, use Markdown to change out sections. For example, after a transcript is downloaded, it is put in the sidecar, or saved in a directory as `{BASENAME}_transcript.md`, then flagged as complete in the sidecar. 
 
+- The `index.csv`  isn't meant to be human readable, it is a cache file for building sidecars. Maintain duration in minutes, reference file names, and use to allow multiple system processing. 
+  - The index is updated with all available scripts, as well as read. Placing it in the media home directory is best.
+
 
 - Be able to run the script from inside the media folder, or from tools root. Be careful about where the work is being done, define paths in advance. 
   - Paths can also be defined from the command line, however, that is not as practical as by a configuration file.

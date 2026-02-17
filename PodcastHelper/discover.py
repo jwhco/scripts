@@ -115,7 +115,7 @@ def discover(media_root: Path, min_duration: int, index_file: Path, append: bool
     with index_file.open(mode, newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         if mode == 'w':
-            w.writerow(['path', 'duration', 'sidecar'])
+            w.writerow(['path', 'minutes', 'sidecar'])  # Updated column name from 'duration' to 'minutes'
         for r in rows:
             w.writerow(r)
 
@@ -159,7 +159,7 @@ def discover_file(file_path: Path, min_duration: int, index_file: Optional[Path]
         with index_file.open(mode, newline='', encoding='utf-8') as f:
             w = csv.writer(f)
             if mode == 'w':
-                w.writerow(['path', 'duration', 'sidecar'])
+                w.writerow(['path', 'minutes', 'sidecar'])  # Updated column name from 'duration' to 'minutes'
             # write sidecar path relative to media_root when possible
             try:
                 side_rel = str(sidecar.relative_to(media_root)) if media_root else str(sidecar)
