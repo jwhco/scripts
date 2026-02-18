@@ -1,0 +1,10 @@
+- [ ] #Goal, Main Thing To Do
+  - [ ] One outcome oriented task,
+  - [ ] Second outcome oriented task,
+  - [ ] Third outcome oriented task,
+- [ ] #Goal, Another Thing To Do
+  - [ ] Fourth outcome oriented task,
+  - [ ] Fifth outcome oriented task,
+  - [ ] Sixth outcome oriented task,
+- [ ] Random thing to get done,
+- [ ] Another random thing doing,
