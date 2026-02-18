@@ -1,10 +1,10 @@
 ---
-tags: 
-- readme-file
-- github-repository
-- read-me
-- script-repository
-- command-line
+tags:
+    - readme-file
+    - github-repository
+    - read-me
+    - script-repository
+    - command-line
 date: 2022-10-28
 updated: 2025-12-23
 type: Readme
@@ -14,6 +14,10 @@ workflow: Approved
 ---
 
 # Useful Scripts and Tools
+
+## Overview
+
+Subdirectories indicate automation scripts for Utilities. The goal is to make these scripts platform-independent; however, most commands will be for macOS and Linux.
 
 ## Modules
 
@@ -27,21 +31,6 @@ workflow: Approved
 
 As these tools mature, they may be forked off into standalone libraries and modules. Until then, each are managed here. When opening an issue, mention module in description.
 
-## Overview
-
-Subdirectories indicate automation scripts for Utilities. The goal is to make these scripts platform-independent; however, most commands will be for macOS and Linux.
-
-## Tools
-
-- [Python3](https://www.python.org/). Scripting language with access to NLP and ML.
-- [Visual Studio Code](https://code.visualstudio.com/Download). Primary editing environment.
-- [Jupyter Notebook](https://jupyter.org/install). Combining documentation with Python development.
-- [Canonical Kubernetes](https://ubuntu.com/kubernetes/). Containerized development environment.
-
-## Organization
-
-Under the root directory will be a project folder specific to the tool. Under that folder, each script set will have its own README. In the best case, the script itself will include documentation.
-
 ## Warning
 
 Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. Some scripts were for one-time use and may no longer function as expected.
@@ -49,4 +38,3 @@ Use these scripts at your own risk. Look over the code carefully. Some have hard
 > Copyright 2023-2025 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=jwhco-scripts-readme) All rights reserved.
 
 /EOF/
-
