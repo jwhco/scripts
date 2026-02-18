@@ -4,16 +4,16 @@ tags:
 - root-keyword-2
 - root-keyword-3
 type: Sidecar
-date: {YYYY-MM-DD -- From date created.}
-created: {YYYY-MM-DD -- From source media.}
+date: 2025-01-01
+created: 2024-01-02
 published:
 updated:
 
 channel:
 catalog:
-duration: {Obtain with ffmpeg}
+duration: 1:20:00
 
-media: {FILENAME}.mp4
+filename: YYYYMMDDmmhh-PXL-0123456.mp4
 ---
 
 # Summary

@@ -1,4 +1,4 @@
-# Specifications
+# Specifications for Podcast Helper Tools
 
 ## Functional
 
@@ -66,9 +66,14 @@ ffprobe -i PXL_20250301_191304585.mp4 -show_format -v quiet | grep duration
 - Extracts duration in seconds,
 - Works with `ffmpeg` installed,
 
-### Creation of Sidecar 
+### Creation of Media Sidecar 
 
 - See [[Example_sidecar.md]] for details about sidecar. It looks very much like a note for Obsidian or Zettlr.
+  - Where:
+    - `created`, is the date the media source was created with format `YYYY-MM-DD`,
+    - `date`, is document first creation date with format `YYYY-MM-DD`,
+    - `duration`, in format `HH:mm:ss` obtained with `ffmpeg` or related tool from original media.
+    - `filename`, the full name of the media file from root or stand alone.
 - Much of the front matter is borrowed from the `Podcast` template in Obsidian.
 - Don't put too much in this that is beyond describing the media file. If there is social content, headlines, or other materials, think about putting that in a different sidecar. 
   - Don't clutter up the file. Make it easy to go from scanning of media to publishing of materials. Especially if {Social, Description, Featured Image, Metadata, Transcript} can be generated individually.
