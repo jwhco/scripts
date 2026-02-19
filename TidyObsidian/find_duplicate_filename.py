@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+
+"""
+Traverse Markdown to Find Duplicate File Names
+
+Features:
+- Spinny cursor to know it is still running because it must scan everything.
+
+"""
+
+
+
 import os
 import glob
 import difflib
