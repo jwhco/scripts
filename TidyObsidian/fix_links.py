@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+
+"""
+An example of Correcting Embeded Media Links
+
+Features:
+- No guardrails, the script will change markdown files without notice.
+- Starts working from the current then crawling every directory.
+
+"""
+
+
 import re
 from pathlib import Path
 
