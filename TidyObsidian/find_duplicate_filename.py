@@ -8,8 +8,6 @@ Features:
 
 """
 
-
-
 import os
 import glob
 import difflib
