@@ -28,17 +28,15 @@ workflow: Approved
 - [Visual Studio Code](https://code.visualstudio.com/Download). The development environment for maintenance uses a `bash` shell for the Terminal.
 - [Obsidian.md](https://obsidian.md/). Note-taking application that is the front end of a Markdown-based notes repository.
 
-## Purpose
-
-- Purge `.trash` files with modifications older than 90 days.
-- (Future #2 ) Delete files from `git` repository upon completion.
-- (Future #3 ) Issue command `git clean` to reduce size.
-
-## Ususage
+## Usage
 
 - Run from the root of the Obsidian vault. Checkout `scripts` and `obsidian` in the same workspace next to each other. Then run using `python3 ../scripts/TidyObsidian/find_similar_filenames.py` in the vault root.
 - Run on a Kubernetes pod away from the workstation. Many of these scripts are CPU-intensive. If you have a large vault, running them on a cluster somewhere saves you a lot of headaches.
 - Always commit before making changes. Some of these scripts do bulk changes to your Obsidian vault. Make sure you can recover from a change. No backup files are created because of version control.
+
+## Requirements
+
+- The script is Obsidian oriented, however, needs to be designed to work with Zettlr, FOAM, and LogSeq. At least NOT break any of these installations, or disrupt running of those note-taking applications.
 
 ## Warning
 
