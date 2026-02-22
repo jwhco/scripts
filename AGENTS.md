@@ -22,6 +22,9 @@
 
 ## Organization
 
+
+- Maintain platform indepencence for scripts. At a minimum assume a `bash` and `python` environment.
+
 - Under the root directory will be a project folder specific to the tool. 
 - Under that folder, each script set will have its own `README.md` for display under GitHub. 
 - In the best case, the script itself will include documentation. Be self contained and function without dependencies.

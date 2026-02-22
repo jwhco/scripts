@@ -20,11 +20,9 @@
   - `scikit-learn`
 - [Jupyter Notebook](https://jupyter.org/)
 
-
-## Requirements
-
-- Scripts will all use the same stopword list. Include stop word dictionary in configuration so it only needs set once. 
-- Compatibility with markdown repos managed by [Obsidian](https://obsidian.md/), [LogSeq](https://logseq.com/), [Zettlr](https://zettlr.com/), and [FOAM](https://marketplace.visualstudio.com/items?itemName=foam.foam-vscode).
+- Markdown: [CommonMark](http://commonmark.org/) and [GitHub-flavored Markdown](https://github.github.com/gfm/),
+- [LaTeX](https://en.wikipedia.org/wiki/LaTeX)
+- [Pandoc](https://pandoc.org/)
 
 ## Examples
 
