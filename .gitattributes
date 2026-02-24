@@ -1,3 +1,10 @@
 # Force all text files to use LF in the repository and on checkout
 * text=auto eol=lf
 
+# Always Normalize
+*.md text
+*.json text
+*.csv text eol=crlf
+
+
+
