@@ -31,6 +31,8 @@ Subdirectories indicate automation scripts for Utilities. The goal is to make th
 
 As these tools mature, they may be forked off into standalone libraries and modules. Until then, each are managed here. When opening an issue, mention module in description.
 
+These labels represent application tags for reference in other platforms. GitHub is used to manage the application, where Obsidian is writing about those applications.
+
 ## Warning
 
 Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. Some scripts were for one-time use and may no longer function as expected.
