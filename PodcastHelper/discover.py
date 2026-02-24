@@ -2,7 +2,9 @@
 """
 Discover MP4 files longer than a threshold and create sidecar markdown files.
 
-Usage: python3 discover.py --media-root /path/to/media --min-duration 600 --index index.csv
+Usage: 
+
+    python3 discover.py --media-root /path/to/media --min-duration 600 --limit 100
 
 This script requires `ffprobe` (from ffmpeg) on PATH to measure durations.
 """
