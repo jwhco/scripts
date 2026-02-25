@@ -33,6 +33,16 @@ As these tools mature, they may be forked off into standalone libraries and modu
 
 These labels represent application tags for reference on other platforms. Use GitHub to manage the application. Use Obsidian when writing about those applications.
 
+## Concepts
+
+- Would  be interesting to have a 1980s VT100 terminl mode. 
+  - Design using `curses` to do a Emacs style VT100 SSH terminal compatible interface. 
+  - A control window on the bottom, right above a `F` key short cuts. Like old DEC VT100 terminals.
+  -  Use this to let someone scroll up and down report tables from asks of Obsidian, without losing CLI.
+  -  Move around the tool like CMOS, without taking hands off the keyboard. The CLI could work like Vim with an escape.
+-  When working in a terminal via Vscode, any file reference prints to the screen so it is a link. 
+   -  The command line tool is the finder, while VsCode is the editor. Try to make them work together.
+
 ## Warning
 
 Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. 
