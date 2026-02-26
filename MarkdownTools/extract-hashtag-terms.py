@@ -1,39 +1,65 @@
 import os
 import re
 import yaml
+import nltk
 from pathlib import Path
+from nltk.corpus import words
+
+# Initialize dictionary for segmentation
+try:
+    nltk.data.find('corpora/words')
+except LookupError:
+    nltk.download('words')
+
+WORD_SET = set(w.lower() for w in words.words())
 
 # --- Configuration ---
 ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
 
+def segment_words(text):
+    """
+    Recursive maximum matching algorithm to break unspaced strings.
+    """
+    def solve(s):
+        if not s: return []
+        for i in range(len(s), 0, -1):
+            word = s[:i]
+            if word in WORD_SET or i == 1:
+                remainder = solve(s[i:])
+                if remainder is not None:
+                    return [word] + remainder
+        return None
+
+    if ' ' not in text and len(text) > 4:
+        segmented = solve(text.lower())
+        return " ".join(segmented) if segmented else text
+    return text
+
 def normalize_term(term):
-    """
-    Standardizes tags by:
-    1. Splitting CamelCase into separate words.
-    2. Replacing hyphens and underscores with spaces.
-    3. Lowercasing the entire string.
-    """
     if not term:
         return ""
-    # Split CamelCase
+    # 1. Split CamelCase
     term = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(term))
-    # Replace separators (kebab-case or snake_case) with spaces
+    # 2. Replace separators with spaces
     term = re.sub(r'[-_]', ' ', term)
-    return term.lower().strip()
+    term = term.lower().strip()
+    # 3. Dictionary-based segmentation
+    return segment_words(term)
 
 def extract_hashtags(root_dir):
-    """Extracts hashtags from the body of markdown files."""
     hashtags = set()
-    # Matches #CamelCase, #kebab-case, or #simple tags
-    # Excludes the # symbol from the capture group
-    tag_pattern = re.compile(r'#([A-Za-z0-9-_]+)')
+    # Fixed Pattern: (?:^|\s) matches start of string or whitespace (non-capturing)
+    # #([A-Za-z0-9-_]+) captures the actual tag
+    tag_pattern = re.compile(r'(?:^|\s)#([A-Za-z0-9-_]+)')
     
     for path in Path(root_dir).rglob('*.[mM][dD]'):
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                # Remove YAML front matter to avoid duplicate counting
+                # Remove YAML to prevent duplicate extraction
                 content = re.sub(r'^---\s*\n(.*?)\n---\s*\n', '', content, flags=re.DOTALL)
+                
+                # findall on a pattern with one capturing group returns only the group
                 matches = tag_pattern.findall(content)
                 for m in matches:
                     hashtags.add(normalize_term(m))
@@ -42,9 +68,7 @@ def extract_hashtags(root_dir):
     return hashtags
 
 def extract_yaml_tags(root_dir):
-    """Extracts tags from YAML front matter."""
     yaml_tags = set()
-    
     for path in Path(root_dir).rglob('*.[mM][dD]'):
         try:
             with open(path, 'r', encoding='utf-8') as f:
@@ -71,12 +95,10 @@ if __name__ == "__main__":
         h_tags = extract_hashtags(ZETTEL_ROOT)
         y_tags = extract_yaml_tags(ZETTEL_ROOT)
         
-        # Combine, unique-ify, and sort
         combined_terms = sorted(list(h_tags.union(y_tags)))
         
         print(f"--- Unique Normalized Terms ({len(combined_terms)}) ---")
         for term in combined_terms:
-            if term: # Ensure no empty strings
+            if term.strip():
                 print(term)
-
-				
+                
