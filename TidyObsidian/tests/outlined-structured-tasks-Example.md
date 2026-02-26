@@ -1,4 +1,6 @@
-# Example Structured Tasks
+# Structured Tasks Example
+
+- Includes a structured outline with two goals. Task dependences is identified by heirarchy.
 
 ## Task List
 
