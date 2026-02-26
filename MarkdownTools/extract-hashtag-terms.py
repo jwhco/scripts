@@ -11,17 +11,26 @@ try:
 except LookupError:
     nltk.download('words')
 
-WORD_SET = set(w.lower() for w in words.words())
-
-# --- Configuration ---
+# Configuration
 ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
+
+# Whitelist: These stay as single tokens (case-insensitive check)
+WHITELIST = {"vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", "linux", "linkedin", "facebook", "hubspot", "google", "grammarly"}
+
+# Load NLTK words and merge with whitelist to ensure segmenter recognizes them
+WORD_SET = set(w.lower() for w in words.words())
+WORD_SET.update(WHITELIST)
 
 def segment_words(text):
     """
     Recursive maximum matching algorithm.
-    Exempts alphanumeric codes that look like category identifiers.
+    Exempts alphanumeric codes and whitelisted terms.
     """
-    # If the text contains digits or is a known code pattern, don't split it.
+    # 1. If the term is in our whitelist, don't split it
+    if text.lower() in WHITELIST:
+        return text.lower()
+
+    # 2. If the text contains digits, don't split it (Category Codes)
     if any(char.isdigit() for char in text):
         return text
 
@@ -37,7 +46,7 @@ def segment_words(text):
 
     if ' ' not in text and len(text) > 4:
         segmented = solve(text.lower())
-        # Final safety check: if it split into a bunch of single letters, return original
+        # Safety: if split into mostly single letters, revert to original
         if segmented and len([x for x in segmented if len(x) == 1]) > (len(text) / 2):
             return text
         return " ".join(segmented) if segmented else text
@@ -47,25 +56,27 @@ def normalize_term(term):
     if not term:
         return ""
     
-    # PROTECT CATEGORY CODES: 
-    # If it's all uppercase and alphanumeric (e.g., S0424A), return as-is
+    # PROTECT CATEGORY CODES: All uppercase + alphanumeric
     if term.isupper() and any(c.isalpha() for c in term):
         return term.strip()
 
-    # 1. Split CamelCase (e.g., WorkplaceWellness -> Workplace Wellness)
+    # Check against whitelist before splitting CamelCase
+    if term.lower() in WHITELIST:
+        return term.lower()
+
+    # 1. Split CamelCase
     term = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(term))
     
     # 2. Replace separators with spaces
     term = re.sub(r'[-_]', ' ', term)
     term = term.strip()
     
-    # 3. Dictionary-based segmentation for long lowercased/unspaced tags
-    # We only lower() here so the isupper() check above can function.
+    # 3. Dictionary-based segmentation
     return segment_words(term.lower())
 
 def extract_hashtags(root_dir):
     hashtags = set()
-    # Captures hashtags preceded by start of line or whitespace
+    # Fixed-width compatible pattern (start of line or whitespace)
     tag_pattern = re.compile(r'(?:^|\s)#([A-Za-z0-9-_]+)')
     
     for path in Path(root_dir).rglob('*.[mM][dD]'):
