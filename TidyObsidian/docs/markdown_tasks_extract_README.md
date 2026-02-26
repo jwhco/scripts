@@ -46,7 +46,7 @@ Where:
 
 Descriptive:
 
-- Neither `C1` nor `C2` are directly related to goals, hoewver, they are blocking movement of `A1` and `B2`.
+- Neither `C1` nor `C2` are directly related to goals, however, they block movement of `A1` and `B2`.
   - How to discover thse dependencies?
   - How do start dates and due dates impact?
 
@@ -66,5 +66,7 @@ Descriptive:
   - From that deliverable task, the script calculates priority of tasks, weighting those that contribute.
   - A short report presents task tree exposure showing what tasks are priority to address. Beyond blocking.
 
+
+> Copyright 2025-2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=markdown-tasks-extract) All rights reserved.
 
 /EOF/

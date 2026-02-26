@@ -4,7 +4,7 @@
 Find similar files in a directory tree # and group them by their normalized names. 
 
 Features:
-- Recursively scans all files in the specified directory.
+- Recursively scans all files in the specified directory. Omit directories hidden or templates.
 - Normalizes filenames by removing numeric prefixes (except Zettelkasten keys), punctuation, and standardizing separators.
 - Groups files with similar normalized names together for easy identification.
 """
