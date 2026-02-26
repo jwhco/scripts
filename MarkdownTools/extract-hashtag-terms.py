@@ -2,17 +2,16 @@ import os
 import re
 import yaml
 import nltk
+import argparse
 from pathlib import Path
 from nltk.corpus import words
+from itertools import islice
 
 # Initialize dictionary for segmentation
 try:
     nltk.data.find('corpora/words')
 except LookupError:
     nltk.download('words')
-
-# Configuration
-ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
 
 WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
@@ -62,63 +61,75 @@ def normalize_term(term):
     term = re.sub(r'[-_]', ' ', term)
     return segment_words(term.lower().strip())
 
-def process_zettelkasten(root_dir):
-    """
-    Single-pass extraction:
-    1. Prunes hidden directories.
-    2. Opens each file exactly once.
-    3. Processes YAML and Body hashtags simultaneously.
-    """
+def get_file_generator(root_dir):
+    """Yields file paths while skipping hidden directories."""
+    for root, dirs, files in os.walk(root_dir):
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        for file in files:
+            if file.lower().endswith('.md'):
+                yield os.path.join(root, file)
+
+def process_files(file_list):
     all_terms = set()
     tag_pattern = re.compile(r'(?:^|\s)#([A-Za-z0-9-_]+)')
     yaml_pattern = re.compile(r'^---\s*\n(.*?)\n---\s*\n', re.DOTALL)
 
-    for root, dirs, files in os.walk(root_dir):
-        # Prune hidden directories in-place
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
-        
-        for file in files:
-            if file.lower().endswith('.md'):
-                filepath = os.path.join(root, file)
-                try:
-                    with open(filepath, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                        
-                        # 1. Process YAML
-                        body_content = content
-                        yaml_match = yaml_pattern.search(content)
-                        if yaml_match:
-                            try:
-                                meta = yaml.safe_load(yaml_match.group(1))
-                                if meta and 'tags' in meta:
-                                    tags = meta['tags']
-                                    tag_list = tags if isinstance(tags, list) else [tags]
-                                    for t in tag_list:
-                                        norm = normalize_term(str(t))
-                                        if norm: all_terms.add(norm)
-                            except yaml.YAMLError:
-                                pass
-                            
-                            # 2. Prepare body (remove YAML to avoid double counting)
-                            body_content = yaml_pattern.sub('', content)
+    for filepath in file_list:
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+                body_content = content
+                yaml_match = yaml_pattern.search(content)
+                if yaml_match:
+                    try:
+                        meta = yaml.safe_load(yaml_match.group(1))
+                        if meta and 'tags' in meta:
+                            tags = meta['tags']
+                            tag_list = tags if isinstance(tags, list) else [tags]
+                            for t in tag_list:
+                                norm = normalize_term(str(t))
+                                if norm: all_terms.add(norm)
+                    except yaml.YAMLError:
+                        pass
+                    body_content = yaml_pattern.sub('', content)
 
-                        # 3. Process Hashtags in Body
-                        hash_matches = tag_pattern.findall(body_content)
-                        for m in hash_matches:
-                            norm = normalize_term(m)
-                            if norm: all_terms.add(norm)
-                            
-                except (OSError, IOError) as e:
-                    print(f"read_error: {filepath} - {e}")
-                    
+                hash_matches = tag_pattern.findall(body_content)
+                for m in hash_matches:
+                    norm = normalize_term(m)
+                    if norm: all_terms.add(norm)
+        except (OSError, IOError) as e:
+            print(f"read_error: {filepath} - {e}")
+            
     return all_terms
 
-# --- Execution ---
 if __name__ == "__main__":
-    if not os.path.isdir(ZETTEL_ROOT):
-        print(f"directory_not_found: {ZETTEL_ROOT}")
+    parser = argparse.ArgumentParser(description="Extract and normalize tags from Zettelkasten.")
+    parser.add_argument(
+        "directory", 
+        nargs="?", 
+        default="/home/hittjw/Documents/GitHub/obsidian/Zettelkasten",
+        help="Root directory of the Zettelkasten"
+    )
+    parser.add_argument(
+        "--limit", 
+        type=int, 
+        default=None, 
+        help="Limit the number of files scanned for testing"
+    )
+    
+    args = parser.parse_args()
+
+    if not os.path.isdir(args.directory):
+        print(f"directory_not_found: {args.directory}")
     else:
-        unique_terms = sorted(list(process_zettelkasten(ZETTEL_ROOT)))
+        # Create generator and apply limit
+        files_gen = get_file_generator(args.directory)
+        if args.limit:
+            files_gen = islice(files_gen, args.limit)
+            print(f"info: limiting scan to {args.limit} files.")
+
+        unique_terms = sorted(list(process_files(files_gen)))
         
         print(f"--- Unique Normalized Terms ({len(unique_terms)}) ---")
         for term in unique_terms:
