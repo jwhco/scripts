@@ -6,6 +6,7 @@ PyYAML
 pyspellchecker
 
 # visualize-content-clusters.py
-pandas
-matplotlib
 scikit-learn
+pandas>=2.3.3
+multiprocess>=2.6.2
+matplotlib
