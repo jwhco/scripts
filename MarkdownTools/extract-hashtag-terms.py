@@ -17,7 +17,7 @@ WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
     "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", 
-    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten"
+    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", "wintak", "civtak"
 }
 
 WORD_SET = set(w.lower() for w in words.words())
