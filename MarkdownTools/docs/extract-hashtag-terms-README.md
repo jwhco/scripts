@@ -3,7 +3,7 @@
 ## Requirements
 
 - Include a whitelist dictionary for terms that will never be split. Words like "VsCode", "LaTeX", and "GitHub".
-- Preserve catalog codes like `A1234B` that are hashtags. 
+- Preserve catalog codes like `A1234B`, `001_A1234B` and `GL7` that are hashtags. They are short (under 10 characters), typically with upper case and numbers.
 - Handle CamelCase, kebab-case, and snake_case, when converting to n-gram phrases. Normalize before listing.
 
 
