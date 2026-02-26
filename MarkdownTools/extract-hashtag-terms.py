@@ -15,7 +15,7 @@ except LookupError:
 ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
 
 # Whitelist: These stay as single tokens (lower-cased in final output)
-WHITELIST = {"vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "obsidian"}
+WHITELIST = {"vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "obsidian", "shopify", "podcast", "logseq"}
 
 WORD_SET = set(w.lower() for w in words.words())
 WORD_SET.update(WHITELIST)
