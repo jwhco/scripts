@@ -1,2 +1,6 @@
 # extract_names_ner.py
 spacy>=3.5
+
+# extract-hashtag-terms.py
+PyYAML
+pyspellchecker
