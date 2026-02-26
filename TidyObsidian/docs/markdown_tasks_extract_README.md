@@ -18,20 +18,37 @@
 
 
 ```mermaid
+---
+title: Model Task Relationships
+width: 100%
+---
+
 graph LR
 
 %% Heirarchy
-A1[Task A1] & A2[Task A2] --> G1[Goal 1]
+A1[Task A1] & A2[Task A2] --> |Preceeds| G1[Goal 1]
 B1[Task B1] & B2[Task B2] --> G2[Goal 2]
-C1[Task C1] & C2[Task C2]
+C1[Task C1] --> C2[Task C2]
 
 %% Dependency
-B1 -.-> A2
-A1 -.-> B1
+G1 -.-> |Preceeds| G2
+B1 -.-> |Preceeds| A2
+A1 -.-> |Preceeds| B1
 C1 & C2 -.-> B2
-C1 -.-> A1
+C1 -.-> |Preceeds| A1
 
 ```
+
+Where:
+- *Preceeds*, could be a `dependsOn` situation.
+- *-->* is direct relationship,
+- *-.->* is indirect relationship,
+
+Descriptive:
+
+- Neither `C1` nor `C2` are directly related to goals, hoewver, they are blocking movement of `A1` and `B2`.
+  - How to discover thse dependencies?
+  - How do start dates and due dates impact?
 
 ## Requirements
 
