@@ -8,6 +8,8 @@
 - Preserve channel hashtags like `#ABR` and `#SWS` making sure to keep uppercase. When presented in normalization, they will remain upper case.
 - Run through files faster by skipping hidden directories. Ignore anything in a `.directory` type folder.
 
+- PRIORITIZE WHITELIST: If the substring is a whitelisted term, take it as a whole even if 'you' and 'tube' are in the dictionary. String `#YouTubeStudio` gets turned into `youtube studio` rather than `you tube studio`.
+
 ## User Story
 
 - User wants proper spelling and consistency in hashtags.
