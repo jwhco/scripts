@@ -18,9 +18,13 @@ WHITELIST = {
     "cyber", "aweber", "aioseo"
 }
 
+# ANSI Color Codes: Red background (41), White foreground (37), Reset (0)
+# This is the most compatible sequence for xterm and xterm-256color
+RED_BG_WHITE_FG = "\033[41;37m"
+RESET = "\033[0m"
+
 # Initialize SpellChecker
 spell = SpellChecker()
-# Ensure all whitelist words are recognized as correct
 spell.word_frequency.load_words([w.lower() for w in WHITELIST])
 
 def is_channel_hashtag(term):
@@ -40,12 +44,10 @@ def segment_words(text):
             suffix = segment_words(parts[1]) if parts[1] else ""
             return f"{prefix} {white_word} {suffix}".strip()
 
-    # Recursive MaxMatch fallback
     def solve(s):
         if not s: return []
         for i in range(len(s), 0, -1):
             word = s[:i]
-            # Use spellchecker's dictionary for segmentation lookup
             if word in spell or i == 1:
                 remainder = solve(s[i:])
                 if remainder is not None:
@@ -114,19 +116,27 @@ def process_files(file_list):
             continue
     return all_terms
 
-def check_spelling(term_list):
-    """Filters for terms with at least one misspelled word, ignoring structural tags."""
-    misspelled = []
+def check_spelling_with_color(term_list):
+    """Filters for terms with misspellings and highlights the error in red."""
+    flagged_output = []
     for term in term_list:
         if is_channel_hashtag(term) or is_catalog_code(term):
             continue
         
         words_to_check = term.split()
-        # Find misspelled words that aren't in our whitelist
         unknown = spell.unknown(words_to_check)
+        
         if unknown:
-            misspelled.append(term)
-    return misspelled
+            colored_words = []
+            for w in words_to_check:
+                if w in unknown:
+                    # Apply red background to misspelled word
+                    colored_words.append(f"{RED_BG_WHITE_FG}{w}{RESET}")
+                else:
+                    colored_words.append(w)
+            flagged_output.append(" ".join(colored_words))
+            
+    return flagged_output
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract and normalize tags from Zettelkasten.")
@@ -145,12 +155,12 @@ if __name__ == "__main__":
         results = sorted(list(process_files(files_gen)))
         
         if args.spellcheck:
-            results = check_spelling(results)
-            if not results:
+            colored_results = check_spelling_with_color(results)
+            if not colored_results:
                 print("No misspellings found.")
             else:
-                print(f"--- Misspelled/Unknown Terms ({len(results)}) ---")
-                for term in results:
+                print(f"--- Misspelled/Unknown Terms ({len(colored_results)}) ---")
+                for term in colored_results:
                     print(term)
         else:
             print(f"--- Unique Normalized Terms ({len(results)}) ---")
