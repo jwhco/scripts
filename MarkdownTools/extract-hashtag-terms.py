@@ -17,7 +17,7 @@ WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
     "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", 
-    "podcast", "logseq"
+    "podcast", "logseq", "semrush", "spreaker", "ahrefs"
 }
 
 WORD_SET = set(w.lower() for w in words.words())
@@ -135,4 +135,3 @@ if __name__ == "__main__":
         for term in unique_terms:
             if term.strip():
                 print(term)
-                
