@@ -17,7 +17,7 @@ WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
     "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", 
-    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", "wintak", "civtak"
+    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", "wintak", "civtak", "tumblr", "locals", "kubernetes", "DFARS", "CMMC", "cyber", "aweber", "aioseo"
 }
 
 WORD_SET = set(w.lower() for w in words.words())
@@ -126,7 +126,10 @@ def process_files(file_list):
                             tag_list = tags if isinstance(tags, list) else [tags]
                             for t in tag_list:
                                 norm = normalize_term(str(t))
-                                if norm: all_terms.add(norm)
+                                if norm:
+                                    # Collapse multiple spaces into one and strip
+                                    clean_norm = re.sub(r'\s+', ' ', norm).strip()
+                                    all_terms.add(clean_norm)
                     except (yaml.YAMLError, TypeError):
                         pass
                     body_content = yaml_pattern.sub('', content)
@@ -134,7 +137,10 @@ def process_files(file_list):
                 hash_matches = tag_pattern.findall(body_content)
                 for m in hash_matches:
                     norm = normalize_term(m)
-                    if norm: all_terms.add(norm)
+                    if norm:
+                        # Collapse multiple spaces into one and strip
+                        clean_norm = re.sub(r'\s+', ' ', norm).strip()
+                        all_terms.add(clean_norm)
         except (OSError, IOError) as e:
             print(f"read_error: {filepath} - {e}")
             
