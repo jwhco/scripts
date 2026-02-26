@@ -14,27 +14,22 @@ except LookupError:
 # Configuration
 ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
 
-# Whitelist: These stay as single tokens (lower-cased in final output)
-WHITELIST = {"vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "obsidian", "shopify", "podcast", "logseq"}
+WHITELIST = {
+    "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
+    "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
+    "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", 
+    "podcast", "logseq"
+}
 
 WORD_SET = set(w.lower() for w in words.words())
 WORD_SET.update(WHITELIST)
 
 def is_catalog_code(term):
-    """
-    Checks if a term matches catalog code heuristics:
-    - Length <= 10
-    - Contains at least one digit
-    - Contains at least one uppercase letter (to preserve A1234B vs a1234b)
-    """
     if len(term) > 10:
         return False
-    has_digit = any(c.isdigit() for c in term)
-    has_upper = any(c.isupper() for c in term)
-    return has_digit and has_upper
+    return any(c.isdigit() for c in term) and any(c.isupper() for c in term)
 
 def segment_words(text):
-    """Recursive maximum matching algorithm for long lowercased tags."""
     def solve(s):
         if not s: return []
         for i in range(len(s), 0, -1):
@@ -46,95 +41,87 @@ def segment_words(text):
         return None
 
     if ' ' not in text and len(text) > 4:
-        # Don't segment if it contains digits (safety for alphanumeric strings)
         if any(char.isdigit() for char in text):
             return text
-        
         segmented = solve(text.lower())
-        # Safety: if split into mostly single letters, revert to original
         if segmented and len([x for x in segmented if len(x) == 1]) > (len(text) / 2):
             return text
         return " ".join(segmented) if segmented else text
     return text
 
 def normalize_term(term):
-    if not term:
-        return ""
-    
+    if not term: return ""
     term = term.strip()
 
-    # 1. PRESERVE CATALOG CODES: 
-    # Catch A1234B, 001_A1234B, GL7 before any modification.
     if is_catalog_code(term):
         return term
-
-    # 2. WHITELIST CHECK: (Pre-lower)
     if term.lower() in WHITELIST:
         return term.lower()
 
-    # 3. NORMALIZATION PIPELINE
-    # Split CamelCase (e.g., WorkplaceWellness -> Workplace Wellness)
     term = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(term))
-    
-    # Replace separators with spaces
     term = re.sub(r'[-_]', ' ', term)
-    term = term.strip()
-    
-    # Dictionary-based segmentation for unspaced tags (lower-cased)
-    return segment_words(term.lower())
+    return segment_words(term.lower().strip())
 
-def extract_hashtags(root_dir):
-    hashtags = set()
-    # Pattern looks for # preceded by start of line or space to avoid anchors
+def process_zettelkasten(root_dir):
+    """
+    Single-pass extraction:
+    1. Prunes hidden directories.
+    2. Opens each file exactly once.
+    3. Processes YAML and Body hashtags simultaneously.
+    """
+    all_terms = set()
     tag_pattern = re.compile(r'(?:^|\s)#([A-Za-z0-9-_]+)')
-    
-    for path in Path(root_dir).rglob('*.[mM][dD]'):
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                # Strip YAML for hashtag search
-                content = re.sub(r'^---\s*\n(.*?)\n---\s*\n', '', content, flags=re.DOTALL)
-                matches = tag_pattern.findall(content)
-                for m in matches:
-                    normalized = normalize_term(m)
-                    if normalized:
-                        hashtags.add(normalized)
-        except (OSError, IOError):
-            continue
-    return hashtags
+    yaml_pattern = re.compile(r'^---\s*\n(.*?)\n---\s*\n', re.DOTALL)
 
-def extract_yaml_tags(root_dir):
-    yaml_tags = set()
-    for path in Path(root_dir).rglob('*.[mM][dD]'):
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                match = re.search(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
-                if match:
-                    meta = yaml.safe_load(match.group(1))
-                    if meta and 'tags' in meta:
-                        tags = meta['tags']
-                        if isinstance(tags, list):
-                            for t in tags:
-                                if t: yaml_tags.add(normalize_term(str(t)))
-                        elif tags:
-                            yaml_tags.add(normalize_term(str(tags)))
-        except (yaml.YAMLError, OSError, IOError):
-            continue
-    return yaml_tags
+    for root, dirs, files in os.walk(root_dir):
+        # Prune hidden directories in-place
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        
+        for file in files:
+            if file.lower().endswith('.md'):
+                filepath = os.path.join(root, file)
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        
+                        # 1. Process YAML
+                        body_content = content
+                        yaml_match = yaml_pattern.search(content)
+                        if yaml_match:
+                            try:
+                                meta = yaml.safe_load(yaml_match.group(1))
+                                if meta and 'tags' in meta:
+                                    tags = meta['tags']
+                                    tag_list = tags if isinstance(tags, list) else [tags]
+                                    for t in tag_list:
+                                        norm = normalize_term(str(t))
+                                        if norm: all_terms.add(norm)
+                            except yaml.YAMLError:
+                                pass
+                            
+                            # 2. Prepare body (remove YAML to avoid double counting)
+                            body_content = yaml_pattern.sub('', content)
+
+                        # 3. Process Hashtags in Body
+                        hash_matches = tag_pattern.findall(body_content)
+                        for m in hash_matches:
+                            norm = normalize_term(m)
+                            if norm: all_terms.add(norm)
+                            
+                except (OSError, IOError) as e:
+                    print(f"read_error: {filepath} - {e}")
+                    
+    return all_terms
 
 # --- Execution ---
 if __name__ == "__main__":
     if not os.path.isdir(ZETTEL_ROOT):
         print(f"directory_not_found: {ZETTEL_ROOT}")
     else:
-        h_tags = extract_hashtags(ZETTEL_ROOT)
-        y_tags = extract_yaml_tags(ZETTEL_ROOT)
+        unique_terms = sorted(list(process_zettelkasten(ZETTEL_ROOT)))
         
-        combined_terms = sorted(list(h_tags.union(y_tags)))
-        
-        print(f"--- Unique Normalized Terms ({len(combined_terms)}) ---")
-        for term in combined_terms:
+        print(f"--- Unique Normalized Terms ({len(unique_terms)}) ---")
+        for term in unique_terms:
             if term.strip():
                 print(term)
                 
