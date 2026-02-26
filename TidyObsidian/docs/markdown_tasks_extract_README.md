@@ -20,8 +20,16 @@
 ```mermaid
 graph LR
 
+%% Heirarchy
 A1[Task A1] & A2[Task A2] --> G1[Goal 1]
 B1[Task B1] & B2[Task B2] --> G2[Goal 2]
+C1[Task C1] & C2[Task C2]
+
+%% Dependency
+B1 -.-> A2
+A1 -.-> B1
+C1 & C2 -.-> B2
+C1 -.-> A1
 
 ```
 
