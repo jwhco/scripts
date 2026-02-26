@@ -18,8 +18,13 @@ ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten"
 
 def segment_words(text):
     """
-    Recursive maximum matching algorithm to break unspaced strings.
+    Recursive maximum matching algorithm.
+    Exempts alphanumeric codes that look like category identifiers.
     """
+    # If the text contains digits or is a known code pattern, don't split it.
+    if any(char.isdigit() for char in text):
+        return text
+
     def solve(s):
         if not s: return []
         for i in range(len(s), 0, -1):
@@ -32,37 +37,47 @@ def segment_words(text):
 
     if ' ' not in text and len(text) > 4:
         segmented = solve(text.lower())
+        # Final safety check: if it split into a bunch of single letters, return original
+        if segmented and len([x for x in segmented if len(x) == 1]) > (len(text) / 2):
+            return text
         return " ".join(segmented) if segmented else text
     return text
 
 def normalize_term(term):
     if not term:
         return ""
-    # 1. Split CamelCase
+    
+    # PROTECT CATEGORY CODES: 
+    # If it's all uppercase and alphanumeric (e.g., S0424A), return as-is
+    if term.isupper() and any(c.isalpha() for c in term):
+        return term.strip()
+
+    # 1. Split CamelCase (e.g., WorkplaceWellness -> Workplace Wellness)
     term = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(term))
+    
     # 2. Replace separators with spaces
     term = re.sub(r'[-_]', ' ', term)
-    term = term.lower().strip()
-    # 3. Dictionary-based segmentation
-    return segment_words(term)
+    term = term.strip()
+    
+    # 3. Dictionary-based segmentation for long lowercased/unspaced tags
+    # We only lower() here so the isupper() check above can function.
+    return segment_words(term.lower())
 
 def extract_hashtags(root_dir):
     hashtags = set()
-    # Fixed Pattern: (?:^|\s) matches start of string or whitespace (non-capturing)
-    # #([A-Za-z0-9-_]+) captures the actual tag
+    # Captures hashtags preceded by start of line or whitespace
     tag_pattern = re.compile(r'(?:^|\s)#([A-Za-z0-9-_]+)')
     
     for path in Path(root_dir).rglob('*.[mM][dD]'):
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                # Remove YAML to prevent duplicate extraction
                 content = re.sub(r'^---\s*\n(.*?)\n---\s*\n', '', content, flags=re.DOTALL)
-                
-                # findall on a pattern with one capturing group returns only the group
                 matches = tag_pattern.findall(content)
                 for m in matches:
-                    hashtags.add(normalize_term(m))
+                    normalized = normalize_term(m)
+                    if normalized:
+                        hashtags.add(normalized)
         except (OSError, IOError):
             continue
     return hashtags
