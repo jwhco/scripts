@@ -23,7 +23,12 @@ WHITELIST = {
 WORD_SET = set(w.lower() for w in words.words())
 WORD_SET.update(WHITELIST)
 
+def is_channel_hashtag(term):
+    """Checks for 1-3 character all-uppercase channel identifiers (e.g., ABR, SWS)."""
+    return 1 <= len(term) <= 3 and term.isupper() and term.isalpha()
+
 def is_catalog_code(term):
+    """Checks for alphanumeric catalog codes (e.g., A1234B, GL7, 001_A1234B)."""
     if len(term) > 10:
         return False
     return any(c.isdigit() for c in term) and any(c.isupper() for c in term)
@@ -52,17 +57,20 @@ def normalize_term(term):
     if not term: return ""
     term = term.strip()
 
-    if is_catalog_code(term):
+    # Separate logic guards for preservation
+    if is_channel_hashtag(term) or is_catalog_code(term):
         return term
+        
     if term.lower() in WHITELIST:
         return term.lower()
 
+    # Normalization for standard topical tags
     term = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(term))
     term = re.sub(r'[-_]', ' ', term)
+    
     return segment_words(term.lower().strip())
 
 def get_file_generator(root_dir):
-    """Yields file paths while skipping hidden directories."""
     for root, dirs, files in os.walk(root_dir):
         dirs[:] = [d for d in dirs if not d.startswith('.')]
         for file in files:
@@ -90,7 +98,7 @@ def process_files(file_list):
                             for t in tag_list:
                                 norm = normalize_term(str(t))
                                 if norm: all_terms.add(norm)
-                    except yaml.YAMLError:
+                    except (yaml.YAMLError, TypeError):
                         pass
                     body_content = yaml_pattern.sub('', content)
 
@@ -123,11 +131,9 @@ if __name__ == "__main__":
     if not os.path.isdir(args.directory):
         print(f"directory_not_found: {args.directory}")
     else:
-        # Create generator and apply limit
         files_gen = get_file_generator(args.directory)
         if args.limit:
             files_gen = islice(files_gen, args.limit)
-            print(f"info: limiting scan to {args.limit} files.")
 
         unique_terms = sorted(list(process_files(files_gen)))
         
