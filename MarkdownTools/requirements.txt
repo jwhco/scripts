@@ -4,3 +4,8 @@ spacy>=3.5
 # extract-hashtag-terms.py
 PyYAML
 pyspellchecker
+
+# visualize-content-clusters.py
+pandas
+matplotlib
+scikit-learn
