@@ -5,6 +5,13 @@ import multiprocessing
 import pandas as pd
 import hashlib
 
+"""
+Markdown Tasks Extract
+
+- An example for standardizating of extracting markdown tasks.
+
+"""
+
 def get_hash(text):
     """Returns a stable hex hash of the input text to avoid comma issues."""
     if not text:
