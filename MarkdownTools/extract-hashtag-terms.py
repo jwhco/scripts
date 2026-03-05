@@ -76,12 +76,24 @@ def normalize_term(term):
     return segment_words(term.lower().strip())
 
 def get_file_generator(root_dir):
+    """
+    Yields file paths while:
+    1. Pruning hidden directories (starts with '.')
+    2. Pruning 'Templates' directories
+    3. Skipping files with 'TEMPLATE' in the name
+    """
     for root, dirs, files in os.walk(root_dir):
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        # Prune hidden and 'Templates' directories in-place
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d != "Templates"]
+        
         for file in files:
+            # Check for markdown extension
             if file.lower().endswith('.md'):
+                # Skip if 'TEMPLATE' is in the filename (case-insensitive)
+                if "TEMPLATE" in file.upper():
+                    continue
                 yield os.path.join(root, file)
-
+                
 def process_files(file_list, error_only=False):
     all_terms = set()
     found_errors = 0
