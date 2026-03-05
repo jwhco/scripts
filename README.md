@@ -43,6 +43,10 @@ These labels represent application tags for reference on other platforms. Use Gi
 -  When working in a terminal via Vscode, any file reference prints to the screen so it is a link. 
    -  The command line tool is the finder, while VsCode is the editor. Try to make them work together.
 
+## Guidelines
+
+- The standard for modules is camel case. For tool names it is kebab-case. Use snake_case for Python functions.
+
 ## Warning
 
 Use these scripts at your own risk. Look over the code carefully. Some have hardcoded paths for this office environment. 

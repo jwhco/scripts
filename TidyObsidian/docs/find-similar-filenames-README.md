@@ -1,13 +1,13 @@
 # Find Similar Filenames
 
-## Purpose
+## Use Case
 
 - Help find duplicate files across the Obsidian vault.
 - Identify a keyword phrase to search for file in Obisidian.
 - A way to reduce the Git repo size removing duplicates.
 - Fix duplicate content from previous imports. Resolve similar names.
 
-## Usage
+## Configuration
 
 Steps:
 
@@ -35,9 +35,14 @@ Steps:
 
 ## Requirements
 
-- [x] Ignore all `.obsidian*` configuration directories. May want to ignore all hidden folders.
-- [ ] Ignore similar names with different zettelkasten keys. It is possible the text phrase after a zettelkasten key is the same because it is the same set project. Contents will be different.
-- [x] Ignore similar names in `.trash` folder. These files are the result of merges already complete. Safe to ignore.
-- [ ] Allow name match when high similar but different extension. This will catch images in multiple formats as well as {.txt,.md,.html} pairs.
+- Treat zettelkasten key as unique value. If it exists, even when keyword string is similar, the zettelkasten key will override. Filenames with duplicate zettelkasten keys, no matter how unique otherwise need to be looked at by the user.
+- Make sure the zettelkasten key is unique amoung all files in the repo. Have a specific warning about this when detecting duplicate file names. This is why `pandas` is so important. Either different hashs can be maintained, or a check can scan through the array of filenames.
+
+## User Story
+
+- User runs script to determine where duplicate files might exist in a large markdown repository. Script runs looking at filenames across the entire directory tree. Reporting back those filenames most likely to be the same.
+
+> Copyright 2024-2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=find-similar-filenames) All rights reserved.
+
 
 /EOF/

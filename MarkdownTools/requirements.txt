@@ -1,2 +1,12 @@
 # extract_names_ner.py
 spacy>=3.5
+
+# extract-hashtag-terms.py
+PyYAML
+pyspellchecker
+
+# visualize-content-clusters.py
+scikit-learn
+pandas>=2.3.3
+multiprocess>=2.6.2
+matplotlib

@@ -1,6 +1,6 @@
-# Markdown Tasks Extraction
+# markdown-tasks-extract.py
 pandas>=2.3.3
-multiprocessing>=2.6.2
+multiprocess>=2.6.2
 
-# Markdown Corkboard
+# markdown-corkboard.py
 PySide6>=6.10.1

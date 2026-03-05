@@ -3,8 +3,11 @@
 ## Purpose
 
 - Extraction tools to make sense of large directories full of markdown files.
-- Report, interprete, and modeling of markdown in general.
+- Report, interprete, and modeling of markdown in general. Bulk markdown tool.
 - Build case in Jupyter to support personal educational journey with text analysis.
+- Not intended to replace linters and validators freely available. Be bulk oriented.
+  - [checkmark](https://github.com/vvvar/checkmark)
+  - [markdownlint](https://github.com/markdownlint/markdownlint)
 
 ## Scripts
 
@@ -28,6 +31,10 @@
 
 
 - **Text preprocessing and cleaning.** Find common syntax mistakes and check front matter.
+  - *Syntax validation.* Ensure the Markdown adheres to CommonMark and GitHub-flavored Markdown.
+  - *Link Validation.* report on validated and broken internal links. Check WikiLink and URL.
+  - *Content and Style Review.* Front matter that is properly formatted. Header tree.
+  - *Content Style Review.* Readability, grammar, and length of files. 
 - **Tokenization.** Specifically tri-gram and question extraction.
 - **Sentiment analysis.** Determine on a content element basis (individual tweet, post, podcast).
 - **Named entity recognition (NER).** Index names, companies, and locations.
@@ -35,6 +42,15 @@
 - **Topic modeling.** Cluster on and discover themes to find marketing opportunities.
 - **Text summarization.** Automation of summaries, overviews, and descriptives.
 
+
+## Keywords
+
+- markdown note-taking tools
+- markdown note taking tools
+- markdown quality assurance
+- markdown quality checkers
+- markdown syntax checker
+- markdown tools command line
 
 ## Reference
 
