@@ -21,3 +21,7 @@
 - When it comes to tasks, have a central place to edit with metadata and context. Properly store these details in a way users doesn't need to manage.
 - Do this to make tasks themselves a basic unit, however, context for presentation doesn't have to be done manually by the user.
 - When possible, have drag and drop ability. Sorting and filtering for a tabular display. Drag columns into desired order to save as views.
+
+> Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=tidy-obsidian-specifications) All rights reserved.
+
+/EOF/
