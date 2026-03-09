@@ -18,23 +18,15 @@ import re
 import sys
 from typing import List, Tuple
 
-try:
-    from nltk.corpus import stopwords
-    NLTK_STOPWORDS = set(stopwords.words('english'))
-except (ImportError, OSError):
-    # Fallback if NLTK not installed or data missing
-    NLTK_STOPWORDS = {
-        'a','an','the','and','or','but','if','then','else','when','while','of','for','on','in','to',
-        'is','are','was','were','be','been','being','it','that','this','these','those','with','as',
-        'by','at','from','not','no','yes','you','i','we','they','he','she','them','his','her','my',
-        'our','your','their','me','do','did','does','done','have','has','had','will','would','can',
-        'could','should','about','which','what','who','whom','how','so','just','also','any','all',
-        'more','most','some','such','into','over','up','down','out','only','now','then'
-    }
+from nltk.corpus import stopwords
+
+# NLTK English stopwords
+NLTK_STOPWORDS = set(stopwords.words('english'))
 
 # Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
 CUSTOM_STOPWORDS = {
-    'eof', 'd', 'f', 'c'
+    # Add custom stopwords here, e.g.: 'word1', 'word2'
+    'eof', 'hittjw'
 }
 
 # Universal English stopwords (NLTK + custom)
@@ -124,8 +116,8 @@ def compute_trigrams(text: str, min_nonstop: int = 2) -> Tuple[collections.Count
     counts = collections.Counter()
     contexts = {}
     for tri in tris:
-        nonstop = sum(1 for w in tri if w not in STOPWORDS)
-        if nonstop >= min_nonstop:
+        # Exclude any trigram containing a stopword
+        if not any(w in STOPWORDS for w in tri):
             key = join_tri(tri)
             counts[key] += 1
     return counts, contexts
