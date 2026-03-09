@@ -116,8 +116,8 @@ def compute_trigrams(text: str, min_nonstop: int = 2) -> Tuple[collections.Count
     counts = collections.Counter()
     contexts = {}
     for tri in tris:
-        # Exclude any trigram containing a stopword
-        if not any(w in STOPWORDS for w in tri):
+        # Exclude any trigram containing a stopword or single-letter word
+        if not any(w in STOPWORDS for w in tri) and not any(len(w) == 1 for w in tri):
             key = join_tri(tri)
             counts[key] += 1
     return counts, contexts
