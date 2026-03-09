@@ -7,7 +7,7 @@ and list them with counts.
 
 Usage examples:
   python scripts/trigrams.py path/to/file.md --start "## Transcript" --end "## Reference" --top 50
-  python scripts/trigrams.py notes.md --min-nonstop 2 --min-count 2 --csv > trigrams.csv
+  python scripts/trigrams.py notes.md --min-ngram 2 --min-count 2 --csv > trigrams.csv
 
 No external dependencies. Works with Python 3.7+.
 """
@@ -95,7 +95,7 @@ def join_tri(tri: Tuple[str,str,str]) -> str:
 
 
 def sample_contexts(original_text: str, tri: str, max_samples: int=3) -> List[str]:
-    # find sentences that contain the trigram (approximate by searching tri in cleaned text)
+    # find sentences that contain the ngram (approximate by searching tri in cleaned text)
     sent_end = re.compile(r'[.!?]\s+')
     sentences = sent_end.split(original_text)
     out = []
@@ -109,14 +109,14 @@ def sample_contexts(original_text: str, tri: str, max_samples: int=3) -> List[st
     return out
 
 
-def compute_trigrams(text: str, min_nonstop: int = 2) -> Tuple[collections.Counter, dict]:
+def compute_trigrams(text: str, min_ngram: int = 2) -> Tuple[collections.Counter, dict]:
     cleaned = clean_markdown(text)
     tokens = tokens_from_text(cleaned)
     tris = trigrams_from_tokens(tokens)
     counts = collections.Counter()
     contexts = {}
     for tri in tris:
-        # Exclude any trigram containing a stopword or single-letter word
+        # Exclude any ngram containing a stopword or single-letter word
         if not any(w in STOPWORDS for w in tri) and not any(len(w) == 1 for w in tri):
             key = join_tri(tri)
             counts[key] += 1
@@ -124,11 +124,11 @@ def compute_trigrams(text: str, min_nonstop: int = 2) -> Tuple[collections.Count
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description='Extract meaningful trigrams from a Markdown file and count occurrences.')
+    p = argparse.ArgumentParser(description='Extract meaningful ngrams from a Markdown file and count occurrences.')
     p.add_argument('file', help='Path to markdown file (or - for stdin)')
     p.add_argument('--start', help='Optional start marker (include text after first occurrence). Exact substring match.')
     p.add_argument('--end', help='Optional end marker (stop before this marker). Exact substring match.')
-    p.add_argument('--min-nonstop', type=int, default=2, help='Minimum number of non-stopwords required in trigram (default 2)')
+    p.add_argument('--min-ngram', type=int, default=2, help='Minimum number of non-stopwords required in ngram (default 2)')
     p.add_argument('--min-count', type=int, default=1, help='Only show trigrams occurring at least this many times (default 1)')
     p.add_argument('--top', type=int, default=0, help='Show top N results (default all)')
     p.add_argument('--csv', action='store_true', help='Emit CSV: trigram,count')
@@ -142,7 +142,7 @@ def main(argv=None):
             data = f.read()
 
     region = extract_region(data, args.start, args.end)
-    counts, contexts = compute_trigrams(region, min_nonstop=args.min_nonstop)
+    counts, contexts = compute_trigrams(region, min_ngram=args.min_ngram)
 
     # filter by min_count and sort
     items = [ (k,v) for k,v in counts.items() if v >= args.min_count ]
@@ -151,7 +151,7 @@ def main(argv=None):
         items = items[:args.top]
 
     if args.csv:
-        print('trigram,count')
+        print('ngram,count')
         for k,v in items:
             print(f'"{k}",{v}')
         return
