@@ -18,15 +18,27 @@ import re
 import sys
 from typing import List, Tuple
 
-# A modest stopword list. Extend as needed.
-STOPWORDS = {
-    'a','an','the','and','or','but','if','then','else','when','while','of','for','on','in','to',
-    'is','are','was','were','be','been','being','it','that','this','these','those','with','as',
-    'by','at','from','not','no','yes','you','i','we','they','he','she','them','his','her','my',
-    'our','your','their','me','do','did','does','done','have','has','had','will','would','can',
-    'could','should','about','which','what','who','whom','how','so','just','also','any','all',
-    'more','most','some','such','into','over','up','down','out','only','now','then'
+try:
+    from nltk.corpus import stopwords
+    NLTK_STOPWORDS = set(stopwords.words('english'))
+except (ImportError, OSError):
+    # Fallback if NLTK not installed or data missing
+    NLTK_STOPWORDS = {
+        'a','an','the','and','or','but','if','then','else','when','while','of','for','on','in','to',
+        'is','are','was','were','be','been','being','it','that','this','these','those','with','as',
+        'by','at','from','not','no','yes','you','i','we','they','he','she','them','his','her','my',
+        'our','your','their','me','do','did','does','done','have','has','had','will','would','can',
+        'could','should','about','which','what','who','whom','how','so','just','also','any','all',
+        'more','most','some','such','into','over','up','down','out','only','now','then'
+    }
+
+# Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
+CUSTOM_STOPWORDS = {
+    'eof', 'd'
 }
+
+# Universal English stopwords (NLTK + custom)
+STOPWORDS = NLTK_STOPWORDS | CUSTOM_STOPWORDS
 
 RE_CODEBLOCK = re.compile(r"```.*?```", re.S)
 RE_INLINE_CODE = re.compile(r"`[^`]*`")
