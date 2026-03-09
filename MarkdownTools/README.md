@@ -11,9 +11,10 @@
 
 ## Scripts
 
-- *extract_names_ner.py*, Use NER to extract PERSON named entities from markdown.
-- *topic_modeling_clusters.py*, Report topical clusters in markdown documents.
-- *extract_trigrams.py*, Report trigrams (three word phrase) found in a set of documents.
+- *extract-names-ner.py*, Use NER to extract PERSON named entities from markdown.
+- *topic-modeling-clusters.py*, Report topical clusters in markdown documents.
+- *extract-ngram-phrases.py*, Report n-grams (three word default) found in a markdown document.
+- *extract-hashtag-terms.py*, Combine both YAML front matter and in body hashtags to list phrases.
 
 ## Tools
 
