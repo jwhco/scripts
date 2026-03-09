@@ -34,7 +34,7 @@ except (ImportError, OSError):
 
 # Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
 CUSTOM_STOPWORDS = {
-    'eof', 'd'
+    'eof', 'd', 'f', 'c'
 }
 
 # Universal English stopwords (NLTK + custom)
