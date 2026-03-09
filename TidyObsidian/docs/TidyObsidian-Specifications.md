@@ -1,11 +1,14 @@
 # Specifications for Tidy Obsidian
 
-## Funcational
+## Functional
+
+- Tools specific for markdown in Obsidian, Zettlr, FOAM, and LogSeq. Focus on compatibility.
 
 ### Procedural
 
 - Be able to represent a Markdown task in several visual forms.
 - Allow editing of tasks in place, as well as in specific views.
+- Be able to extract YAML front matter and markdown seperately. Such as tags and hashtags which may impact context.
 
 ### Commands
 

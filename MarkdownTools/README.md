@@ -9,8 +9,6 @@
     - [checkmark](https://github.com/vvvar/checkmark)
     - [markdownlint](https://github.com/markdownlint/markdownlint)
 
-
-
 ## Tools
 
 - [Python](https://www.python.org/)
