@@ -8,6 +8,7 @@
 - Not intended to replace linters and validators freely available. Be bulk oriented.
     - [checkmark](https://github.com/vvvar/checkmark)
     - [markdownlint](https://github.com/markdownlint/markdownlint)
+- Not intended to replace Voyant Tools, https://voyant-tools.org/docs/tutorial-tools_.html
 
 ## Tools
 
