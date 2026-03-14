@@ -11,5 +11,5 @@ nltk
 # visualize-content-clusters.py
 scikit-learn
 pandas>=2.3.3
-multiprocess>=2.6.2
+multiprocess
 matplotlib

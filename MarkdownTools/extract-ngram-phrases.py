@@ -26,7 +26,7 @@ NLTK_STOPWORDS = set(stopwords.words('english'))
 # Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
 CUSTOM_STOPWORDS = {
     # Add custom stopwords here, e.g.: 'word1', 'word2'
-    'eof', 'hittjw'
+    'eof', 'hittjw', 'http', 'https', 'www', 'com', 'org', 'net', 'io', 'github', 'gitlab',
 }
 
 # Universal English stopwords (NLTK + custom)
