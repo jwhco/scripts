@@ -6,9 +6,12 @@
 - Preserve catalog codes like `A1234B`, `001_A1234B` and `GL7` that are hashtags. They are short (under 10 characters), typically with upper case and numbers.
 - Handle CamelCase, kebab-case, and snake_case, when converting to n-gram phrases. Normalize before listing.
 - Preserve channel hashtags like `#ABR` and `#SWS` making sure to keep uppercase. When presented in normalization, they will remain upper case.
-- Run through files faster by skipping hidden directories. Ignore anything in a `.directory` type folder.
+- Prune down paths,
+  - Run through files faster by skipping hidden directories. Ignore anything in a `.directory` type folder. Git, Obsidian and LogSeq have hidden folders.
+  - Ignore any directories named `Templates` and files with the word "TEMPLATE" in the filename. These are common in Obsidian.
 
 - PRIORITIZE WHITELIST: If the substring is a whitelisted term, take it as a whole even if 'you' and 'tube' are in the dictionary. String `#YouTubeStudio` gets turned into `youtube studio` rather than `you tube studio`.
+- 
 
 ## User Story
 

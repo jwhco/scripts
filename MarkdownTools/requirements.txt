@@ -5,6 +5,9 @@ spacy>=3.5
 PyYAML
 pyspellchecker
 
+# extract-ngram-phrases.py
+nltk
+
 # visualize-content-clusters.py
 scikit-learn
 pandas>=2.3.3
