@@ -1,0 +1,9 @@
+name: GitHub Pre-Push actions
+on: [push]
+jobs:
+  ensure_clean_jupyter_notebooks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: ResearchSoftwareActions/EnsureCleanNotebooksAction@1.1
+      with:
+        disable-checks: execution_count
