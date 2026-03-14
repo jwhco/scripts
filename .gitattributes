@@ -7,4 +7,7 @@
 *.csv text eol=crlf
 
 
+# Jupyter Notebooks
+*.ipynb diff=jupyternotebook
+*.ipynb merge=jupyternotebook
 

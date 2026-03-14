@@ -1,5 +1,8 @@
 # Git Ignore
-.ipynb_checkpoints
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
 
 # (Text2Markdown) Simplenote2Zettelkasten.py 
 */notes.zip
@@ -10,4 +13,12 @@
 *.deb
 
 # Python Virtual Environment
-venv
+.env
+env/
+.venv
+venv/
+
+# Large data files
+*.csv
+
+
