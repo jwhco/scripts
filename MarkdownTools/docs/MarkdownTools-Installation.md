@@ -13,6 +13,7 @@ python3 -m pip install -r MarkdownTools/requirements.txt
 
 3. Open a Juyper in VsCode to run,
    1. Correct any errors in execution,
+      1. Change Kernels to Pythong Virtual Environment,
    2. Make corrections in `requirements.txt`
    3. Check running in right environment,
 4. FINISH
