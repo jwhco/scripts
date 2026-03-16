@@ -9,7 +9,7 @@ from spellchecker import SpellChecker
 
 # Configuration
 # ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten" # Ubuntu
-ZETTEL_ROOT = "/workspace/obsidian/Zettelkasten" # K8S
+ZETTEL_ROOT = "/workspaces/obsidian/Zettelkasten" # K8S
 
 WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 

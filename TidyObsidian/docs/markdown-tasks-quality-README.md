@@ -1,6 +1,6 @@
 # Markdown Task Quality Checker
 
-## Purpose 
+## Purpose
 
 - Find non-standard markdown tasks, fix them or highlight for user, report all tasks.
 - The script itself doesn't change the markdown files, it reports a higher quality version of the tasks.
@@ -12,8 +12,8 @@
 
 ```markdown
 - [ ] Task description. (Est: 8h)
-	- [ ] Sub-Task Description (2h)
-	- [ ] Sub-Task Two Description.
+    - [ ] Sub-Task Description (2h)
+    - [ ] Sub-Task Two Description.
 ```
 
 - Because Obsidian is my primary note-tking application, favor syntax compatable with Task plugin.
@@ -27,10 +27,9 @@
 ## Requirements
 
 - When cleaning up a task, don't change layout. Don't change indentation, tab spacing in front of bullet list. The task could have sub-tasks for details in a list.
-- Find all the markdown tasks like `grep -r -E '^[\t ]*[-*]\s*\[.?\].*' /workspace/obsidian --include=*.md` which works well. It finds things the script mixed.
+- Find all the markdown tasks like `grep -r -E '^[\t ]*[-*]\s*\[.?\].*' /workspaces/obsidian --include=*.md` which works well. It finds things the script mixed.
 - Script needs to know if a task is in a `---` or code block as an example. Wholesale updating format may be okay, except in documentation showing poor syntax.
 - Understand tasks that are hierachal, attributing the indented sub-tasks as inherint dependency to the higher level task. An outline of tasks implies highest level tasks are completed after the sub-tasks, or sub-sub-tasks are completed.
-
 
 ## Workflow Pseodocode
 
@@ -45,17 +44,14 @@
 9. Report best quality markdown task. Make sure that every task is hashed in a way to match back with original when updates are available.
 10. END
 
-
-
-
 ## Notes
 
-- Python library `markdown-checklist` can crate task lists with checkboxes in Markdown format. 
+- Python library `markdown-checklist` can crate task lists with checkboxes in Markdown format.
 - Python library `markdown-analysis` can parse markdown, extracting headers, paragraphs, and links. https://pypi.org/project/markdown-analysis/
 
 ## Reference
 
 - Matthew Rathbone. (2025, August 19) Markdown Task Lists and Checkboxes: Complete Guide for Project Management. https://blog.markdowntools.com/posts/markdown-task-lists-and-checkboxes-complete-guide
-  - Highlights good and bad syntax for basic task list. As well as some platform specific.
+    - Highlights good and bad syntax for basic task list. As well as some platform specific.
 
 /EOF/

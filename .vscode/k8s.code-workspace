@@ -1,11 +1,11 @@
 {
 	"folders": [
 		{
-			"path": "/workspace/scripts"
+			"path": "/workspaces/scripts",
 		},
 		{
-			"path": "/workspace/obsidian"
-		}
+			"path": "/workspaces/obsidian",
+		},
 	],
-	"settings": {}
+	"settings": {},
 }
