@@ -166,14 +166,11 @@ def inventory(media_root: Path, catalog_filter: Optional[str] = None,
     # Print results
     count = 0
     for sidecar_path, metadata in sidecars:
-        # Create relative path for display (VS Code clickable)
-        try:
-            rel_path = sidecar_path.relative_to(media_root)
-        except ValueError:
-            rel_path = sidecar_path
+        # Use absolute path for display (VS Code clickable)
+        abs_path = str(sidecar_path)
         
         # Format the output row
-        output = format_output_row(metadata, str(rel_path))
+        output = format_output_row(metadata, abs_path)
         print(output)
         
         count += 1
