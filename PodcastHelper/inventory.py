@@ -178,7 +178,10 @@ def inventory(media_root: Path, catalog_filter: Optional[str] = None,
             break
     
     print('-' * 80)
-    print(f"Total: {count} sidecar(s) found")
+    if limit is not None and len(sidecars) > count:
+        print(f"Showing: {count} of {len(sidecars)} sidecar(s) found")
+    else:
+        print(f"Total: {len(sidecars)} sidecar(s) found")
     
     return 0
 
