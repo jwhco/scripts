@@ -12,11 +12,22 @@
 
 ## Specifications
 
-- Extract key functions from `markdown-tasks-extract.py` to use here. Place in external file for use with both scripts.
+
+- Tasks are formatted in the markdown files are compatible with Obsidian Dataview Task plugins. There may be non-standard tasks, which it would be okay to report as errors. Only the single line indicated by the markdown task designation, i.e. `- [ ]` or `- [/]` (not complete tasks) is in scope.
+- Dependences between tasks are indicated by the `[dependsOn:: A1B2C3]` YAML containing the ID of a precuser task. The linked task will include `[id:: A1B2C3]` clearly stated.
+- Look at the [Obsidian Tasks plugin](https://github.com/obsidian-tasks-group/obsidian-tasks) repo for details on formatting. Also the [Tasks User Guide - Task Formats](https://publish.obsidian.md/tasks/Reference/Task+Formats/About+Task+Formats) for formatting.
+
+- The `--catalog A1234B`, `--channel ABC`, and `--hashtag HashTag` are all strings. Contents will vary, but it will always be a string with no spaces, not case sensative, and textually included on the task line or in the YAML front matter of the same document.
+- When determining urgency, all tasks will need to be extracted into memory, then dates calculated. Some dates will need to be updated with dates from the original note. 
+  - At  very basic, use a network nodal relationship between dependences to determine which tasks are more important than others. A task with a lot of connections is more important than one with very few.
+  - The task itself may have a `[priority:: high]` YAML value. If each of the possible priorities have a number value, then it can go in the decision matrix that determines urgency. Build a reference file, then model how [obsidian task plugin urgency](https://publish.obsidian.md/tasks/Advanced/Urgency) is calculated.
 
 ## Requirements
 
 - The tree displayed will be like the MS-DOS `tree` command that would outline directories visually. Show in ANSI characters suitable for an `xterm` terminal.
+-  Extract key functions from `markdown-tasks-extract.py` to use here. Place in external file for use with both scripts. Write a library to contain common code.
+- Works with the markdown extensions `.md` and `.mmd` exclusively. Expect the markdown to be commonmark, GitHub flavored, or Pandoc markdown. The markdown may include YAML front matter.
+- Process all files with tasks. Optimize disk engagement to reduce overhead. Don't assume the markdown corpus is Obsidian. It could be managed by LogSeq, Zettlr, or FOAM.
 
 ## User Story
 
