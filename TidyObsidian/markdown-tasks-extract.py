@@ -64,12 +64,12 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="Stop after finding N files with tasks")
     args = parser.parse_args()
 
-    # 1. Collection Phase (Ignoring hidden dirs)
+    # 1. Collection Phase (Ignoring hidden dirs and Templates)
     all_files = []
     for root, dirs, files in os.walk(args.directory):
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'Templates']
         for f in files:
-            if f.endswith('.md'):
+            if f.endswith('.md') and 'Template' not in f:
                 all_files.append(os.path.join(root, f))
                 if args.limit and len(all_files) >= args.limit:
                     break
