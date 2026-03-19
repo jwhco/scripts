@@ -9,6 +9,7 @@ Markdown Tasks - Tree
 import argparse
 import os
 import re
+import sys
 from collections import defaultdict
 from markdowntasks import extract_tasks_from_line, get_tasks_from_file, get_tasks_from_directory
 
@@ -93,6 +94,30 @@ def sort_tasks_by_urgency(tasks):
     return sorted(tasks, key=lambda x: (x.get('status', 'todo'), x.get('text', '')))
 
 
+def get_tasks_from_source(source):
+    """Get tasks from various input sources: stdin (-), file, or directory.
+    """
+    tasks = []
+    
+    if source == '-':
+        # Read from stdin
+        for line in sys.stdin:
+            task = extract_tasks_from_line(line)
+            if task:
+                task['file'] = '<stdin>'
+                tasks.append(task)
+    elif os.path.isfile(source):
+        # Single file
+        tasks = get_tasks_from_file(source)
+    elif os.path.isdir(source):
+        # Directory - recurse
+        tasks = get_tasks_from_directory(source, recursive=True)
+    else:
+        raise ValueError(f"Source '{source}' is not a valid file or directory")
+    
+    return tasks
+
+
 def main():
     """Main function to parse arguments and run the script.
     """
@@ -103,8 +128,17 @@ def main():
 Examples:
   %(prog)s --hashtag Project
   %(prog)s --catalog personal --limit 5
-  %(prog)s --channel work --directory /path/to/notes
+  cat file.md | %(prog)s --channel work -
+  %(prog)s /path/to/notes
         """
+    )
+    
+    # Input source (positional)
+    parser.add_argument(
+        'source',
+        nargs='?',
+        default='.',
+        help='Input source: directory (default: current), file path, or - for stdin'
     )
     
     # Filter options (mutually exclusive, optional)
@@ -130,17 +164,6 @@ Examples:
         help='Limit to top N tasks'
     )
     parser.add_argument(
-        '--directory',
-        default='.',
-        help='Directory to search for markdown files (default: current directory)'
-    )
-    parser.add_argument(
-        '--recursive',
-        action='store_true',
-        default=True,
-        help='Search recursively (default: True)'
-    )
-    parser.add_argument(
         '--max-depth',
         type=int,
         default=3,
@@ -149,11 +172,11 @@ Examples:
     
     args = parser.parse_args()
     
-    # Get all tasks from markdown files
+    # Get all tasks from source (stdin, file, or directory)
     try:
-        tasks = get_tasks_from_directory(args.directory, args.recursive)
+        tasks = get_tasks_from_source(args.source)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}", file=sys.stderr)
         return 1
     
     # Filter tasks based on the specified filter (optional)
