@@ -107,8 +107,8 @@ Examples:
         """
     )
     
-    # Filter options (mutually exclusive)
-    filter_group = parser.add_mutually_exclusive_group(required=True)
+    # Filter options (mutually exclusive, optional)
+    filter_group = parser.add_mutually_exclusive_group(required=False)
     filter_group.add_argument(
         '--hashtag',
         help='Filter tasks by hashtag'
@@ -156,7 +156,7 @@ Examples:
         print(f"Error: {e}")
         return 1
     
-    # Filter tasks based on the specified filter
+    # Filter tasks based on the specified filter (optional)
     if args.hashtag:
         filtered_tasks = filter_tasks_by_hashtag(tasks, args.hashtag)
         filter_type = "hashtag"
@@ -169,16 +169,27 @@ Examples:
         filtered_tasks = filter_tasks_by_channel(tasks, args.channel)
         filter_type = "channel"
         filter_value = args.channel
+    else:
+        # No filter applied, show all tasks
+        filtered_tasks = tasks
+        filter_type = None
+        filter_value = None
     
     # Sort tasks by urgency
     filtered_tasks = sort_tasks_by_urgency(filtered_tasks)
     
     # Apply limit if specified
     if args.limit and len(filtered_tasks) > args.limit:
-        print(f"Showing top {args.limit} of {len(filtered_tasks)} tasks with {filter_type} '{filter_value}'")
+        if filter_type:
+            print(f"Showing top {args.limit} of {len(filtered_tasks)} tasks with {filter_type} '{filter_value}'")
+        else:
+            print(f"Showing top {args.limit} of {len(filtered_tasks)} tasks")
         filtered_tasks = filtered_tasks[:args.limit]
     else:
-        print(f"Showing {len(filtered_tasks)} tasks with {filter_type} '{filter_value}'")
+        if filter_type:
+            print(f"Showing {len(filtered_tasks)} tasks with {filter_type} '{filter_value}'")
+        else:
+            print(f"Showing {len(filtered_tasks)} tasks")
     
     # Build and display dependency tree
     tree, task_map = build_dependency_tree(filtered_tasks)
