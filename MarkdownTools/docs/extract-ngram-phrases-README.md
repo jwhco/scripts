@@ -2,11 +2,14 @@
 
 ## Use Case
 
-- Extract from a file all of the ngrams (trigram by default), then print on the screen.
+- Extract from a file all of the ngrams (trigram by default), then print on the screen. Use to better understand a single file or a corpus of files.
+- The n-grams can be piped into a script for further analysis, or handled by another tool for clustering. 
 
-## Configuration
+## Configure Run-Time Environment
 
-- Install NLTK data sets, https://www.nltk.org/data.html
+1. Work from a `.venv` Python Virtual Environment,
+2. Prepare packages, `pip install -r requirements.txt`,
+3. Install NLTK data sets, https://www.nltk.org/data.html
 
 ```python
 import nltk

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-- A library of scripts to support text conversion, editirial productivity, and quality assurance of markdown.
+- A library of scripts to support text conversion, editorial productivity, and quality assurance of markdown.
 
 ## Conciseness
 
