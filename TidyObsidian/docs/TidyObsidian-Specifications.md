@@ -19,6 +19,22 @@
 
 ## Technical
 
+### Task Dependency in Hierachial Relationship
+
+- Start with Weighted Network Model or Graph.
+- A task that is blocked is less important than the blocking task. The blocking task needs to be done first. So if task A depends on the completion of task B, then B is a higher priority by relationship. 
+  - The priority and due dates of task A get passed to B in the network relationship. While priorities may be off, or additional tasks blocking, these calculations create task weighting.
+  - To determine which task is valuable, a network diagram is build. Factors such as aging, priority, dependencies, and being in progress are weights in connections. 
+- The tasks are the `nodes` with connections being dependencies. Those dependences can be a value on `dependsOn` or the same `channel`, `catalog` or `hashtag` reference. Nodes cluster when they are in the same file.
+  - Common hashtags form communities.
+  - The weight becomes the distance between each node. Then to get from one task to another, the tasks with the longest road needs to be done first. Like a bunch of tasks hanging off a `Goal` hashtag.
+    - All `Goal` hashtags together is a nodal cluster, `--hashtag Goal` then weight based on the same category of tasks.
+- All of this allows [Network Analysis](https://almeidasilvaf.github.io/NAR/chapters/02_network_statistics.html) on the tasks.  Calculations can be done on a GPU if you have  lot of tasks. Math is likely better than grinding out the text or using AI to interperet.
+
+Reference:
+
+- Sarah Lee (AI). (2025, May 19) The Ultimate Guide to Weighted Graphs. https://www.numberanalytics.com/blog/ultimate-guide-weighted-graphs
+
 ### Universal Task Editing Console
 
 - When it comes to tasks, have a central place to edit with metadata and context. Properly store these details in a way users doesn't need to manage.

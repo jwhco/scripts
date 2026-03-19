@@ -12,7 +12,7 @@
     - [ ] Fourth outcome oriented task, [id:: abc123]
     - [ ] Fifth outcome oriented task, #A1234A [priority:: highest]
     - [ ] Sixth outcome oriented task, #B3453C [dependsOn:: abc123]
-- [ ] Random thing to get done, [created:: 2025-11-28] [due:: 2026-01-01]
+- [ ] #Project, Random thing to get done, [created:: 2025-11-28] [due:: 2026-01-01]
     - Specific thing to do for this task.
     - Another thing related to this random task. [id:: xyz456]
 - [ ] Another random thing doing, [created:: 2024-01-01] This statement is out of order.
