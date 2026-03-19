@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+"""
+Markdown Tasks - Quality Check
+
+Extract markdown tasks, clean them up, present in proper order. Standardize on Obsidian Dataview Tasks.
+
+"""
+
+
 import os
 import re
 import argparse
@@ -128,12 +138,8 @@ def process_file(file_path, live=False):
 def main():
     parser = argparse.ArgumentParser(description="Quality Control: Surgical Task Standardizer")
     parser.add_argument("dir", nargs="?", default=".", help="Vault directory")
-    parser.add_argument("--fixtasks", nargs="?", const="dry", choices=['dry', 'true'], 
+    parser.add_argument("--fixtasks", nargs="?", const="dry", choices=['dry', 'true'],
                         help="Standardize tasks: 'dry' (report only) or 'true' (modify disk)")
-    
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
 
     args = parser.parse_args()
     is_live = (args.fixtasks == 'true')

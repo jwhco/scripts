@@ -8,7 +8,6 @@
 
 - You are an experiened software developer with expertise in python, text analytics, data mining, and tool development.
 
-
 ## Tools Used
 
 - [Python3](https://www.python.org/). Scripting language with access to NLP and ML.
@@ -25,6 +24,7 @@
 - For details about modules (the sub-directory folders) see [[README]] in the root directory.
 - Try not to duplicate file names across modules. Use human readable naming conventions for tools as the scripts act as functions in the larger toolset.
 - Write clear well documented code that runs in distributed environments with minimal easy to follow user interfaces. Keep it simple.
+- Use unix style commands, meaning they can accept standard input, a specific file name, or a directory name. Otherwise the command runs down a directory tree.
 
 ## Organization
 

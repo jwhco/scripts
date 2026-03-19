@@ -1,9 +1,4 @@
-import os
-import re
-import argparse
-import multiprocessing
-import pandas as pd
-import hashlib
+#!/usr/bin/env python3
 
 """
 Markdown Tasks Extract
@@ -11,6 +6,15 @@ Markdown Tasks Extract
 - An example for standardizating of extracting markdown tasks.
 
 """
+
+import os
+import re
+import argparse
+import multiprocessing
+import pandas as pd
+import hashlib
+
+
 
 def get_hash(text):
     """Returns a stable hex hash of the input text to avoid comma issues."""

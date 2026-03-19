@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+
+"""
+Markdown Tasks - Fix Id
+
+A quality check for Markdown Obisidan Dataview Tasks
+"""
+
+
 import os
 import re
 import argparse
