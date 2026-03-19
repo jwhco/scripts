@@ -1,6 +1,6 @@
 # markdown-tasks-extract.py
-pandas>=2.3.3
-multiprocess>=2.6.2
+pandas>=3.0.1
+multiprocess>=0.70.19
 
 # markdown-corkboard.py
-PySide6>=6.10.1
+PySide6>=6.10.2
