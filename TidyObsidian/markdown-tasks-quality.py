@@ -144,13 +144,13 @@ def main():
     args = parser.parse_args()
     is_live = (args.fixtasks == 'true')
 
-    # Collect files ignoring hidden directories
+    # Collect files ignoring hidden directories and Templates
     all_files = []
     # Adjusted file collection to include additional markdown extensions
     for root, dirs, fs in os.walk(args.dir):
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'Templates']
         for f in fs:
-            if f.endswith(('.md', '.markdown')):
+            if f.endswith(('.md', '.markdown')) and 'Template' not in f:
                 all_files.append(os.path.join(root, f))
 
     print(f"--- Quality Audit: {len(all_files)} files ---", file=sys.stderr)

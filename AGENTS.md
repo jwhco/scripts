@@ -25,6 +25,7 @@
 - Try not to duplicate file names across modules. Use human readable naming conventions for tools as the scripts act as functions in the larger toolset.
 - Write clear well documented code that runs in distributed environments with minimal easy to follow user interfaces. Keep it simple.
 - Use unix style commands, meaning they can accept standard input, a specific file name, or a directory name. Otherwise the command runs down a directory tree.
+- For all scripts and documents use kabab-case for OS compatibility.
 
 ## Organization
 
