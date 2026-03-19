@@ -24,7 +24,8 @@
 
 ## Requirements
 
-- The tree displayed will be like the MS-DOS `tree` command that would outline directories visually. Show in ANSI characters suitable for an `xterm` terminal.
+- The tree displayed will be like the MS-DOS `tree` command that would outline directories visually. Show in ANSI ASCII characters suitable for an `xterm` terminal.
+  - The ASCII character range was 128 to 255, used for drawing lines and connecting elements in the graphical representation of the directory tree.
 -  Extract key functions from `markdown-tasks-extract.py` to use here. Place in external file for use with both scripts. Write a library to contain common code.
 - Works with the markdown extensions `.md` and `.mmd` exclusively. Expect the markdown to be commonmark, GitHub flavored, or Pandoc markdown. The markdown may include YAML front matter.
 - Process all files with tasks. Optimize disk engagement to reduce overhead. Don't assume the markdown corpus is Obsidian. It could be managed by LogSeq, Zettlr, or FOAM.
