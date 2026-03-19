@@ -15,7 +15,7 @@ from collections import defaultdict
 
 def extract_tasks_from_line(line):
     """Parse a single markdown task line into task data.
-    Example: '- [ ] #Project, Title of Project.'
+    Example: '- [ ] #Project, Title of Project. [id:: A1B2C3] [dependsOn:: X9Y8Z7]'
     """
     task = {}
     # Extract task status
@@ -30,21 +30,33 @@ def extract_tasks_from_line(line):
     text_match = re.search(r'\] (.*)', line)
     if not text_match:
         return None
-    task['text'] = text_match.group(1).strip()
+    full_text = text_match.group(1).strip()
+    task['text'] = full_text
 
-    # Extract tags
-    tags_match = re.search(r'#([^\s]+)', line)
-    if tags_match:
-        task['tags'] = [tag.strip() for tag in tags_match.group(1).split(',')]
-    else:
-        task['tags'] = []
+    # Extract Obsidian Dataview metadata [key:: value]
+    metadata_pattern = re.compile(r'\[(\w+)::\s*([^\]]+)\]')
+    metadata = {}
+    for match in metadata_pattern.finditer(full_text):
+        key = match.group(1).lower()
+        value = match.group(2).strip()
+        metadata[key] = value
+    
+    task['id'] = metadata.get('id')
+    task['priority'] = metadata.get('priority')
+    task['due'] = metadata.get('due')
+    task['created'] = metadata.get('created')
+    task['dependson'] = metadata.get('dependson')
+    
+    # Extract hashtags (#Project)
+    tags_pattern = re.compile(r'#(\w+)')
+    tags = [tag.lower() for tag in tags_pattern.findall(full_text)]
+    task['tags'] = tags if tags else []
 
-    # Extract dependencies
-    dep_match = re.search(r'\[[^\]]+\]', line)
-    if dep_match:
-        task['dependencies'] = [dep.strip()[1:-1] for dep in dep_match.group(0).split('->')]
-    else:
-        task['dependencies'] = []
+    # Extract dependencies (dependsOn field)
+    dependencies = []
+    if task.get('dependson'):
+        dependencies = [dep.strip() for dep in task['dependson'].split(',')]
+    task['dependencies'] = dependencies
 
     return task
 
