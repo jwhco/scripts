@@ -10,7 +10,7 @@ import argparse
 import os
 import re
 from collections import defaultdict
-from markdowntasks import extract_tasks_from_line, get_tasks_from_file
+from markdowntasks import extract_tasks_from_line, get_tasks_from_file, get_tasks_from_directory
 
 def build_dependency_tree(tasks, root_tag=None):
     """Build a hierarchical dependency tree from tasks.

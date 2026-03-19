@@ -1,5 +1,15 @@
-# tidy_obsidian.py - Shared library for TidyObsidian scripts
 
+
+"""
+Markdown Tasks Library
+
+- For quality assurance and management of markdown tasks following Obsidian Dataview Tasks format.
+
+"""
+
+
+
+import os
 import re
 from collections import defaultdict
 
