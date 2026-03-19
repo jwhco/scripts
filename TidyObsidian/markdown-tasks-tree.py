@@ -78,16 +78,17 @@ def build_dependency_tree(filtered_tasks, all_tasks):
     return graph, task_map, root_task_ids
 
 
-def display_tree(graph, task_map, root_tasks=None, indent=0, max_depth=3, visited=None):
+def display_tree(graph, task_map, root_tasks=None, indent=0, max_depth=5, visited=None, show_prefix=True):
     """Display the dependency tree in ANSI format with task descriptions.
     
     Args:
         graph: Dependency graph (parent -> [children])
         task_map: Task ID -> task object mapping
         root_tasks: List of root task IDs to start from
-        indent: Current indentation level
-        max_depth: Maximum tree depth
+        indent: Current indentation level (spaces)
+        max_depth: Maximum tree depth (default 5 for at least 3 meaningful levels)
         visited: Set of already-visited task IDs to prevent duplicates
+        show_prefix: Whether to show the └── tree character (False for root level)
     """
     if visited is None:
         visited = set()
@@ -109,16 +110,18 @@ def display_tree(graph, task_map, root_tasks=None, indent=0, max_depth=3, visite
         if not task:
             continue
         
-        # Format: indent + box corner + task text + status
+        # Format: indent + optional box corner + task text + status
         status_char = 'x' if task.get('status') == 'done' else ' '
         task_text = task.get('text', 'Unknown')
-        prefix = '└── ' if indent > 0 else ''
+        prefix = '└── ' if show_prefix else ''
         print(' ' * indent + prefix + f"[{status_char}] {task_text}")
         
         # Recursively display children
         children = graph.get(task_id, [])
         if children:
-            display_tree(graph, task_map, children, indent + 4, max_depth - 1, visited)
+            # Increment indent by 1 for each level (aligns in middle of previous └──)
+            child_indent = indent + 1
+            display_tree(graph, task_map, children, child_indent, max_depth - 1, visited, show_prefix=True)
 
 
 def filter_tasks_by_hashtag(tasks, hashtag):
@@ -235,8 +238,8 @@ Examples:
     parser.add_argument(
         '--max-depth',
         type=int,
-        default=3,
-        help='Maximum depth to display in the tree (default: 3)'
+        default=5,
+        help='Maximum depth to display in the tree (default: 5)'
     )
     
     args = parser.parse_args()
@@ -287,7 +290,7 @@ Examples:
     # Include all dependencies of the filtered tasks
     graph, task_map, root_task_ids = build_dependency_tree(filtered_tasks, tasks)
     
-    display_tree(graph, task_map, root_task_ids, max_depth=args.max_depth)
+    display_tree(graph, task_map, root_task_ids, max_depth=args.max_depth, show_prefix=False)
     
     return 0
 

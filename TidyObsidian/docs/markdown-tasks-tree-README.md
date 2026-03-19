@@ -3,7 +3,7 @@
 ## Use Case
 
 - Extract markdown related tasks in the Obsidian Dataview Task plugin format, display them in a heirarchal tree according to dependences.
-- 
+- Tasks higher on the list need to be done first and my be blocking sub-tasks in the tree.
 
 ## Configuration
 
