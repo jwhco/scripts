@@ -12,6 +12,7 @@
 
 ## Specifications
 
+- The three character indent, `└──` lets you have a 'T' in the middle. This makes the long `|` multple line link work.
 
 - Tasks are formatted in the markdown files are compatible with Obsidian Dataview Task plugins. There may be non-standard tasks, which it would be okay to report as errors. Only the single line indicated by the markdown task designation, i.e. `- [ ]` or `- [/]` (not complete tasks) is in scope.
 - Dependences between tasks are indicated by the `[dependsOn:: A1B2C3]` YAML containing the ID of a precuser task. The linked task will include `[id:: A1B2C3]` clearly stated.
