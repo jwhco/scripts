@@ -39,6 +39,10 @@
 	- What is returned to the output is a heirarchy with the most important project at top, then continues.
 	- With the `--limit 5` option, the User can see the top five of that hashtag, as well as everything in the tree. 
 
+- User asks script, `python markdown-tasks-tree.py --hashtag Project /workspaces/obsidian/ --limit 5` expecting tasks containing `#Project` to be at the top level of the tree. 
+  - The script returns, the top 5 priority scoring tasks, then a tree showing the relationship of any task dependencies. The dependences don't have to have the hashtag.
+  - After printing this tree to screen, the script states "Showing top 5 of 17 tasks with hashtag 'Project'" before exiting.
+
 > Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=markdown-tasks-tree) All rights reserved.
 
 /EOF/
