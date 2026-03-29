@@ -219,24 +219,34 @@ def find_duplicates(
     all_blocks = [item for sublist in block_results for item in sublist]
     print(f"Collected {len(all_blocks)} blocks from unique files.\n")
 
-    # Step 5: Aggressive, indexed block-level duplicate detection
+        # Step 5: Aggressive, indexed block-level duplicate detection
     canonical_blocks = []
     token_index = defaultdict(set)
 
-
     for file_path, block_text, line_num in all_blocks:
         tokens = tokenize(block_text)
-        length = len(block_text)
+        if not tokens:
+            continue
 
+        length = len(block_text)
+        token_count = len(tokens)
         sig_tokens = select_signature_tokens(tokens)
+
+        # If we have no signature tokens (e.g., all stopwords), just treat as its own canonical block.
         if not sig_tokens:
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {"text": block_text, "tokens": tokens, "length": length,
-                 "locations": [(file_path, line_num)]}
+                {
+                    "text": block_text,
+                    "tokens": tokens,
+                    "token_count": token_count,
+                    "length": length,
+                    "locations": [(file_path, line_num)],
+                }
             )
             continue
 
+        # Collect candidate canonical block indices via inverted index.
         candidate_indices = set()
         for t in sig_tokens:
             candidate_indices.update(token_index.get(t, ()))
@@ -245,6 +255,7 @@ def find_duplicates(
         for idx in candidate_indices:
             cb = canonical_blocks[idx]
 
+            # Quick length ratio filter (same as before).
             shorter = min(cb["length"], length)
             longer = max(cb["length"], length)
             if longer == 0:
@@ -252,7 +263,8 @@ def find_duplicates(
             if (longer - shorter) / longer > LENGTH_RATIO_TOLERANCE:
                 continue
 
-            sim = jaccard(tokens, cb["tokens"])
+            # Faster Jaccard using cached token counts.
+            sim = jaccard(tokens, cb["tokens"], token_count, cb["token_count"])
             if sim >= similarity_threshold:
                 cb["locations"].append((file_path, line_num))
                 matched = True
@@ -261,11 +273,17 @@ def find_duplicates(
         if not matched:
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {"text": block_text, "tokens": tokens, "length": length,
-                 "locations": [(file_path, line_num)]}
+                {
+                    "text": block_text,
+                    "tokens": tokens,
+                    "token_count": token_count,
+                    "length": length,
+                    "locations": [(file_path, line_num)],
+                }
             )
             for t in sig_tokens:
                 token_index[t].add(cb_idx)
+
 
     # Step 6: Keep only blocks appearing in >1 file
     duplicates = []
