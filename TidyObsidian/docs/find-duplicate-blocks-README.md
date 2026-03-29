@@ -34,6 +34,8 @@
 
 - Because the Obsidian vault is in a Git repo, use the Git local metadata to find files faster. Avoid heavy disk reads until looking at file context.
 
+- Use stop words to skip tokenization of low value text. Overall reducing the number of tokens to compare.
+
 ## Usage
 
 Go to working directly. Call script by full path.
