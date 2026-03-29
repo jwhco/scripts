@@ -99,14 +99,39 @@ def tokenize(text):
     return set(WORD_RE.findall(text.lower()))
 
 
-def jaccard(tokens_a, tokens_b):
+def jaccard(tokens_a, tokens_b, len_a=None, len_b=None):
+    """Faster Jaccard using precomputed lengths when available."""
     if not tokens_a or not tokens_b:
         return 0.0
     inter = len(tokens_a & tokens_b)
     if inter == 0:
         return 0.0
-    union = len(tokens_a | tokens_b)
+    if len_a is None:
+        len_a = len(tokens_a)
+    if len_b is None:
+        len_b = len(tokens_b)
+    union = len_a + len_b - inter
+    if union == 0:
+        return 0.0
     return inter / union
+
+
+def select_signature_tokens(tokens):
+    """Hash-based selection of signature tokens (more selective than lexicographic)."""
+    if not tokens:
+        return []
+    # Stable hash: sha1 of token text, then sort by that value
+    # This approximates MinHash but stays simple and deterministic.
+    hashed = [
+        (hashlib.sha1(tok.encode("utf-8")).hexdigest(), tok)
+        for tok in tokens
+        if tok not in STOPWORDS  # skip very common / low-value tokens
+    ]
+    if not hashed:
+        return []
+    hashed.sort(key=lambda x: x[0])
+    return [tok for _, tok in hashed[:SIGNATURE_TOKENS_PER_BLOCK]]
+
 
 
 def read_and_hash_file(args):
@@ -198,11 +223,6 @@ def find_duplicates(
     canonical_blocks = []
     token_index = defaultdict(set)
 
-    def select_signature_tokens(tokens):
-        if not tokens:
-            return []
-        sorted_tokens = sorted(tokens)
-        return sorted_tokens[:SIGNATURE_TOKENS_PER_BLOCK]
 
     for file_path, block_text, line_num in all_blocks:
         tokens = tokenize(block_text)
