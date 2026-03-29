@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Sus out blocks of duplicate text across an entire directory tree. 
+- Sus out blocks of duplicate text across an entire directory tree.
 - Script works very well with any directory full of Markdown. Any file based note-taking.
 - Find thin content. Files that are pretty much empty will show up as dupliate.
 
@@ -13,29 +13,30 @@
 - Script grinds out a lot of CPU and memory. Need a more incremental way of processing. Maybe read blocks into blocks on disk, then come back and compare. There are 38K files in this Obsidian vault. That's too many.
 - Make more command line friendly. Return any non-zero number of duplicate blocks. Have a `--silent` mode which writes the output to a local file in the root directory.
 - It looks like the script does scanning, then checking, and only shows output after all the blocks are checked. It needs to show output as it is checking.
-  -  For later to add a limit in the number of finds, the reporting of finds needs to be done as the checks go on.
-  - Don't wait till the scanning is done to start showing some results.
+    - For later to add a limit in the number of finds, the reporting of finds needs to be done as the checks go on.
+    - Don't wait till the scanning is done to start showing some results.
 - The checking of files seems to be in parallel, however, the block checking is not in parallel or using multiple processors.
-  - Check larger blocks of hash. Check four or eight at a time. Sort through everything to check fasster.
-
+    - Check larger blocks of hash. Check four or eight at a time. Sort through everything to check fasster.
 
 ## Requirements
 
-- Determine which blocks in Markdown files are duplicate. Run through whole files first, then if desired run through individual files. When checking a whole file, a checksum is good enough. 
+- Determine which blocks in Markdown files are duplicate. Run through whole files first, then if desired run through individual files. When checking a whole file, a checksum is good enough.
 - Report of possible duplicate files, or percent duplicate. Report with "=== Similar files: %% match ===" then list of markdown files. That's enough for an operator to search on strings to find files.
-- Ignores headers `##` and `##` because those are likely to be similar in note-taking templates. 
+- Ignores headers `##` and `##` because those are likely to be similar in note-taking templates.
 - Completely ignore YAML front matter materials. Metadata contained is highly likely to be duplicate across many files.
 - Use of parallel scanning with multiprocessing. For file reading, filtering, hashing, and block extraction.
-- Near-duplicate whole-file detection (e.g., 90% simliar entire files.) 
-- Token-based Jaccard similarity for fast near-duplicate detection. 
+- Near-duplicate whole-file detection (e.g., 90% simliar entire files.)
+- Token-based Jaccard similarity for fast near-duplicate detection.
 - Reduce lines that include wikilink, option to ignore wikilink all together.
 - A `--limit-results <n>` option, list "whole-file duplicates" then quite after result count. This way I'm comparing flew blocks. Have a default being all blocks, with limis being {500, 1K, 10K, 1M} type format.
-  - The rational is you've got to fix what it finds. So if the script runs, finds the first 100, then you can fix the first 100 and run it again. Not wait for it to run 78K hashes.
-  - It still may need to hash the entire site before it does a certain number of checks. Limit the length of results presented because the represents work to do.
+    - The rational is you've got to fix what it finds. So if the script runs, finds the first 100, then you can fix the first 100 and run it again. Not wait for it to run 78K hashes.
+    - It still may need to hash the entire site before it does a certain number of checks. Limit the length of results presented because the represents work to do.
 
-## Usuage
+- Because the Obsidian vault is in a Git repo, use the Git local metadata to find files faster. Avoid heavy disk reads until looking at file context.
 
-Go to working directlry. Call script by full path.
+## Usage
+
+Go to working directly. Call script by full path.
 
 ```bash
 python3 find_duplicate_blocks.py --ignore-wikilink --ignore-short-lines 20

@@ -19,12 +19,26 @@ from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 
 # ---------------- CONFIGURATION ----------------
-BLOCK_SIZE = 3                  # lines per block
+BLOCK_SIZE = 5                  # lines per block
 SIMILARITY_THRESHOLD = 0.9      # Jaccard token similarity
-SIGNATURE_TOKENS_PER_BLOCK = 5  # how many tokens to index per block
+SIGNATURE_TOKENS_PER_BLOCK = 3  # how many tokens to index per block
 LENGTH_RATIO_TOLERANCE = 0.3    # +/- 30% length window for candidates
 LOW_VALUE_LINE_THRESHOLD = 20   # drop lines shorter than this after wikilink removal
 # ------------------------------------------------
+
+from nltk.corpus import stopwords
+
+# NLTK English stopwords
+NLTK_STOPWORDS = set(stopwords.words('english'))
+
+# Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
+CUSTOM_STOPWORDS = {
+    # Add custom stopwords here, e.g.: 'word1', 'word2'
+    'eof', 'hittjw', 'http', 'https', 'www', 'com', 'org', 'net', 'io', 'github', 'gitlab',
+}
+
+# Universal English stopwords (NLTK + custom)
+STOPWORDS = NLTK_STOPWORDS | CUSTOM_STOPWORDS
 
 WORD_RE = re.compile(r"\w+")
 WIKILINK_RE = re.compile(r"\[\[.*?\]\]")
