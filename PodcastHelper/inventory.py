@@ -26,6 +26,13 @@ def parse_sidecar(sidecar_path: Path):
                 metadata[key.strip()] = value.strip()
     return metadata
 
+def parse_duration(duration: str) -> int:
+    """Parse a duration string in HH:mm:ss format into total seconds."""
+    parts = list(map(int, duration.split(':')))
+    while len(parts) < 3:  # Ensure HH:mm:ss format
+        parts.insert(0, 0)
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+
 def list_inventory(media_root: Path, index_file: Path = None, catalog: str = None, min_duration: int = 600):
     """List media files based on filters."""
     media_root = media_root.resolve()
@@ -44,7 +51,7 @@ def list_inventory(media_root: Path, index_file: Path = None, catalog: str = Non
     with index_file.open('r', newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            duration_seconds = int(row['minutes']) * 60
+            duration_seconds = parse_duration(row['minutes'])
 
             if catalog and row.get('catalog') != catalog:
                 continue
