@@ -26,40 +26,49 @@ def parse_sidecar(sidecar_path: Path):
                 metadata[key.strip()] = value.strip()
     return metadata
 
-def list_inventory(media_root: Path, index_file: Path, catalog: str, min_duration: int):
+def list_inventory(media_root: Path, index_file: Path = None, catalog: str = None, min_duration: int = 600):
     """List media files based on filters."""
     media_root = media_root.resolve()
     results = []
 
+    # Determine index file location
+    if not index_file:
+        index_file = media_root / 'index.csv'
+
+    # Check if index file exists
+    if not index_file.exists():
+        print(f"Error: Index file not found at {index_file}. Please ensure the index file exists.")
+        return
+
     # Read index file
-    if index_file.exists():
-        with index_file.open('r', newline='', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                duration_seconds = int(row['minutes']) * 60
+    with index_file.open('r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            duration_seconds = int(row['minutes']) * 60
 
-                if catalog and row.get('catalog') != catalog:
-                    continue
-                if min_duration and duration_seconds < min_duration:
-                    continue
+            if catalog and row.get('catalog') != catalog:
+                continue
+            if duration_seconds < min_duration:
+                continue
 
-                results.append({
-                    'path': row['path'],
-                    'duration': str(timedelta(seconds=duration_seconds)),
-                    'catalog': row.get('catalog', 'N/A'),
-                    'published': row.get('published', 'No')
-                })
+            results.append({
+                'media_file': row['path'],
+                'sidecar_file': row['sidecar'],
+                'duration': str(timedelta(seconds=duration_seconds)),
+                'catalog': row.get('catalog', 'N/A'),
+                'published': row.get('published', 'No')
+            })
 
     # Print results
-    print("Path\tDuration\tCatalog\tPublished")
+    print("Media File\tSidecar File\tDuration\tCatalog\tPublished")
     for result in results:
-        print(f"{result['path']}\t{result['duration']}\t{result['catalog']}\t{result['published']}")
+        print(f"{result['media_file']}\t{result['sidecar_file']}\t{result['duration']}\t{result['catalog']}\t{result['published']}")
 
 def main():
     parser = argparse.ArgumentParser(description="Inventory podcast media files.")
     parser.add_argument('--catalog', type=str, help="Filter by catalog code.")
-    parser.add_argument('--min-duration', type=int, help="Minimum duration in seconds.")
-    parser.add_argument('--index', type=Path, required=True, help="Path to the index file.")
+    parser.add_argument('--min-duration', type=int, default=600, help="Minimum duration in seconds (default: 10 minutes).")
+    parser.add_argument('--index', type=Path, help="Path to the index file (optional if --media-root is provided).")
     parser.add_argument('--media-root', type=Path, required=True, help="Root directory for media files.")
 
     args = parser.parse_args()
@@ -68,7 +77,7 @@ def main():
         media_root=args.media_root,
         index_file=args.index,
         catalog=args.catalog,
-        min_duration=args.min_duration or 0
+        min_duration=args.min_duration
     )
 
 if __name__ == '__main__':
