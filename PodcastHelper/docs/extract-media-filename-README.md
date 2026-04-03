@@ -38,4 +38,12 @@ git grep -E "(PXL_|IMG_)"| python3 /workspaces/scripts/PodcastHelper/extract-med
 
 This needs to be run where a media root is available. This will look for all types of media, including images.
 
+Find the specific `.mp4` files not mentioned in notes, yet on the local disk. Then sort so oldest is on bottom. Upload that stuff.
+
+```bash
+git grep -E "(PXL_|IMG_)" | python ../scripts/PodcastHelper/extract-media-filename.py --missing --media-root /e/Media/ | grep mp4 | sort -r
+```
+
+Start looking for filenames on the bottom. Get them uploaded while capturing in note taking.
+
 /EOF/
