@@ -35,12 +35,15 @@ def parse_arguments():
     return parser.parse_args()
 
 def find_files_on_disk(media_root):
-    """Recursively find all media files under the given root directory."""
+    """Recursively find all media files under the given root directory matching Google or Apple filename formats."""
     media_files = set()
+
     for root, _, files in os.walk(media_root):
         for file in files:
-            if file.lower().endswith(("jpg", "heic", "mov", "mp4")):
-                media_files.add(os.path.join(root, file))
+            # Validate files using existing extraction functions
+            if extract_pixel_filenames(file) or extract_apple_filenames(file):
+                media_files.add(file)
+
     return media_files
 
 def main():
