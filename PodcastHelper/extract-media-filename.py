@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+"""
+Extract Media Filename
+
+- Make a list of the known media filenames in text pipe.
+- Print these filenames as a simple text list.
+
+"""
+
 import re
 import sys
 
@@ -17,13 +27,23 @@ def extract_apple_filenames(text):
     return apple_regex.findall(text)
 
 def main():
+    # Initialize a set to store unique filenames
+    unique_files = set()
+
     # Process line by line from standard input
     for line in sys.stdin:
         # Combine both extraction methods
         found_files = extract_pixel_filenames(line) + extract_apple_filenames(line)
         
-        for match in found_files:
-            print(match)
+        # Add found files to the set
+        unique_files.update(found_files)
+
+    # Sort the unique filenames
+    sorted_files = sorted(unique_files)
+
+    # Print the sorted filenames
+    for filename in sorted_files:
+        print(filename)
 
 if __name__ == "__main__":
     try:
