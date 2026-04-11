@@ -12,6 +12,6 @@
 ## Citation
 
 - James Parasons. (2023, October 24) Auto Remove Low-Value Keywords From URL Permalink Slug in WP. https://jamesparsons.com/remove-low-value-keywords-permalink
-
+- Spencer Lanoue. (2025, January 31) Remove Stop Words from Slugs for Better SEO: A Complete Guide. https://www.usepattern.com/resources/whatare-stop-words-in-slugs-and-how-to-remove-seo#why-stop-words-can-be-a-problem-for-seo
 
 /EOF/
