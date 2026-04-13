@@ -27,9 +27,11 @@
   - Returns any media at this length or longer.
 - (export.py) Copy specific media to external disk.
   - `export.py {MEDIA_SOURCE} {DESTINATION_DIR}`
-  - (inventory.py) Use to determine, with insight from sidecar, what files are available. 
-    - `inventory.py --catalog=A1234B` returns anything flagged for that catalog code, prints a list like `ls -l` to screen.
-    - Attributes for each listed item would include the status. Is the media published?
+- (inventory.py) Use to determine, with insight from sidecar, what files are available. 
+  - `inventory.py --catalog=A1234B` returns anything flagged for that catalog code, prints a list like `ls -l` to screen.
+  - Attributes for each listed item would include the status. Is the media published?
+  -  Find desirable content, report it to screen, and get an idea of what can be published.
+  - `inventory.py --min-duration 10m --index --media-root /mnt/e/Media/` would list media that fits duration from index.
 
 ## Technical
 
@@ -77,5 +79,13 @@ ffprobe -i PXL_20250301_191304585.mp4 -show_format -v quiet | grep duration
 - Much of the front matter is borrowed from the `Podcast` template in Obsidian.
 - Don't put too much in this that is beyond describing the media file. If there is social content, headlines, or other materials, think about putting that in a different sidecar. 
   - Don't clutter up the file. Make it easy to go from scanning of media to publishing of materials. Especially if {Social, Description, Featured Image, Metadata, Transcript} can be generated individually.
+
+### Figure Out What To Publish
+
+- Publisher wants to publish podcast episodes, including episodes longer than 10 minutes. User runs a script to query the index, then if requested metadata may be extracted from a sidecar file.
+- The sidecar may indicate which content has already been published, or is in progress. 
+- There may be channel and catalog details to find the show notes in a notes repository. The user may be looking for media files with a specific campaign.
+- User needs to be able to go through sidecards, update metadata, then extract into a report so files can be uploaded.
+- An inventory tool to develop a pick list. Media can be published, the report format supports ctrl-click in vscode to edit files on the screen.
 
 /EOF/
