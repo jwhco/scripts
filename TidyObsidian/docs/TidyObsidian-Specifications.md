@@ -19,6 +19,23 @@
 
 ## Technical
 
+### Stop Words Run-Time Environment
+
+1. Use `.venv` Python Virtual Environment,
+2. Install packages, `pip install -r requirements.txt`,
+   1. Includes, `nltk` for stop-words data set, https://www.nltk.org/data.html
+3. Execute,
+
+```python
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
+```
+
+4. END
+
+Stop words are used to reduce chunk sizes in duplicate detection.
+
 ### Task Dependency in Hierachial Relationship
 
 - Start with Weighted Network Model or Graph.
