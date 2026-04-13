@@ -1,5 +1,5 @@
 # markdown-tasks-extract.py
-pandas>=3.0.1
+pandas>=2.0.1
 multiprocess>=0.70.19
 
 # markdown-corkboard.py
