@@ -58,6 +58,12 @@ Reference:
 - Do this to make tasks themselves a basic unit, however, context for presentation doesn't have to be done manually by the user.
 - When possible, have drag and drop ability. Sorting and filtering for a tabular display. Drag columns into desired order to save as views.
 
+### Reducing Duplicate Filenames
+
+- Both the `find-duplicate-blocks.py` and `find-similar-filenames.py` find duplicate files. To determine duplicate blocks takes longer. Both will find enough work to keep you busy.
+- No matter what script you use, there will be a large number of duplicates to process. Sorting out the duplicates is helpful, but not a high priority activity.
+- Which ever gets the corrections out of your system is good. And what ever helps you to complete more delerables is helpful. Duplicates tend to happen when importing or consolidating systems.
+
 > Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=tidy-obsidian-specifications) All rights reserved.
 
 /EOF/
