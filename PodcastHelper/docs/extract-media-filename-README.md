@@ -7,6 +7,8 @@
 
 ## Issues
 
+- May be better presented as single command. `missing.py mp4 --media-root /mnt/e/Media `
+
 ## Requirements
 
 - Use to answer the question, "Is this podcast candidate mentioned in notes?" If not it is a candidate to upload to YouTube.
@@ -16,34 +18,30 @@
 - By default the script prints filenames mentioned in piped text.
 - The media on disk will have the same filename formatting as the media looked for in pipe.
 
-
 ## Usage
-
-### Extraction Media Filenames
-
-Pipe text to script to create a list of found filenames. Launch in directory with text.
-
-```bash
-git grep -E "(PXL_|IMG_)"| python3 /workspaces/scripts/PodcastHelper/extract-media-filename.py 
-```
-
-Using `git grep` returns only the matching pattern, meaning less text to process. Extraction goes very fast.
 
 ### Find Missing Media
 
-To find media on the disk that isn't mentioned in notes.
-
-git grep -E "(PXL_|IMG_)"| python3 /workspaces/scripts/PodcastHelper/extract-media-filename.py --missing --media-root .
-```
-
-This needs to be run where a media root is available. This will look for all types of media, including images.
-
-Find the specific `.mp4` files not mentioned in notes, yet on the local disk. Then sort so oldest is on bottom. Upload that stuff.
+- Find media on disk, but not mentioned in Obisidan using a media stream from repository.
+- Pipe text to script to create a list of found filenames. Launch in directory with text.
+- Using `git grep` returns only the matching pattern, meaning less text to process.
 
 ```bash
-git grep -E "(PXL_|IMG_)" | python ../scripts/PodcastHelper/extract-media-filename.py --missing --media-root /e/Media/ | grep mp4 | sort -r
+git grep -E "(PXL_|IMG_)"| python3 /workspaces/scripts/PodcastHelper/extract-media-filename.py --missing --media-root /mnt/e/Media
 ```
 
-Start looking for filenames on the bottom. Get them uploaded while capturing in note taking.
+- Media root must be defined. These are available files to upload to video sharing.
+- This will look for all types of media, including images. May mention control files.
+
+### Find Missing MP4 Media
+
+- Find the specific `.mp4` files not mentioned in notes, yet on the local disk. 
+  - Then sort so oldest is on bottom. Upload that stuff.
+
+```bash
+git grep -E "(PXL_|IMG_)" | python ~/GitHub/scripts/PodcastHelper/extract-media-filename.py --missing --media-root /mnt/e/Media/ | grep mp4 | sort -r
+```
+
+- Start looking for filenames on the bottom. Get them uploaded while capturing in note taking.
 
 /EOF/
