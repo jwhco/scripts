@@ -4,11 +4,11 @@
 
 - Sus out blocks of duplicate text across an entire directory tree.
 - Script works very well with any directory full of Markdown. Any file based note-taking.
-- Find thin content. Files that are pretty much empty will show up as dupliate.
+- Find thin content. Files that are pretty much empty will show up as duplicate.
 
 ## Issues
 
-- Will need a way to save a cache or incrementally work. With a large repo, it's drawing up a large number of files and takes a long time even on a good machine.
+- Will need a way to save a cache or incrementally work. With a large repo, it's drawing up many files and takes a long time even on a good machine.
 - It's hard to tell if the script is running. Using a debugger it is running, however, there are no command line indicators that something started or is happening.
 - Script grinds out a lot of CPU and memory. Need a more incremental way of processing. Maybe read blocks into blocks on disk, then come back and compare. There are 38K files in this Obsidian vault. That's too many.
 - Make more command line friendly. Return any non-zero number of duplicate blocks. Have a `--silent` mode which writes the output to a local file in the root directory.
