@@ -5,17 +5,24 @@
 - Extract from a file all of the ngrams (trigram by default), then print on the screen. Use to better understand a single file or a corpus of files.
 - The n-grams can be piped into a script for further analysis, or handled by another tool for clustering. 
 
-## Configure Run-Time Environment
+## Technical
 
-1. Work from a `.venv` Python Virtual Environment,
-2. Prepare packages, `pip install -r requirements.txt`,
-3. Install NLTK data sets, https://www.nltk.org/data.html
+### Stop Words Run-Time Environment
+
+1. Use `.venv` Python Virtual Environment,
+2. Install packages, `pip install -r requirements.txt`,
+   1. Includes, `nltk` for stop-words data set, https://www.nltk.org/data.html
+3. Execute,
 
 ```python
 import nltk
 nltk.download('stopwords')
 nltk.download('punkt')
 ```
+
+4. END
+
+Stop words are used to reduce chunk sizes in duplicate detection.
 
 ## Requirements
 

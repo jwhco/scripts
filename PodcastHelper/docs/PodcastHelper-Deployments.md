@@ -3,10 +3,7 @@
 ## Environment
 
 - Runs in WSL or Native Linux machine with direct access to media files.
-- Needs high speed storage because podcast media is large gigabytes.
-
-### Tools
-
+- Needs high speed storage because podcast media is large gig
 - Make
 - Python3
 - ffmpeg

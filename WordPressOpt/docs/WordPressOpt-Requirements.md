@@ -10,11 +10,14 @@
 
 ## Scope
 
+- Works within the WordPress Snippet Plug-in, don't require specific code modification to simpify for most users.
+
 ## Requirements
 
 - Transform RSS feed into URL list. Also be able to extract URLs from markdown text for distributed link checking.
 - Ping services tools. Specific to WordPress. Keep list clean, focused, and suitable for cut-n-paste into a site.
 - Tools for migrating, reformatting, and fixing WordPress. Consolidate those tools here. As well as relevant configurations.
+- Inject HTML Google Tag Manager header and footer. Make it very simple to include this, don't bulk up the front end of WordPress.
 
 ## Stakeholders
 

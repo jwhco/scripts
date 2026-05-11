@@ -19,12 +19,26 @@ from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 
 # ---------------- CONFIGURATION ----------------
-BLOCK_SIZE = 3                  # lines per block
+BLOCK_SIZE = 5                  # lines per block
 SIMILARITY_THRESHOLD = 0.9      # Jaccard token similarity
-SIGNATURE_TOKENS_PER_BLOCK = 5  # how many tokens to index per block
+SIGNATURE_TOKENS_PER_BLOCK = 3  # how many tokens to index per block
 LENGTH_RATIO_TOLERANCE = 0.3    # +/- 30% length window for candidates
 LOW_VALUE_LINE_THRESHOLD = 20   # drop lines shorter than this after wikilink removal
 # ------------------------------------------------
+
+from nltk.corpus import stopwords
+
+# NLTK English stopwords
+NLTK_STOPWORDS = set(stopwords.words('english'))
+
+# Custom stopwords to append to NLTK list. Modify this for domain-specific filtering.
+CUSTOM_STOPWORDS = {
+    # Add custom stopwords here, e.g.: 'word1', 'word2'
+    'eof', 'hittjw', 'http', 'https', 'www', 'com', 'org', 'net', 'io', 'github', 'gitlab',
+}
+
+# Universal English stopwords (NLTK + custom)
+STOPWORDS = NLTK_STOPWORDS | CUSTOM_STOPWORDS
 
 WORD_RE = re.compile(r"\w+")
 WIKILINK_RE = re.compile(r"\[\[.*?\]\]")
@@ -85,14 +99,39 @@ def tokenize(text):
     return set(WORD_RE.findall(text.lower()))
 
 
-def jaccard(tokens_a, tokens_b):
+def jaccard(tokens_a, tokens_b, len_a=None, len_b=None):
+    """Faster Jaccard using precomputed lengths when available."""
     if not tokens_a or not tokens_b:
         return 0.0
     inter = len(tokens_a & tokens_b)
     if inter == 0:
         return 0.0
-    union = len(tokens_a | tokens_b)
+    if len_a is None:
+        len_a = len(tokens_a)
+    if len_b is None:
+        len_b = len(tokens_b)
+    union = len_a + len_b - inter
+    if union == 0:
+        return 0.0
     return inter / union
+
+
+def select_signature_tokens(tokens):
+    """Hash-based selection of signature tokens (more selective than lexicographic)."""
+    if not tokens:
+        return []
+    # Stable hash: sha1 of token text, then sort by that value
+    # This approximates MinHash but stays simple and deterministic.
+    hashed = [
+        (hashlib.sha1(tok.encode("utf-8")).hexdigest(), tok)
+        for tok in tokens
+        if tok not in STOPWORDS  # skip very common / low-value tokens
+    ]
+    if not hashed:
+        return []
+    hashed.sort(key=lambda x: x[0])
+    return [tok for _, tok in hashed[:SIGNATURE_TOKENS_PER_BLOCK]]
+
 
 
 def read_and_hash_file(args):
@@ -180,29 +219,34 @@ def find_duplicates(
     all_blocks = [item for sublist in block_results for item in sublist]
     print(f"Collected {len(all_blocks)} blocks from unique files.\n")
 
-    # Step 5: Aggressive, indexed block-level duplicate detection
+        # Step 5: Aggressive, indexed block-level duplicate detection
     canonical_blocks = []
     token_index = defaultdict(set)
 
-    def select_signature_tokens(tokens):
-        if not tokens:
-            return []
-        sorted_tokens = sorted(tokens)
-        return sorted_tokens[:SIGNATURE_TOKENS_PER_BLOCK]
-
     for file_path, block_text, line_num in all_blocks:
         tokens = tokenize(block_text)
-        length = len(block_text)
+        if not tokens:
+            continue
 
+        length = len(block_text)
+        token_count = len(tokens)
         sig_tokens = select_signature_tokens(tokens)
+
+        # If we have no signature tokens (e.g., all stopwords), just treat as its own canonical block.
         if not sig_tokens:
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {"text": block_text, "tokens": tokens, "length": length,
-                 "locations": [(file_path, line_num)]}
+                {
+                    "text": block_text,
+                    "tokens": tokens,
+                    "token_count": token_count,
+                    "length": length,
+                    "locations": [(file_path, line_num)],
+                }
             )
             continue
 
+        # Collect candidate canonical block indices via inverted index.
         candidate_indices = set()
         for t in sig_tokens:
             candidate_indices.update(token_index.get(t, ()))
@@ -211,6 +255,7 @@ def find_duplicates(
         for idx in candidate_indices:
             cb = canonical_blocks[idx]
 
+            # Quick length ratio filter (same as before).
             shorter = min(cb["length"], length)
             longer = max(cb["length"], length)
             if longer == 0:
@@ -218,7 +263,8 @@ def find_duplicates(
             if (longer - shorter) / longer > LENGTH_RATIO_TOLERANCE:
                 continue
 
-            sim = jaccard(tokens, cb["tokens"])
+            # Faster Jaccard using cached token counts.
+            sim = jaccard(tokens, cb["tokens"], token_count, cb["token_count"])
             if sim >= similarity_threshold:
                 cb["locations"].append((file_path, line_num))
                 matched = True
@@ -227,11 +273,17 @@ def find_duplicates(
         if not matched:
             cb_idx = len(canonical_blocks)
             canonical_blocks.append(
-                {"text": block_text, "tokens": tokens, "length": length,
-                 "locations": [(file_path, line_num)]}
+                {
+                    "text": block_text,
+                    "tokens": tokens,
+                    "token_count": token_count,
+                    "length": length,
+                    "locations": [(file_path, line_num)],
+                }
             )
             for t in sig_tokens:
                 token_index[t].add(cb_idx)
+
 
     # Step 6: Keep only blocks appearing in >1 file
     duplicates = []
