@@ -6,9 +6,9 @@
 
 ## Requirements
 
-
+- The unique identifier is `permalink` representing a podcast episode in RSS as well as the markdown episode sidecar files. Must be able to match this link no matter how it is formatted in the YAML front matter.
 - The following YAML front matter values DO NOT have quotes around them. `date`, `permalink`, `download`, and `duration`.
-  - The `title` YAML front matter DOES have quotes around the title string.
+  - According to the GitHub YAML frontmatter specification the text of a `title:` value doesn't have quotes. It is plain text title case.
 - Ignore any markdown sidecars with `Template` in the directory path or filename.
 - The podcast RSS feed contains episodes and is hosted on Spreaker. The matching domain of the RSS feed will include `spreaker.com` in all cases.
     - The script can have different options to include RSS from Apple, or other platforms. However, for the first version make sure it works perfect for Spreaker feeds.
