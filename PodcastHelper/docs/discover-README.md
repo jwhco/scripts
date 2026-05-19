@@ -14,18 +14,15 @@
 
 ## User Story
 
-- Attaching an external drive of media, a User wants to quickly find media suitable for podcast episodes. 
-  - User runs the script, sidecars are produced. These contain the media name, path, length, and extracted metadata.
-  - Using markdown tools, or OS search, the markdown sidecar can be removed. Looking at front matter Obsidian can report.
-  - Once discovered, the User can start uploading materials 
-
+- Attaching an external drive of media, a User wants to quickly find media suitable for podcast episodes.
+    - User runs the script, sidecars are produced. These contain the media name, path, length, and extracted metadata.
+    - Using markdown tools, or OS search, the markdown sidecar can be removed. Looking at front matter Obsidian can report.
+    - Once discovered, the User can start uploading materials
 
 ## Configuration
 
 - Install `ffmpeg` before use.
 
-
 > Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=inventory-podcast-helper) All rights reserved.
-
 
 /EOF/
