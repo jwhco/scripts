@@ -538,6 +538,8 @@ def gather_existing_sidecars(root: Path) -> List[Tuple[Path, Dict[str, object]]]
     candidates = git_grep_files(root, 'type: Podcast')
     results: List[Tuple[Path, Dict[str, object]]] = []
     for path in candidates:
+        if 'Template' in str(path):
+            continue
         metadata = parse_yaml_front_matter(path)
         if str(metadata.get('type', '')).strip().lower() == 'podcast':
             results.append((path, metadata))
@@ -556,12 +558,14 @@ def report_sidecars(root: Path) -> None:
     if not sidecars:
         print_info('No podcast sidecar markdown files found.')
         return
-    print_info(f'Found {len(sidecars)} podcast sidecars:')
+    print_info('filename,date,title,permalink')
     for path, metadata in sidecars:
+        filename = str(path)
         date = str(metadata.get('date', '')).strip()
         title = str(metadata.get('title', '') or '').strip() or extract_title_from_markdown(path)
         permalink = str(metadata.get('permalink', '')).strip()
-        print_info(f'{path} | date={date or ""} | title={truncate_for_report(title)} | permalink={truncate_for_report(permalink)}')
+        title_escaped = title.replace('"', '""')
+        print_info(f'{filename},{date},"{title_escaped}",{permalink}')
 
 
 def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> Tuple[Dict[str, object], List[str]]:

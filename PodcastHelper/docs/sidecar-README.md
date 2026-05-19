@@ -6,6 +6,7 @@
 
 ## Requirements
 
+- Ignore any markdown sidecars with `Template` in the directory path or filename. 
 - The podcast RSS feed contains episodes and is hosted on Spreaker. The matching domain of the RSS feed will include `spreaker.com` in all cases.
 	- The script can have different options to include RSS from Apple, or other platforms. However, for the first version make sure it works perfect for Spreaker feeds.
 - The script runs from the command line with the name `sidecar.py`. All output is suitable for a basic xterm. 
@@ -127,6 +128,7 @@ episode:
 duration:
 permalink:
 download:
+title: 
 ```
 
 Where:
@@ -135,6 +137,7 @@ Where:
 - `permalink` is from RSS `link` in the `item` representing an episode.
 - `platform` is the title case of the RSS `item` value `link` domain name, not including "www" or ".com" which represents the hosting platform name.
 - `download` is the RSS `item` value from `enclosure` URL to include the full canonical address.
+- `title` is the RSS `item` episode title. Place quotes around it. 
 - `date` is the `YYYY-MM-DD` verion of the RSS `item` episode `pubDate`, translated.
 - `duration` is a calculation from an episodes `itunes:duration` which is represented in minutes. 
   - Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent. Normalize to the shortest form. Most podcast episodes are under an hour.
