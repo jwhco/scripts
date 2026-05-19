@@ -1,8 +1,8 @@
-# Sidecar - Create Note From RSS
+# Sidecar - Create Markdown Sidecar From RSS
 
 ## Use Case
 
-- To collect information from an RSS feed to create markdown sidecar representing the episode.
+- To collect information from an RSS feed to create markdown sidecar representing the episode. Also support maintaining accurate episode information.
 
 ## Requirements
 
@@ -15,6 +15,25 @@
   - Use environmental variables to determine if script is running via an SSH terminal, an xterminal, or under VsCode. Reduce overhead by making outputs clean and compatiable for all terminal environments.
 - Don't spam the RSS hosting and enclosure hosting platforms. Rate check the download of transcripts by queing them up then running in the background while building the markdown episode sidecar.
 - When possible use `git grep ` to look at only markdown extensions `.md` to reduce overhead when searching files. Check to make sure we're in a git environment, then error out if not. Look in the `directory` location.
+- When reporting on markdown episode sidecars with the `--report` argument, mention all sidecars even if they have incomplete front matter or missing information. 
+  - Present your findings on the screen starting with the filename and path (VsCode engagable), a quick highlight of front matter, and show only enough not to wrap.
+  - Reporting date published, title, and permalink is most relevant.
+- When creating filenames for markdown expisode sidecar, digest the title removing any special characters, removing stop words, its okay to preserve word order. 
+  - A title like "Know which podcast episode has most audience potential" would become "Most Audience Potential" as these best represent the phrase. 
+  - Digesting titles can be done with tri-gram, summarizing the phrase, or scoring values to shorten while retaining context. Maybe ancor on a adjective. 
+  - For english stop words use `import nltk` as it will likely already be available in the environment.
+- If the HTML formatted description in RSS has tables, code, or incomplete text in a href starting with `http`, then ignore tables and code. Then rebuild the incomplete text using the href value. Keep Google Analytics UTM codes when possible. 
+  - Otherwise convert line breaks in HTML to suitable in Markdown. Focus primarily on the formatting when converting. Basic HTML tags into Markdown.
+- Asset folder structure. There will only be `/pages/assets/` with markdown episodes files created in `/pages/`. Don't create any other sub-folders. After reviewed, these markdown sidecars will get moved into project folders.
+- There needs to be conflict detection in `--check-yaml` that flags with values are different from RSS or blank when details existing in RSS. The goal is to determine if the sidecars already created need updating.
+- When rate limiting on same domain downloads, only allow a few concurrent downloads (default 2), while introducing a random delay (up to 3 seconds) between each start of downloads. 
+  - If the maximum concurrent are running, then don't start a new download, when one finishs, wait the random delay before starting the next.
+  - This will run on a local network with dual wan connections. The delays between sessions should let the network router balance requests. 
+  - Sessions can remain own for concurrent downloads, but then close and reopen for the next batch, or between each to trigger balancing.
+- Environment variables for temporary folder will be `TEMP` or default as `/tmp`, where `TERM` is for terminal. And `TERM_PROGRAM=vscode` means session is running under VsCode. When possible print to screen in a way that works under SSH but doesn't require a specific environment.
+- If the `--directory` location isn't a GIT repo, then exit. The reason a git repository is desired is to recover from file creation or updates of front matter. Don't let the script run if there is no repo.
+- With SSH terminal outputs, ANSI escape codes should work. Do what works for Xterm. Keep it simple otherwise.
+
 
 ## User Story
 
