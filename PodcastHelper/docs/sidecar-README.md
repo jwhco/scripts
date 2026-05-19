@@ -165,7 +165,9 @@ Notes:
 - User runs `sidecar.py --rss-feed https://www.spreaker.com/show/3257924/episodes/feed --directory /workspaces/obsidian/ --update --dry-run` to figure out what might be updated.
 - When ran without the `--dry-run` the script will update only the YAML front matter in existing markdown episode sidecars. Not replacing a field with an exiting value.
 - There is a `--check-yaml` option that always does a `--dry-run` yet will identify where a markdown episode sidecar exists, however, one or more values are in conflict.
-- Everything is matching on the PERMALINK form the RSS as a key.
+- Everything is matching on the PERMALINK form the RSS as a key. Only update where there is an exact match of the key. Don't modify anything else, or if `permalink` is missing.
+- This update is only looking at the context of the RSS feed. If it only finds 5 out of 250, then build sidecars to fill this gap. If the number is 250 out of 250 then all the episodes in that feed are accounted for.
+- This function only updates YAML front matter. The rest of the document may have edits that are not to change. For example, the description may have been expanded.
 
 ## Configuration
 
