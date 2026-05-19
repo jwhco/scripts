@@ -8,7 +8,7 @@
 
 - The unique identifier is `permalink` representing a podcast episode in RSS as well as the markdown episode sidecar files. Must be able to match this link no matter how it is formatted in the YAML front matter.
 - The following YAML front matter values DO NOT have quotes around them. `date`, `permalink`, `download`, and `duration`.
-  - According to the GitHub YAML frontmatter specification the text of a `title:` value doesn't have quotes. It is plain text title case.
+    - According to the GitHub YAML frontmatter specification the text of a `title:` value doesn't have quotes. It is plain text title case.
 - Ignore any markdown sidecars with `Template` in the directory path or filename.
 - The podcast RSS feed contains episodes and is hosted on Spreaker. The matching domain of the RSS feed will include `spreaker.com` in all cases.
     - The script can have different options to include RSS from Apple, or other platforms. However, for the first version make sure it works perfect for Spreaker feeds.
@@ -130,22 +130,22 @@ title:
 
 Where:
 
-- `channel` is the RSS `channel` abriviated according to the following specifications:
-  - Table:
-    - "AdBriefing Copywriting Tips" = ABR
-    - "Inside Strategic Relations" = ISR
-    - "Prosperity Homestead" = PHM
-    - "Sustainable Wealth Secrets" = SWS
-    - "Commercial Electrical Profits" = CEP
-  - Any unrecognized channel name will be abriviated according to the first letter in each word all caps. 
-  - Set this `channel` value early in reading the RSS because it is the same value for every episode in the same file.
+- `channel` is the RSS `channel` abbreviated according to the following specifications:
+    - Table:
+        - "AdBriefing Copywriting Tips" = ABR
+        - "Inside Strategic Relations" = ISR
+        - "Prosperity Homestead" = PHM
+        - "Sustainable Wealth Secrets" = SWS
+        - "Commercial Electrical Profits" = CEP
+    - Any unrecognized channel name will be abbreviated according to the first letter in each word all caps.
+    - Set this `channel` value early in reading the RSS because it is the same value for every episode in the same file.
 - `permalink` is from RSS `link` in the `item` representing an episode.
 - `platform` is the title case of the RSS `item` value `link` domain name, not including "www" or ".com" which represents the hosting platform name.
 - `download` is the RSS `item` value from `enclosure` URL to include the full canonical address.
 - `title` is the RSS `item` episode title. Place quotes around it.
 - `date` is the `YYYY-MM-DD` verion of the RSS `item` episode `pubDate`, translated. This is a date value, there are no quotations.
 - `duration` is a calculation from an episodes `itunes:duration` which is represented in minutes.
-    - Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent. 
+    - Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent.
     - Normalize to the shortest form. Most podcast episodes are under an hour.
     - The `itunes:duration` of `1297` would become `duration` of `21:37`, representing the `mm:ss` format.
 - `tags` come from RSS `item` for the episode `itunes:keywords` then are presented in YAML front matter as newline, dash, then keyword list as presented in RSS.

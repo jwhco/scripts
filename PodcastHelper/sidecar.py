@@ -243,10 +243,25 @@ def parse_author(author_text: Optional[str]) -> str:
 def abbreviate_channel(channel_title: Optional[str]) -> str:
     if not channel_title:
         return ''
-    words = re.findall(r"[A-Za-z0-9]+", channel_title)
+    title_clean = channel_title.strip()
+    
+    # Custom absolute mapping specifications
+    mapping = {
+        "AdBriefing Copywriting Tips": "ABR",
+        "Inside Strategic Relations": "ISR",
+        "Prosperity Homestead": "PHM",
+        "Sustainable Wealth Secrets": "SWS",
+        "Commercial Electrical Profits": "CEP"
+    }
+    
+    if title_clean in mapping:
+        return mapping[title_clean]
+        
+    # Fallback default: First letter of each word, all caps
+    words = re.findall(r"[A-Za-z0-9]+", title_clean)
     if not words:
         return ''
-    return ''.join(word[0].upper() for word in words)[:4]
+    return ''.join(word[0].upper() for word in words)
 
 
 def platform_from_url(url: str) -> str:
@@ -280,11 +295,15 @@ def parse_rss_feed(xml_text: str) -> Tuple[str, List[Dict[str, str]]]:
     channel = root.find('channel') or root.find('./rss/channel')
     if channel is None:
         channel = root.find('.//channel')
+        
     channel_title = ''
+    channel_abbreviation = ''
     if channel is not None:
         title_elem = channel.find('title')
         if title_elem is not None and title_elem.text:
             channel_title = title_elem.text.strip()
+            # Calculated early at the loop source file initialization phase
+            channel_abbreviation = abbreviate_channel(channel_title)
 
     items: List[Dict[str, str]] = []
     for item in root.findall('.//item'):
@@ -324,6 +343,7 @@ def parse_rss_feed(xml_text: str) -> Tuple[str, List[Dict[str, str]]]:
         if transcript_url and transcript_type not in ('text/plain', 'text/vtt'):
             transcript_url = ''
             transcript_type = ''
+            
         items.append({
             'title': title,
             'link': link,
@@ -335,6 +355,7 @@ def parse_rss_feed(xml_text: str) -> Tuple[str, List[Dict[str, str]]]:
             'enclosure_url': enclosure_url,
             'transcript_url': transcript_url,
             'transcript_type': transcript_type,
+            'channel_abbreviation': channel_abbreviation  # Cached uniform early value assigned to episode tracking map
         })
     return channel_title, items
 
@@ -413,7 +434,7 @@ def build_front_matter(rss_item: Dict[str, str], channel_title: str) -> Tuple[st
         'published': '',
         'updated': '',
         'type': 'Podcast',
-        'channel': abbreviate_channel(channel_title),
+        'channel': rss_item.get('channel_abbreviation', ''),
         'catalog': '',
         'platform': platform_from_url(rss_item.get('link', '')),
         'episode': '',
@@ -429,7 +450,6 @@ def render_yaml(front: Dict[str, object]) -> str:
     tags = get_tag_list(front.get('tags', []))
     lines: List[str] = ['tags:']
     for tag in tags:
-        # Enforce unquoted structure for all simple tag metadata values
         lines.append(f'  - {safe_yaml_value(tag, force_unquoted=True)}')
     lines.append(f'author: {safe_yaml_value(str(front.get("author", "")))}')
     
@@ -587,7 +607,7 @@ def report_sidecars(root: Path) -> None:
 def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> Tuple[Dict[str, object], List[str]]:
     updated = existing_metadata.copy()
     changes: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title', 'channel']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         
@@ -607,7 +627,7 @@ def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str,
 
 def detect_conflicts(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> List[str]:
     conflicts: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title', 'channel']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         
@@ -694,22 +714,18 @@ def main() -> None:
     parser.add_argument('--update', action='store_true', help='Update missing YAML front matter from RSS feed')
     parser.add_argument('--check-yaml', action='store_true', help='Dry-run conflict check between RSS and sidecar YAML')
     args = parser.parse_args()
-    
     root = (args.directory or Path.cwd()).resolve()
     if not root.exists() or not root.is_dir():
         raise SystemExit(f'Directory {root} does not exist.')
     ensure_git_repo(root)
-    
     if args.report:
         report_sidecars(root)
         if not args.rss_feed:
             return
-            
     if args.check_yaml and not args.rss_feed:
         raise SystemExit('--check-yaml requires --rss-feed')
     if args.update and not args.rss_feed:
         raise SystemExit('--update requires --rss-feed')
-        
     if args.rss_feed:
         rss_result = subprocess.run(['curl', '-fsSL', args.rss_feed], capture_output=True, text=True)
         if rss_result.returncode != 0:
@@ -718,7 +734,6 @@ def main() -> None:
         if not rss_items:
             print_info('No items found in RSS feed.')
             return
-            
         if args.check_yaml:
             print_info('Checking YAML conflicts...')
             conflicts_found = 0
@@ -737,7 +752,6 @@ def main() -> None:
             if conflicts_found == 0:
                 print_info('No YAML conflicts detected.')
             return
-            
         if args.update:
             print_info('Updating existing sidecars...')
             updated_count = 0
@@ -750,44 +764,33 @@ def main() -> None:
                     updated_count += 1
             print_info(f'Processed {len(rss_items)} RSS items, updated {updated_count} files.')
             return
-            
         output_dir = find_output_directory(root)
         assets_dir = output_dir / 'assets'
         if not args.dry_run:
             assets_dir.mkdir(parents=True, exist_ok=True)
-            
         created = 0
         download_tasks: List[Tuple[str, Path]] = []
-        
-        # In-memory registries to prevent identical items in the same batch from colliding
         seen_permalinks = set()
         seen_transcripts = set()
-        
         for rss_item in rss_items:
             if args.limit is not None and created >= args.limit:
                 break
-                
             permalink = rss_item.get('link', '').strip()
             if not permalink:
                 continue
-                
-            # Skip if we already touched it in this run, or if it's already saved to Git
             if permalink in seen_permalinks or git_grep_permalink(root, permalink):
                 continue
-                
             seen_permalinks.add(permalink)
             print_info(f'Processing episode: {rss_item.get("title", "<no title>")}')
-            
             transcript_url = rss_item.get('transcript_url', '').strip()
             if transcript_url and transcript_url not in seen_transcripts:
                 seen_transcripts.add(transcript_url)
                 download_tasks.append((transcript_url, assets_dir / basename_from_url(transcript_url)))
-                
             create_sidecar_file(output_dir, rss_item, channel_title, args.dry_run)
             created += 1
-            
         create_transcript_downloads(download_tasks, args.dry_run)
         print_info(f'Processed {len(rss_items)} RSS items, created {created} new sidecars.')
-		
+
+
 if __name__ == '__main__':
     main()
