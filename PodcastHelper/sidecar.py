@@ -16,8 +16,8 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
-DEFAULT_CONCURRENT_DOWNLOADS = 2
-DEFAULT_MAX_DELAY_SECONDS = 3
+DEFAULT_CONCURRENT_DOWNLOADS = 5
+DEFAULT_MAX_DELAY_SECONDS = 5
 NATIVE_TMPDIRS = ["TEMP", "TMP", "TMPDIR"]
 STOPWORDS_FALLBACK = {
     'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren', 'as',
