@@ -358,7 +358,7 @@ def html_to_markdown(html_text: str) -> str:
     text = re.sub(r'(?i)</i>', '_', text)
 
     def anchor_replace(match: re.Match) -> str:
-        href = match.group('href') or ''
+        href = match.group(1) or ''
         text_inner = match.group(2) or ''
         text_inner = text_inner.strip()
         if href and text_inner and href.strip() == text_inner.strip():
@@ -412,6 +412,7 @@ def build_front_matter(rss_item: Dict[str, str], channel_title: str) -> Tuple[st
         'permalink': rss_item.get('link', ''),
         'download': rss_item.get('enclosure_url', ''),
         'transcript': rss_item.get('transcript_url', ''),
+        'title': rss_item.get('title', ''),
     }
 
 
@@ -434,6 +435,7 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'duration: {safe_yaml_value(str(front.get("duration", "")))}')
     lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")))}')
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")))}')
+    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")))}')
     if str(front.get('transcript', '')).strip():
         lines.append(f'transcript: {safe_yaml_value(str(front.get("transcript", "")))}')
     return '\n'.join(lines)
