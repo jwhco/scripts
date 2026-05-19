@@ -152,6 +152,14 @@ Notes:
 
 ## Configuration
 
+
+- Make sure `curl` is installed.
+
+## Reference
+
+- Confessions of a SysAdmin. (2024, November 19) Fetching RSS Feeds Respectfully With `curl`. https://blog.amen6.com/blog/2024/11/fetching-rss-feeds-respectfully-with-curl/
+
+
 > Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=sidecar-podcast-helper) All rights reserved.
 
 /EOF/
