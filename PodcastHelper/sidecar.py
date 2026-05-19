@@ -200,8 +200,11 @@ def format_duration(duration_text: Optional[str]) -> str:
     if not duration_text:
         return ''
     cleaned = duration_text.strip()
+    
+    # If it's a pure digit string, treat it as total seconds or total minutes based on your preference.
+    # Standard RSS spec usually defines raw digits as total seconds.
     if cleaned.isdigit():
-        total_seconds = int(cleaned) * 60
+        total_seconds = int(cleaned)
     elif ':' in cleaned:
         parts = [p.strip() for p in cleaned.split(':') if p.strip().isdigit()]
         try:
@@ -210,20 +213,26 @@ def format_duration(duration_text: Optional[str]) -> str:
             total_seconds = 0
         else:
             if len(parts) == 1:
-                total_seconds = parts[0] * 60
+                total_seconds = parts[0]
             elif len(parts) == 2:
+                # MM:SS format
                 total_seconds = parts[0] * 60 + parts[1]
             else:
+                # HH:MM:SS format
                 total_seconds = parts[0] * 3600 + parts[1] * 60 + parts[2]
     else:
         try:
-            total_seconds = int(float(cleaned) * 60)
+            total_seconds = int(float(cleaned))
         except Exception:
             total_seconds = 0
+
     if total_seconds < 0:
         total_seconds = 0
+
+    # Format output dynamically back to MM:SS or HH:MM:SS depending on size
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
+    
     if hours:
         return f"{hours}:{minutes:02d}:{seconds:02d}"
     return f"{minutes}:{seconds:02d}"
