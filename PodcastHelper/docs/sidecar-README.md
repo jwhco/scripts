@@ -17,7 +17,8 @@
 - When possible use `git grep ` to look at only markdown extensions `.md` to reduce overhead when searching files. Check to make sure we're in a git environment, then error out if not. Look in the `directory` location.
 - When reporting on markdown episode sidecars with the `--report` argument, mention all sidecars even if they have incomplete front matter or missing information. 
   - Present your findings on the screen starting with the filename and path (VsCode engagable), a quick highlight of front matter, and show only enough not to wrap.
-  - Reporting date published, title, and permalink is most relevant.
+  - Reporting date published, title, and permalink is most relevant. If one of these values don't exist, then leave bank.
+  - The objective of reporting is to get a quick inventory of the existing markdown episode sidecars dumped to the screen so I can filter for what I'm trying to find.
 - When creating filenames for markdown expisode sidecar, digest the title removing any special characters, removing stop words, its okay to preserve word order. 
   - A title like "Know which podcast episode has most audience potential" would become "Most Audience Potential" as these best represent the phrase. 
   - Digesting titles can be done with tri-gram, summarizing the phrase, or scoring values to shorten while retaining context. Maybe ancor on a adjective. 
@@ -25,6 +26,7 @@
 - If the HTML formatted description in RSS has tables, code, or incomplete text in a href starting with `http`, then ignore tables and code. Then rebuild the incomplete text using the href value. Keep Google Analytics UTM codes when possible. 
   - Otherwise convert line breaks in HTML to suitable in Markdown. Focus primarily on the formatting when converting. Basic HTML tags into Markdown.
 - Asset folder structure. There will only be `/pages/assets/` with markdown episodes files created in `/pages/`. Don't create any other sub-folders. After reviewed, these markdown sidecars will get moved into project folders.
+  - If the `pages` subfolder doesn't exist in the root of `--directory`, then throw a WARNING then put the files in the root if an `/assets/` exists. Otherwise throw an ERROR and exit.
 - There needs to be conflict detection in `--check-yaml` that flags with values are different from RSS or blank when details existing in RSS. The goal is to determine if the sidecars already created need updating.
 - When rate limiting on same domain downloads, only allow a few concurrent downloads (default 2), while introducing a random delay (up to 3 seconds) between each start of downloads. 
   - If the maximum concurrent are running, then don't start a new download, when one finishs, wait the random delay before starting the next.
@@ -33,6 +35,9 @@
 - Environment variables for temporary folder will be `TEMP` or default as `/tmp`, where `TERM` is for terminal. And `TERM_PROGRAM=vscode` means session is running under VsCode. When possible print to screen in a way that works under SSH but doesn't require a specific environment.
 - If the `--directory` location isn't a GIT repo, then exit. The reason a git repository is desired is to recover from file creation or updates of front matter. Don't let the script run if there is no repo.
 - With SSH terminal outputs, ANSI escape codes should work. Do what works for Xterm. Keep it simple otherwise.
+
+
+
 
 
 ## User Story
@@ -51,13 +56,15 @@
     - The `--limit 10` is to process 10 new episodes then stop. This allows the user to check their work.
     - A command line option `--dry-run` will do the matching and discovery of what is missing WITHOUT creating any markdown sidecar files. No modifications will be made.
     - If `--diretory` is NOT mentioned, then it will start in the current working directory. Any files created will go in the `pages` subfolder off the root of running.
-      - If the `pages` subfolder doesn't exist in the root, then alternatively the current working directory.
+
     - Script downloads the RSS feed,
     - Uses `git grep -n -- "permalink: {PERMALINK}" -- '*.md'` to find a reference to the podcast episode in the front matter of referencing permalink.
         - The variable `{PERMALINK}` would be replaced by the RSS `link` value from the `item` representing this episode.
         - If the permalink doesn't exist in the `directory` markdown files, then create a new sidecar markdown file with the following details from RSS (on sidecar per podcast episode.)
         - Use the `pages` directory in the root of the `directory` folder, error if it doesn't exist.
-        - Create a filename based on the episode `pubDate` yet formatted in a zettelkasten key as `YYYYMMDDmmhh` followed a three word phrase derived from `title` (removing stop words). The title will be in title case, capitalizing the first letter in each word.
+        - Create a filename based on the episode `pubDate` yet formatted in a zettelkasten key as `YYYYMMDDmmhh` followed a three word phrase derived from `title` (removing stop words). 
+        - The title will be in title case, capitalizing the first letter in each word. No numbers other than the zettelkasten key.
+        - Use the first three meaningful words of the title when shortening the title into a three word phrase. If fewer than three words in the title, then use two. As long as the zettelkasten key exists.
     - Script builds YAML front matter, then follows with a `#` title, then description. Convert HTML description to markdown.
         - If there are any URL's where the `href` and text are the same, then only include the text.
     - The script runs in the background with status so user knows where they left off. Provide status suitable for running over SSH terminal session.
@@ -105,7 +112,7 @@ Where:
 
 ```yaml
 tags:
-author: Justin Hitt
+author: 
 
 date:
 created:
@@ -115,12 +122,11 @@ updated:
 type: Podcast
 channel:
 catalog:
-platform: Spreaker
+platform: 
 episode:
 duration:
 permalink:
 download:
-root-keyword:
 ```
 
 Where:
@@ -130,14 +136,17 @@ Where:
 - `platform` is the title case of the RSS `item` value `link` domain name, not including "www" or ".com" which represents the hosting platform name.
 - `download` is the RSS `item` value from `enclosure` URL to include the full canonical address.
 - `date` is the `YYYY-MM-DD` verion of the RSS `item` episode `pubDate`, translated.
-- `duration` is a calculation from an episodes `itunes:duration` which is represented in minutes. Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent.
+- `duration` is a calculation from an episodes `itunes:duration` which is represented in minutes. 
+  - Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent. Normalize to the shortest form. Most podcast episodes are under an hour.
 - `tags` come from RSS `item` for the episode `itunes:keywords` then are presented in YAML front matter as newline, dash, then keyword list as presented in RSS.
+- `author` is going to be a persons name from the RSS `itunes:author`. When that phrase includes `|` then the second words are the authors name. For example, "JCO Media | Justin Hitt" becomes "Justin Hitt" in all cases.
+- The following will remain blank and don't have an equivalent in the RSS feed. `channel`, `episode`, `updated`, `created`, and  
 
 
 Notes:
 
 - If a value `podcast:transcript` exists in the RSS episode `item`, then include in YAML front matter as `transcript` URL.
-  - Also download the transcript file `type="text/plain` into an `asset` subfolder. 
+  - Also download the transcript file `type="text/plain` into an `asset` subfolder. If no plain text exists, then download `type="text/vtt"` format. If no text, then leave blank.
   - Include in a section near the end of the markdown sidecar to include `## Related` then line break, then `- Transcript [[{FILENAME}]]` followed by another newline.
   - It's important that I'm able to find transcripts from the sidecar when looking at this file in my note taking application.
 
