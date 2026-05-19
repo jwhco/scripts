@@ -83,7 +83,12 @@ def git_grep_files(root: Path, pattern: str) -> List[Path]:
 
 
 def git_grep_permalink(root: Path, permalink: str) -> Optional[Path]:
-    result = run_git_command(root, ['grep', '-n', '--', f'permalink: {permalink}', '--', '*.md'])
+    # Escape permalink for regex usage within grep -E
+    escaped_permalink = re.escape(permalink)
+    # Matches permalink: permalink, permalink: "permalink", permalink: 'permalink'
+    pattern = f"^permalink:\\s*['\"]?{escaped_permalink}['\"]?\\s*$"
+    
+    result = run_git_command(root, ['grep', '-n', '-E', '--', pattern, '--', '*.md'])
     if result.returncode == 0 and result.stdout:
         first_line = result.stdout.splitlines()[0]
         path_part = first_line.split(':', 1)[0]
@@ -106,6 +111,8 @@ def parse_yaml_front_matter(md_path: Path) -> Dict[str, object]:
             break
         if stripped.lstrip().startswith('-') and current_key == 'tags':
             current_value = stripped.lstrip()[1:].strip()
+            # Clean up quotes around tag entries if present
+            current_value = current_value.strip("'\"")
             if current_value:
                 metadata.setdefault('tags', [])
                 metadata['tags'].append(current_value)
@@ -114,7 +121,7 @@ def parse_yaml_front_matter(md_path: Path) -> Dict[str, object]:
             continue
         key, _, value = stripped.partition(':')
         key = key.strip()
-        value = value.strip()
+        value = value.strip().strip("'\"")
         if key == 'tags':
             metadata['tags'] = []
             current_key = 'tags'
@@ -169,12 +176,14 @@ def slugify_title(title: str) -> str:
     return ' '.join(cleaned[:3])
 
 
-def safe_yaml_value(value: Optional[str]) -> str:
+def safe_yaml_value(value: Optional[str], force_unquoted: bool = False) -> str:
     if value is None:
         return ''
     text = str(value).strip()
     if text == '':
         return ''
+    if force_unquoted:
+        return text
     if re.search(r'[:\n\r]|^\s|\s$|["\'{}\[\],&*#?\-<>=!%@`]', text):
         text = text.replace('"', '\\"')
         return f'"{text}"'
@@ -420,9 +429,12 @@ def render_yaml(front: Dict[str, object]) -> str:
     tags = get_tag_list(front.get('tags', []))
     lines: List[str] = ['tags:']
     for tag in tags:
+        # Keep tags safe but allow quotes if symbols call for it
         lines.append(f'  - {safe_yaml_value(tag)}')
     lines.append(f'author: {safe_yaml_value(str(front.get("author", "")))}')
-    lines.append(f'date: {safe_yaml_value(str(front.get("date", "")))}')
+    
+    # date, permalink, download, duration must NEVER have quotes
+    lines.append(f'date: {safe_yaml_value(str(front.get("date", "")), force_unquoted=True)}')
     lines.append(f'created: {safe_yaml_value(str(front.get("created", "")))}')
     lines.append(f'published: {safe_yaml_value(str(front.get("published", "")))}')
     lines.append(f'updated: {safe_yaml_value(str(front.get("updated", "")))}')
@@ -432,10 +444,13 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'catalog: {safe_yaml_value(str(front.get("catalog", "")))}')
     lines.append(f'platform: {safe_yaml_value(str(front.get("platform", "")))}')
     lines.append(f'episode: {safe_yaml_value(str(front.get("episode", "")))}')
-    lines.append(f'duration: {safe_yaml_value(str(front.get("duration", "")))}')
-    lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")))}')
-    lines.append(f'download: {safe_yaml_value(str(front.get("download", "")))}')
-    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")))}')
+    lines.append(f'duration: {safe_yaml_value(str(front.get("duration", "")), force_unquoted=True)}')
+    lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")), force_unquoted=True)}')
+    lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
+    
+    # title must NEVER have quotes and matches GitHub YAML specification plain text title case
+    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")), force_unquoted=True)}')
+    
     if str(front.get('transcript', '')).strip():
         lines.append(f'transcript: {safe_yaml_value(str(front.get("transcript", "")))}')
     return '\n'.join(lines)
@@ -574,7 +589,7 @@ def report_sidecars(root: Path) -> None:
 def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> Tuple[Dict[str, object], List[str]]:
     updated = existing_metadata.copy()
     changes: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         if existing_value == '' and rss_value:
@@ -590,7 +605,7 @@ def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str,
 
 def detect_conflicts(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> List[str]:
     conflicts: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         if existing_value and rss_value and existing_value != rss_value:
