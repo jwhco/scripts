@@ -16,8 +16,8 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
-DEFAULT_CONCURRENT_DOWNLOADS = 5
-DEFAULT_MAX_DELAY_SECONDS = 5
+DEFAULT_CONCURRENT_DOWNLOADS = 2
+DEFAULT_MAX_DELAY_SECONDS = 3
 NATIVE_TMPDIRS = ["TEMP", "TMP", "TMPDIR"]
 STOPWORDS_FALLBACK = {
     'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren', 'as',
@@ -429,7 +429,8 @@ def render_yaml(front: Dict[str, object]) -> str:
     tags = get_tag_list(front.get('tags', []))
     lines: List[str] = ['tags:']
     for tag in tags:
-        lines.append(f'  - {safe_yaml_value(tag)}')
+        # Enforce unquoted structure for all simple tag metadata values
+        lines.append(f'  - {safe_yaml_value(tag, force_unquoted=True)}')
     lines.append(f'author: {safe_yaml_value(str(front.get("author", "")))}')
     
     lines.append(f'date: {safe_yaml_value(str(front.get("date", "")), force_unquoted=True)}')
@@ -446,7 +447,6 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")), force_unquoted=True)}')
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
     
-    # Enforce plain text title case format (never quoted)
     lines.append(f'title: {safe_yaml_value(str(front.get("title", "")).title(), force_unquoted=True)}')
     
     if str(front.get('transcript', '')).strip():
