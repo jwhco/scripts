@@ -83,9 +83,7 @@ def git_grep_files(root: Path, pattern: str) -> List[Path]:
 
 
 def git_grep_permalink(root: Path, permalink: str) -> Optional[Path]:
-    # Escape permalink for regex usage within grep -E
     escaped_permalink = re.escape(permalink)
-    # Matches permalink: permalink, permalink: "permalink", permalink: 'permalink'
     pattern = f"^permalink:\\s*['\"]?{escaped_permalink}['\"]?\\s*$"
     
     result = run_git_command(root, ['grep', '-n', '-E', '--', pattern, '--', '*.md'])
@@ -111,7 +109,6 @@ def parse_yaml_front_matter(md_path: Path) -> Dict[str, object]:
             break
         if stripped.lstrip().startswith('-') and current_key == 'tags':
             current_value = stripped.lstrip()[1:].strip()
-            # Clean up quotes around tag entries if present
             current_value = current_value.strip("'\"")
             if current_value:
                 metadata.setdefault('tags', [])
@@ -200,9 +197,6 @@ def format_duration(duration_text: Optional[str]) -> str:
     if not duration_text:
         return ''
     cleaned = duration_text.strip()
-    
-    # If it's a pure digit string, treat it as total seconds or total minutes based on your preference.
-    # Standard RSS spec usually defines raw digits as total seconds.
     if cleaned.isdigit():
         total_seconds = int(cleaned)
     elif ':' in cleaned:
@@ -215,10 +209,8 @@ def format_duration(duration_text: Optional[str]) -> str:
             if len(parts) == 1:
                 total_seconds = parts[0]
             elif len(parts) == 2:
-                # MM:SS format
                 total_seconds = parts[0] * 60 + parts[1]
             else:
-                # HH:MM:SS format
                 total_seconds = parts[0] * 3600 + parts[1] * 60 + parts[2]
     else:
         try:
@@ -229,7 +221,6 @@ def format_duration(duration_text: Optional[str]) -> str:
     if total_seconds < 0:
         total_seconds = 0
 
-    # Format output dynamically back to MM:SS or HH:MM:SS depending on size
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     
@@ -438,11 +429,9 @@ def render_yaml(front: Dict[str, object]) -> str:
     tags = get_tag_list(front.get('tags', []))
     lines: List[str] = ['tags:']
     for tag in tags:
-        # Keep tags safe but allow quotes if symbols call for it
         lines.append(f'  - {safe_yaml_value(tag)}')
     lines.append(f'author: {safe_yaml_value(str(front.get("author", "")))}')
     
-    # date, permalink, download, duration must NEVER have quotes
     lines.append(f'date: {safe_yaml_value(str(front.get("date", "")), force_unquoted=True)}')
     lines.append(f'created: {safe_yaml_value(str(front.get("created", "")))}')
     lines.append(f'published: {safe_yaml_value(str(front.get("published", "")))}')
@@ -457,8 +446,8 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")), force_unquoted=True)}')
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
     
-    # title must NEVER have quotes and matches GitHub YAML specification plain text title case
-    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")), force_unquoted=True)}')
+    # Enforce plain text title case format (never quoted)
+    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")).title(), force_unquoted=True)}')
     
     if str(front.get('transcript', '')).strip():
         lines.append(f'transcript: {safe_yaml_value(str(front.get("transcript", "")))}')
@@ -601,6 +590,10 @@ def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str,
     for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
+        
+        if key == 'title':
+            rss_value = rss_value.title()
+            
         if existing_value == '' and rss_value:
             updated[key] = rss_value
             changes.append(key)
@@ -617,6 +610,10 @@ def detect_conflicts(existing_metadata: Dict[str, object], rss_front: Dict[str, 
     for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
+        
+        if key == 'title':
+            rss_value = rss_value.title()
+            
         if existing_value and rss_value and existing_value != rss_value:
             conflicts.append(f"{key}: existing='{existing_value}' rss='{rss_value}'")
         elif not existing_value and rss_value:
