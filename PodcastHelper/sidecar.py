@@ -694,18 +694,22 @@ def main() -> None:
     parser.add_argument('--update', action='store_true', help='Update missing YAML front matter from RSS feed')
     parser.add_argument('--check-yaml', action='store_true', help='Dry-run conflict check between RSS and sidecar YAML')
     args = parser.parse_args()
+    
     root = (args.directory or Path.cwd()).resolve()
     if not root.exists() or not root.is_dir():
         raise SystemExit(f'Directory {root} does not exist.')
     ensure_git_repo(root)
+    
     if args.report:
         report_sidecars(root)
         if not args.rss_feed:
             return
+            
     if args.check_yaml and not args.rss_feed:
         raise SystemExit('--check-yaml requires --rss-feed')
     if args.update and not args.rss_feed:
         raise SystemExit('--update requires --rss-feed')
+        
     if args.rss_feed:
         rss_result = subprocess.run(['curl', '-fsSL', args.rss_feed], capture_output=True, text=True)
         if rss_result.returncode != 0:
@@ -714,6 +718,7 @@ def main() -> None:
         if not rss_items:
             print_info('No items found in RSS feed.')
             return
+            
         if args.check_yaml:
             print_info('Checking YAML conflicts...')
             conflicts_found = 0
@@ -732,6 +737,7 @@ def main() -> None:
             if conflicts_found == 0:
                 print_info('No YAML conflicts detected.')
             return
+            
         if args.update:
             print_info('Updating existing sidecars...')
             updated_count = 0
@@ -744,29 +750,44 @@ def main() -> None:
                     updated_count += 1
             print_info(f'Processed {len(rss_items)} RSS items, updated {updated_count} files.')
             return
+            
         output_dir = find_output_directory(root)
         assets_dir = output_dir / 'assets'
         if not args.dry_run:
             assets_dir.mkdir(parents=True, exist_ok=True)
+            
         created = 0
         download_tasks: List[Tuple[str, Path]] = []
+        
+        # In-memory registries to prevent identical items in the same batch from colliding
+        seen_permalinks = set()
+        seen_transcripts = set()
+        
         for rss_item in rss_items:
             if args.limit is not None and created >= args.limit:
                 break
-            permalink = rss_item.get('link', '')
+                
+            permalink = rss_item.get('link', '').strip()
             if not permalink:
                 continue
-            if git_grep_permalink(root, permalink):
+                
+            # Skip if we already touched it in this run, or if it's already saved to Git
+            if permalink in seen_permalinks or git_grep_permalink(root, permalink):
                 continue
+                
+            seen_permalinks.add(permalink)
             print_info(f'Processing episode: {rss_item.get("title", "<no title>")}')
-            transcript_url = rss_item.get('transcript_url', '')
-            if transcript_url:
+            
+            transcript_url = rss_item.get('transcript_url', '').strip()
+            if transcript_url and transcript_url not in seen_transcripts:
+                seen_transcripts.add(transcript_url)
                 download_tasks.append((transcript_url, assets_dir / basename_from_url(transcript_url)))
+                
             create_sidecar_file(output_dir, rss_item, channel_title, args.dry_run)
             created += 1
+            
         create_transcript_downloads(download_tasks, args.dry_run)
         print_info(f'Processed {len(rss_items)} RSS items, created {created} new sidecars.')
-
-
+		
 if __name__ == '__main__':
     main()
