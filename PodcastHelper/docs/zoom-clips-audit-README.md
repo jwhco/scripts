@@ -1,11 +1,13 @@
 # Zoom Clips Audit - From Zoom Clips Export Which Covered
 
 
-## Ues Case
+## Use Case
 
 - Determine if Markdown episode sidecar has been created. Create, update, and report.
 
 ## Requirements
+
+- Ignore files with `Template` in file name or path.
 
 ## Specifications
 
