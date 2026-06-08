@@ -1,0 +1,212 @@
+# Sidecar - Create Markdown Sidecar From RSS
+
+## Use Case
+
+- To collect information from an RSS feed to create markdown sidecar representing the episode. Also support maintaining accurate episode information.
+
+## Requirements
+
+- The unique identifier is `permalink` representing a podcast episode in RSS as well as the markdown episode sidecar files. Must be able to match this link no matter how it is formatted in the YAML front matter.
+- The following YAML front matter values DO NOT have quotes around them. `date`, `permalink`, `download`, and `duration`.
+    - According to the GitHub YAML frontmatter specification the text of a `title:` value doesn't have quotes. It is plain text title case.
+- Ignore any markdown sidecars with `Template` in the directory path or filename.
+- The podcast RSS feed contains episodes and is hosted on Spreaker. The matching domain of the RSS feed will include `spreaker.com` in all cases.
+    - The script can have different options to include RSS from Apple, or other platforms. However, for the first version make sure it works perfect for Spreaker feeds.
+- The script runs from the command line with the name `sidecar.py`. All output is suitable for a basic xterm.
+    - It's okay to have spinny things for outputs, or curses to make text smoother, however, it must work over an SSH terminal in VsCode.
+- The script will be written in python. Download any files using the lowest overhead way possible.
+    - Use environmental variables to determine where a temporary folder exists for downloading RSS, or staging any files.
+    - Use environmental variables to determine if script is running via an SSH terminal, an x-terminal, or under VsCode. Reduce overhead by making outputs clean and compatiable for all terminal environments.
+- Don't spam the RSS hosting and enclosure hosting platforms. Rate check the download of transcripts by queing them up then running in the background while building the markdown episode sidecar.
+- When possible use `git grep ` to look at only markdown extensions `.md` to reduce overhead when searching files. Check to make sure we're in a git environment, then error out if not. Look in the `directory` location.
+- When reporting on markdown episode sidecars with the `--report` argument, mention all sidecars even if they have incomplete front matter or missing information.
+    - Present your findings on the screen starting with the filename and path (VsCode engagable), a quick highlight of front matter, and show only enough not to wrap.
+    - Reporting date published, title, and permalink is most relevant. If one of these values don't exist, then leave bank.
+    - The objective of reporting is to get a quick inventory of the existing markdown episode sidecars dumped to the screen so I can filter for what I'm trying to find.
+- When creating filenames for markdown expisode sidecar, digest the title removing any special characters, removing stop words, its okay to preserve word order.
+    - A title like "Know which podcast episode has most audience potential" would become "Most Audience Potential" as these best represent the phrase.
+    - Digesting titles can be done with tri-gram, summarizing the phrase, or scoring values to shorten while retaining context. Maybe ancor on a adjective.
+    - For English stop words use `import nltk` as it will likely already be available in the environment.
+- If the HTML formatted description in RSS has tables, code, or incomplete text in a href starting with `http`, then ignore tables and code. Then rebuild the incomplete text using the href value. Keep Google Analytics UTM codes when possible.
+    - Otherwise convert line breaks in HTML to suitable in Markdown. Focus primarily on the formatting when converting. Basic HTML tags into Markdown.
+- Asset folder structure. There will only be `/pages/assets/` with markdown episodes files created in `/pages/`. Don't create any other sub-folders. After reviewed, these markdown sidecars will get moved into project folders.
+    - If the `pages` subfolder doesn't exist in the root of `--directory`, then throw a WARNING then put the files in the root if an `/assets/` exists. Otherwise throw an ERROR and exit.
+- There needs to be conflict detection in `--check-yaml` that flags with values are different from RSS or blank when details existing in RSS. The goal is to determine if the sidecars already created need updating.
+- When rate limiting on same domain downloads, only allow a few concurrent downloads (default 2), while introducing a random delay (up to 3 seconds) between each start of downloads.
+    - If the maximum concurrent are running, then don't start a new download, when one finishs, wait the random delay before starting the next.
+    - This will run on a local network with dual wan connections. The delays between sessions should let the network router balance requests.
+    - Sessions can remain own for concurrent downloads, but then close and reopen for the next batch, or between each to trigger balancing.
+- Environment variables for temporary folder will be `TEMP` or default as `/tmp`, where `TERM` is for terminal. And `TERM_PROGRAM=vscode` means session is running under VsCode. When possible print to screen in a way that works under SSH but doesn't require a specific environment.
+- If the `--directory` location isn't a GIT repo, then exit. The reason a git repository is desired is to recover from file creation or updates of front matter. Don't let the script run if there is no repo.
+- With SSH terminal outputs, ANSI escape codes should work. Do what works for Xterm. Keep it simple otherwise.
+
+## User Story
+
+### User Wants to Find Podcast Sidecars
+
+- User is trying to figure out what podcast sidecars already exist in a markdown notes vault.
+- They run `sidecar.py --directory  /workspaces/obsidian/ --report` to get a list of markdown sidecars that exist in the directory.
+- When reporting, provide status, so the user knows the script is doing something. Print the path to the file containing a podcast episode sidecar.
+- You'll know it is a podcast sidecar because the YAML front matter will include `type: Podcast` and `permalink: ` with a value.
+- Quickly report on front matter values that are relevant for an RSS feed, or other updating processes for this script.
+
+### User Wants to Build Podcast Sidecars
+
+- User wants to archive a podast via RSS feed. They run `sidecar.py --rss-feed https://www.spreaker.com/show/3257924/episodes/feed --directory /workspaces/obsidian/ --limit 10`
+    - The `--limit 10` is to process 10 new episodes then stop. This allows the user to check their work.
+    - A command line option `--dry-run` will do the matching and discovery of what is missing WITHOUT creating any markdown sidecar files. No modifications will be made.
+    - If `--diretory` is NOT mentioned, then it will start in the current working directory. Any files created will go in the `pages` subfolder off the root of running.
+
+    - Script downloads the RSS feed,
+    - Uses `git grep -n -- "permalink: {PERMALINK}" -- '*.md'` to find a reference to the podcast episode in the front matter of referencing permalink.
+        - The variable `{PERMALINK}` would be replaced by the RSS `link` value from the `item` representing this episode.
+        - If the permalink doesn't exist in the `directory` markdown files, then create a new sidecar markdown file with the following details from RSS (on sidecar per podcast episode.)
+        - Use the `pages` directory in the root of the `directory` folder, error if it doesn't exist.
+        - Create a filename based on the episode `pubDate` yet formatted in a zettelkasten key as `YYYYMMDDmmhh` followed a three word phrase derived from `title` (removing stop words).
+        - The title will be in title case, capitalizing the first letter in each word. No numbers other than the zettelkasten key.
+        - Use the first three meaningful words of the title when shortening the title into a three word phrase. If fewer than three words in the title, then use two. As long as the zettelkasten key exists.
+    - Script builds YAML front matter, then follows with a `#` title, then description. Convert HTML description to markdown.
+        - If there are any URL's where the `href` and text are the same, then only include the text.
+    - The script runs in the background with status so user knows where they left off. Provide status suitable for running over SSH terminal session.
+    - When complete, provide single line status of number of episodes processed, how many files created.
+    - After creating a file, report to the screen with the full path so that text can be crtl-clicked to open in VsCode. Most sessions will run in VsCode bash terminal.
+
+## Specifications
+
+### Template for Podcast Markdown Sidecar
+
+- Filename = "YYYMMDDmmss Key Word Phrase"
+- The markdown sidecar has a simple template, referencing only the transcript if available.
+
+Template:
+
+```markdown
+---
+{ YAML FRONT MATTER }
+---
+
+# {TITLE}
+
+## Podcast
+
+{TITLE}
+
+{PLATFORM}, {FILENAME} -->
+
+{DESCRIPTION}
+
+- Tags = {TAGS}
+```
+
+Where:
+
+- `YAML FRONT MATTER`, replace with the fully generated front matter as described elsewhere in this document.
+- `FILENAME` comes from the RSS `item` episode `enclosure` URL filename. Not the whole URL, just the filename `.mp3` or what ever media name.
+- `TAGS` is the RSS `item` episode `itunes:keywords` with spaces between the comma, all on a single line.
+
+### Building of Sidecar YAML Front Matter
+
+- The markdown sidecar has front matter containing the following values. Complete all possible values from RSS feed episode details.
+
+```yaml
+tags:
+author:
+
+date:
+created:
+published:
+updated:
+
+type: Podcast
+channel:
+catalog:
+platform:
+episode:
+duration:
+permalink:
+download:
+title:
+```
+
+Where:
+
+- `channel` is the RSS `channel` abbreviated according to the following specifications:
+    - Table:
+        - "AdBriefing Copywriting Tips" = ABR
+        - "Inside Strategic Relations" = ISR
+        - "Prosperity Homestead" = PHM
+        - "Sustainable Wealth Secrets" = SWS
+        - "Commercial Electrical Profits" = CEP
+    - Any unrecognized channel name will be abbreviated according to the first letter in each word all caps.
+    - Set this `channel` value early in reading the RSS because it is the same value for every episode in the same file.
+- `permalink` is from RSS `link` in the `item` representing an episode.
+- `platform` is the title case of the RSS `item` value `link` domain name, not including "www" or ".com" which represents the hosting platform name.
+- `download` is the RSS `item` value from `enclosure` URL to include the full canonical address.
+- `title` is the RSS `item` episode title. Place quotes around it.
+- `date` is the `YYYY-MM-DD` version of the RSS `item` episode `pubDate`, translated. This is a date value, there are no quotations.
+- `duration` is a calculation from an episodes `itunes:duration` which is represented in minutes.
+    - Transform those minutes to `hh:mm:ss` or `mm:ss` to best represent.
+    - Normalize to the shortest form. Most podcast episodes are under an hour.
+    - The `itunes:duration` of `1297` would become `duration` of `21:37`, representing the `mm:ss` format.
+- `tags` come from RSS `item` for the episode `itunes:keywords` then are presented in YAML front matter as newline, dash, then keyword list as presented in RSS.
+- `author` is going to be a persons name from the RSS `itunes:author`. When that phrase includes `|` then the second words are the authors name. For example, "JCO Media | Justin Hitt" becomes "Justin Hitt" in all cases.
+- The following will remain blank and don't have an equivalent in the RSS feed. `channel`, `episode`, `updated`, `created`, and
+
+Notes:
+
+- If a value `podcast:transcript` exists in the RSS episode `item`, then include in YAML front matter as `transcript` URL.
+    - Also download the transcript file `type="text/plain` into an `asset` subfolder. If no plain text exists, then download `type="text/vtt"` format. If no text, then leave blank.
+    - Include in a section near the end of the markdown sidecar to include `## Related` then line break, then `- Transcript [[{FILENAME}]]` followed by another newline.
+    - It's important that I'm able to find transcripts from the sidecar when looking at this file in my note-taking application.
+
+### Update Missing Details in YAML Front Matter
+
+- User wants to refresh any missing information in the YAML front matter of a markdown sidecar based on RSS feed.
+- User runs `sidecar.py --rss-feed https://www.spreaker.com/show/3257924/episodes/feed --directory /workspaces/obsidian/ --update --dry-run` to figure out what might be updated.
+- When ran without the `--dry-run` the script will update only the YAML front matter in existing markdown episode sidecars. Not replacing a field with an exiting value.
+- There is a `--check-yaml` option that always does a `--dry-run` yet will identify where a markdown episode sidecar exists, however, one or more values are in conflict.
+- Everything is matching on the PERMALINK form the RSS as a key. Only update where there is an exact match of the key. Don't modify anything else, or if `permalink` is missing.
+- This update is only looking at the context of the RSS feed. If it only finds 5 out of 250, then build sidecars to fill this gap. If the number is 250 out of 250 then all the episodes in that feed are accounted for.
+- This function only updates YAML front matter. The rest of the document may have edits that are not to change. For example, the description may have been expanded.
+
+## Syntax
+
+Usage: sidecar.py [-h] [--directory DIRECTORY] [--rss-feed RSS_FEED] [--limit LIMIT] [--dry-run] [--report] [--update]
+                  [--check-yaml]
+
+Create and inspect podcast RSS markdown sidecars
+
+Where:
+ - `--help` or `-h`, Show this help message and exit
+ - `--directory DIRECTORY`,                        Repository root for markdown vault
+ -  `--rss-feed RSS_FEED`   RSS feed URL to process
+ -  `--limit LIMIT`         Limit new sidecars to create
+ -  `--dry-run`             Do not modify files
+ - `--report`              Report existing podcast sidecars
+ -  `--update`              Update missing YAML front matter from RSS feed
+ -  `--check-yaml`         Dry-run conflict check between RSS and sidecar YAML
+
+
+
+- Create new markdown sidecars, limit to 10, `python3 PodcastHelper/sidecar.py --directory /workspaces/obsidian/ --rss-feed https://www.spreaker.com/show/3257924/episodes/feed  --limit 10`
+  - Sometimes if you run a limit, then run again, it will duplicate one podast episode. There needs to be enough time to write to disk and commit before git sees change.
+  - Best practices is to run the script. Check the work, then commit changes to note-taking repository.
+
+
+## Configuration
+
+- Make sure `curl` is installed.
+- Feeds for in-house publications, `--rss-feed`
+  - AdBriefing Copywriting Tips, https://www.spreaker.com/show/3257924/episodes/feed
+  - Sustainable Wealth Secrets, https://www.spreaker.com/show/3653804/episodes/feed
+  - Inside Strategic Relations, https://www.spreaker.com/show/3010682/episodes/feed
+  - Prosperity Homestead, https://www.spreaker.com/show/3659183/episodes/feed
+  - Commercial Electrical Profits, https://www.spreaker.com/show/3567902/episodes/feed
+
+## Reference
+
+- Confessions of a SysAdmin. (2024, November 19) Fetching RSS Feeds Respectfully With `curl`. https://blog.amen6.com/blog/2024/11/fetching-rss-feeds-respectfully-with-curl/
+
+> Copyright 2026 [JWH Consolidated LLC](https://www.jwhco.com/?utm_source=repository&utm_medium=github.com&utm_content=sidecar-podcast-helper) All rights reserved.
+
+/EOF/

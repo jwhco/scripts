@@ -44,6 +44,9 @@ Make it easier to publish all relevant media and handling large files associated
 
 - Use different scripts, so steps can be taken manually. Each script has a specific single purpose. All scripts read-write the sidecar following the same specifications.
 
+- All reports have context under VsCode terminal. A mention of media file, or markdown sidecar will be Ctrl-clickable to open. Use relative path so it may also work in Obsidian or Zettlr.
+- Use different sidecar files to represent workflow. Like Proposal --> Segement --> Description --> Transcript --> Promotion.
+
 - Scripts run under Make. This way, if sidecar or files exist, the work will be skipped.
 - Video content recorded on Google Pixel 7a, stored in REPO by Adobe Bridge,
 - Once videos are found, a sidecar is produced, and then audio conversion.
@@ -80,10 +83,11 @@ Make it easier to publish all relevant media and handling large files associated
 - Storage location for media is located on laptop hosted on external drive. NAS would be better.
 - Need Kubernetes cluster running Fabric deployment and recipes. Access for analysis. If Fabric is slow batching may not be an option.
 - Limited AI credits, while bulk finding of podcasts is good, processing by AI may need to be on a case by case basis. Limit initial inputs and outputs to single file.
+  - This might be done by digesting materials with the script, then using sidecar to narrow focus of what might be given to AI to ingest.
 - All commands have a `--limit` option to quit after the first X changes. That way scripts can be tested faster, they won't run for hours, and less impact on resources. Works like SQL LIMIT option.
 - Podcasts may be uploaded out of order, or get out of sync with supporting documents. Make sure side-car include the base name of the media file.
 - Video files typically don't have EXIF specific data. Python can pull EXIF from images and audio, but something else will be needed for video. 
-  - To reach from image and audion, use Python `Pillow` for EXIF data.
-- Meta data is not always accurate. For video date creation, it will need to be combination of file, metadata, and comparison with local assets. If there is an image in the same directory, then EXIF from that image may help too.
+  - To reach from image and audio, use Python `Pillow` for EXIF data.
+- Metadata is not always accurate. For video date creation, it will need to be combination of file, metadata, and comparison with local assets. If there is an image in the same directory, then EXIF from that image may help too.
 
 /EOF/
