@@ -10,6 +10,9 @@ date: 2026-03-17
 
 # Find Mature Content in Repository
 
+- See [[TidyObsidian-Requirements]]
+- See [[TidyObsidian-Specifications]]
+
 ## Purpose
 
 - Find ready to publish content in repository. Focus on good grammar, reading level, and topical relevance.
@@ -23,11 +26,12 @@ date: 2026-03-17
 
 ## Requirements
 
+- Use Python Dataframe when manipulating data to simplify trouble shooting. Reporting will just print one of thes etables.
 
-	- What is "highly structured enough to publish"? Number of words. Structure of sentences. Readability. Size of paragraphs and grammar. 
-	- Evaluate clarity, structure, and strength of the arguments. Does the content make sense. Are there any python libraries to support this, minimal AI.
-	- Develop a checklist that includes analysis, review, and a punch list of items. Like how SEO analysis works.
-		- Zettlr editor has [readability algorithm](https://www.zettlr.com/readability) implementation. It's available during editing.
+- What is "highly structured enough to publish"? Number of words. Structure of sentences. Readability. Size of paragraphs and grammar. 
+- Evaluate clarity, structure, and strength of the arguments. Does the content make sense. Are there any python libraries to support this, minimal AI.
+- Develop a checklist that includes analysis, review, and a punch list of items. Like how SEO analysis works.
+- Zettlr editor has [readability algorithm](https://www.zettlr.com/readability) implementation. It's available during editing.
 
 - Use a dictionary to expand root keyword terms. For each word in phrase, or bi-gram, find synonoms to produce a search combination. Also find words near each other.
 
