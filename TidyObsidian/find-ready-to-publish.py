@@ -54,8 +54,15 @@ def is_published(meta):
     has_permalink = 'permalink' in meta and meta['permalink']
     
     if has_permalink:
-        status = meta.get('status', '').lower()
-        type_field = meta.get('type', '').lower()
+        status = meta.get('status', '')
+        if isinstance(status, list):
+            status = status[0] if status else ''
+        status = str(status).lower()
+        
+        type_field = meta.get('type', '')
+        if isinstance(type_field, list):
+            type_field = type_field[0] if type_field else ''
+        type_field = str(type_field).lower()
         
         if status == 's4-publish' or type_field in ('post', 'feature', 'article'):
             return True
@@ -149,9 +156,13 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
     """
     candidates = []
     
-    for dirpath, _, filenames in os.walk(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Skip hidden directories (starting with .)
+        dirnames[:] = [d for d in dirnames if not d.startswith('.')]
+        
         for fname in filenames:
-            if not fname.lower().endswith('.md'):
+            # Skip hidden files and non-markdown files
+            if fname.startswith('.') or not fname.lower().endswith('.md'):
                 continue
             
             full_path = os.path.join(dirpath, fname)
@@ -174,18 +185,32 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
             
             # Filter: yaml type (case-insensitive)
             if yaml_type:
-                doc_type = meta.get('type', '').lower()
+                doc_type = meta.get('type', '')
+                if isinstance(doc_type, list):
+                    doc_type = doc_type[0] if doc_type else ''
+                doc_type = str(doc_type).lower()
                 if doc_type != yaml_type.lower():
                     continue
             
             # Score the candidate
             completeness = score_completeness(meta, body, word_count)
             
+            # Normalize type and status from potential list to string
+            doc_type = meta.get('type', 'Unknown')
+            if isinstance(doc_type, list):
+                doc_type = doc_type[0] if doc_type else 'Unknown'
+            doc_type = str(doc_type)
+            
+            doc_status = meta.get('status', 'Draft')
+            if isinstance(doc_status, list):
+                doc_status = doc_status[0] if doc_status else 'Draft'
+            doc_status = str(doc_status)
+            
             candidate = {
                 'file': full_path,
                 'title': meta.get('title', fname),
-                'type': meta.get('type', 'Unknown'),
-                'status': meta.get('status', 'Draft'),
+                'type': doc_type,
+                'status': doc_status,
                 'word_count': word_count,
                 'readability': calculate_readability_score(body),
                 'completeness': completeness,
