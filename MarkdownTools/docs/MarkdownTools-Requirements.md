@@ -11,7 +11,7 @@
 - Scripts will all use the same stopword list. Include stop word dictionary in configuration so it only needs set once.
 - Compatibility with markdown repos managed by [Obsidian](https://obsidian.md/), [LogSeq](https://logseq.com/), [Zettlr](https://zettlr.com/), and [FOAM](https://marketplace.visualstudio.com/items?itemName=foam.foam-vscode).
 
-
+- A script that can find badly formatted Markdown and errors in YAML front matter. Scan the repo, print a log of errors found. Errors can be ranked, then fixed in a note-taking application.
 
 ## Stakeholders
 

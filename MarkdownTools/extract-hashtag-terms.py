@@ -15,7 +15,7 @@ ZETTEL_ROOT = "/mnt/c/Users/User/GitHub/obsidian/Zettelkasten" # WSL
 WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
-    "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", 
+    "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", "zoom",
     "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", 
     "wintak", "civtak", "tumblr", "locals", "kubernetes", "DFARS", "CMMC", 
     "cyber", "aweber", "aioseo"
