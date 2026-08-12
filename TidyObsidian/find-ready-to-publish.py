@@ -209,7 +209,7 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
             
             record = {
                 'file': full_path,
-                'title': meta.get('title', fname),
+                'title': meta.get('title', ''),
                 'type': doc_type,
                 'status': doc_status,
                 'word_count': word_count,
@@ -232,30 +232,38 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
 
 
 def report_candidates(df):
-    """Print ranked list of publication-ready candidates from DataFrame."""
+    """Print ranked list of publication-ready candidates from DataFrame.
+    
+    Limits output to top 50 candidates by completeness score.
+    """
     if df.empty:
         print("No candidates found.\n")
         return
     
-    print(f"\nReady-to-Publish Candidates ({len(df)} found)\n")
+    # Limit to top 50 candidates
+    df_top = df.head(50)
+    
+    print(f"\nReady-to-Publish Candidates ({len(df_top)} of {len(df)} found)\n")
     print(f"{'Rank':<6} {'Score':<8} {'Words':<8} {'Filename':<40} {'Status':<15} {'Title':<30}")
     print("-" * 115)
     
-    for i, (idx, row) in enumerate(df.iterrows(), 1):
+    for i, (idx, row) in enumerate(df_top.iterrows(), 1):
         # Extract filename from full path
         filename = os.path.basename(row['file'])
-        status = str(row['status'])[:14]
-        title = row['title'][:29] if row['title'] else ''
+        # Use space placeholder if status is blank or None
+        status = str(row['status'])[:14] if row['status'] else ' '
+        # Use space placeholder if title is blank or None
+        title = str(row['title'])[:29] if row['title'] else ' '
         print(f"{i:<6} {int(row['completeness']):<8} {int(row['word_count']):<8} {filename:<40} {status:<15} {title:<30}")
     
     print("\nTop Candidate Details:\n")
-    top = df.iloc[0]
+    top = df_top.iloc[0]
     filename = os.path.basename(top['file'])
     print(f"Filename:    {filename}")
     print(f"Full Path:   {top['file']}")
-    print(f"Title:       {top['title']}")
+    print(f"Title:       {top['title'] if top['title'] else '(none)'}")
     print(f"Type:        {top['type']}")
-    print(f"Status:      {top['status']}")
+    print(f"Status:      {top['status'] if top['status'] else '(none)'}")
     print(f"Word Count:  {int(top['word_count'])}")
     print(f"Readability: {top['readability']:.1f}")
     print(f"Completeness: {int(top['completeness'])}/100")
