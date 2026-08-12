@@ -3,9 +3,9 @@
 Extract PERSON named entities from markdown drafts using spaCy.
 
 Usage:
-  python3 scripts/extract_names_ner.py
-  python3 scripts/extract_names_ner.py --include-notes  # also scan Scrivener/Notes
-  python3 scripts/extract_names_ner.py --out outputs/people.csv
+    python3 scripts/extract_names_ner.py
+    python3 scripts/extract_names_ner.py --include-notes  # also scan Notes under the base directory
+    python3 scripts/extract_names_ner.py --out outputs/people.csv
 
 The script expects `spacy` and the `en_core_web_sm` model to be installed.
 It will produce a CSV at `outputs/people.csv` (default) and print a summary.
@@ -145,25 +145,29 @@ def write_csv(people, outpath):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--include-notes', action='store_true', help='Also scan `Scrivener/Notes`')
+    p.add_argument('directory', nargs='?', default='.',
+                   help='Base directory to scan (default: current directory)')
+    p.add_argument('--include-notes', action='store_true', help='Also scan `Notes` under the base directory')
     p.add_argument('--out', default='outputs/people.csv', help='CSV output path')
     p.add_argument('--min-count', type=int, default=1, help='Minimum occurrences to include')
     args = p.parse_args()
 
-    base = 'Scrivener'
-    draft = os.path.join(base, 'Draft')
-    notes = os.path.join(base, 'Notes')
+    base = args.directory
 
     print('Loading spaCy model...')
     nlp = load_model()
     print('Model loaded.')
 
-    paths = [draft]
-    if args.include_notes:
-        paths.append(notes)
+    # Scan the provided base directory recursively for all Markdown files.
+    # The previous behavior scanned `Draft` (and optionally `Notes`) subfolders;
+    # this script now walks the entire base directory tree and processes all
+    # files ending in `.md`.
+    if not os.path.isdir(base):
+        print(f"Error: base directory not found: {base}")
+        sys.exit(1)
 
     print('Scanning files...')
-    people = scan_paths(paths, nlp)
+    people = scan_paths([base], nlp)
 
     # filter by min_count
     filtered = {name: info for name, info in people.items() if info['count'] >= args.min_count}
