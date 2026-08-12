@@ -17,6 +17,7 @@ import sys
 import re
 import argparse
 import yaml
+import pandas as pd
 from collections import defaultdict
 
 
@@ -152,9 +153,9 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
         max_words: Maximum word count
         yaml_type: Optional YAML type filter (case-insensitive)
     
-    Returns list of dicts with file info and scores.
+    Returns pandas DataFrame with candidate articles and scores.
     """
-    candidates = []
+    records = []
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
         # Skip hidden directories (starting with .)
@@ -206,7 +207,7 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
                 doc_status = doc_status[0] if doc_status else 'Draft'
             doc_status = str(doc_status)
             
-            candidate = {
+            record = {
                 'file': full_path,
                 'title': meta.get('title', fname),
                 'type': doc_type,
@@ -217,37 +218,42 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
                 'yaml_complete': bool(meta.get('title') and meta.get('tags')),
             }
             
-            candidates.append(candidate)
+            records.append(record)
     
-    return candidates
+    # Convert to DataFrame
+    if records:
+        df = pd.DataFrame(records)
+        # Sort by completeness score (descending)
+        df = df.sort_values('completeness', ascending=False).reset_index(drop=True)
+    else:
+        df = pd.DataFrame(columns=['file', 'title', 'type', 'status', 'word_count', 'readability', 'completeness', 'yaml_complete'])
+    
+    return df
 
 
-def report_candidates(candidates):
-    """Print ranked list of publication-ready candidates."""
-    if not candidates:
+def report_candidates(df):
+    """Print ranked list of publication-ready candidates from DataFrame."""
+    if df.empty:
         print("No candidates found.\n")
         return
     
-    # Sort by completeness score (descending)
-    ranked = sorted(candidates, key=lambda x: -x['completeness'])
-    
-    print(f"\nReady-to-Publish Candidates ({len(ranked)} found)\n")
+    print(f"\nReady-to-Publish Candidates ({len(df)} found)\n")
     print(f"{'Rank':<6} {'Score':<8} {'Words':<8} {'Title':<40} {'Status':<12}")
     print("-" * 90)
     
-    for i, c in enumerate(ranked, 1):
-        title = c['title'][:39]
-        print(f"{i:<6} {c['completeness']:<8} {c['word_count']:<8} {title:<40} {c['status']:<12}")
+    for i, (idx, row) in enumerate(df.iterrows(), 1):
+        title = row['title'][:39]
+        print(f"{i:<6} {int(row['completeness']):<8} {int(row['word_count']):<8} {title:<40} {row['status']:<12}")
     
     print("\nTop Candidate Details:\n")
-    top = ranked[0]
+    top = df.iloc[0]
     print(f"File:        {top['file']}")
     print(f"Title:       {top['title']}")
     print(f"Type:        {top['type']}")
     print(f"Status:      {top['status']}")
-    print(f"Word Count:  {top['word_count']}")
+    print(f"Word Count:  {int(top['word_count'])}")
     print(f"Readability: {top['readability']:.1f}")
-    print(f"Completeness: {top['completeness']}/100")
+    print(f"Completeness: {int(top['completeness'])}/100")
     print(f"YAML Ready:  {'Yes' if top['yaml_complete'] else 'No'}")
 
 
@@ -273,13 +279,12 @@ def main():
         sys.exit(1)
     
     print(f"Scanning {args.directory}...")
-    candidates = scan_directory(args.directory, args.min_words, args.max_words, args.yaml_type)
+    df = scan_directory(args.directory, args.min_words, args.max_words, args.yaml_type)
     
     if args.json:
-        import json
-        print(json.dumps(candidates, indent=2))
+        print(df.to_json(orient='records', indent=2))
     else:
-        report_candidates(candidates)
+        report_candidates(df)
 
 
 if __name__ == '__main__':
