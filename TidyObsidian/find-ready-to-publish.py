@@ -238,16 +238,21 @@ def report_candidates(df):
         return
     
     print(f"\nReady-to-Publish Candidates ({len(df)} found)\n")
-    print(f"{'Rank':<6} {'Score':<8} {'Words':<8} {'Title':<40} {'Status':<12}")
-    print("-" * 90)
+    print(f"{'Rank':<6} {'Score':<8} {'Words':<8} {'Filename':<40} {'Status':<15} {'Title':<30}")
+    print("-" * 115)
     
     for i, (idx, row) in enumerate(df.iterrows(), 1):
-        title = row['title'][:39]
-        print(f"{i:<6} {int(row['completeness']):<8} {int(row['word_count']):<8} {title:<40} {row['status']:<12}")
+        # Extract filename from full path
+        filename = os.path.basename(row['file'])
+        status = str(row['status'])[:14]
+        title = row['title'][:29] if row['title'] else ''
+        print(f"{i:<6} {int(row['completeness']):<8} {int(row['word_count']):<8} {filename:<40} {status:<15} {title:<30}")
     
     print("\nTop Candidate Details:\n")
     top = df.iloc[0]
-    print(f"File:        {top['file']}")
+    filename = os.path.basename(top['file'])
+    print(f"Filename:    {filename}")
+    print(f"Full Path:   {top['file']}")
     print(f"Title:       {top['title']}")
     print(f"Type:        {top['type']}")
     print(f"Status:      {top['status']}")
