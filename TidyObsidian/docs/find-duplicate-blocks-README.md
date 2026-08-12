@@ -1,3 +1,9 @@
+---
+script: find-duplicate-blocks.py
+author: Justin Hitt
+---
+
+
 # Find Duplicate Blocks
 
 ## Purpose
