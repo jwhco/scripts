@@ -10,6 +10,7 @@ Usage:
   python3 find-ready-to-publish.py /path/to/markdown/repo
   python3 find-ready-to-publish.py . --min-words 400 --max-words 2500
   python3 find-ready-to-publish.py . --yaml-type article
+  python3 find-ready-to-publish.py . --verbose  # Show all errors with filenames
 """
 
 import os
@@ -25,6 +26,7 @@ def parse_yaml_front_matter(text):
     """Extract YAML front matter from markdown.
     
     Returns (yaml_dict, body_text) or ({}, text) if no front matter.
+    Ensures meta is always a dict, never a string or other type.
     """
     yaml_pattern = re.compile(r'^---\s*\n(.*?)\n---\s*\n', re.DOTALL)
     match = yaml_pattern.search(text)
@@ -35,7 +37,10 @@ def parse_yaml_front_matter(text):
     try:
         meta = yaml.safe_load(match.group(1))
         body = yaml_pattern.sub('', text)
-        return meta or {}, body
+        # Ensure meta is a dict; if YAML parsed to a string or other type, return empty dict
+        if not isinstance(meta, dict):
+            meta = {}
+        return meta, body
     except Exception:
         return {}, text
 
@@ -144,7 +149,7 @@ def score_completeness(meta, body_text, word_count):
     return min(100, int(score))
 
 
-def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
+def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None, verbose=False):
     """Scan directory for markdown candidates.
     
     Args:
@@ -152,10 +157,12 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
         min_words: Minimum word count
         max_words: Maximum word count
         yaml_type: Optional YAML type filter (case-insensitive)
+        verbose: Show errors and skipped files
     
     Returns pandas DataFrame with candidate articles and scores.
     """
     records = []
+    errors = []
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
         # Skip hidden directories (starting with .)
@@ -172,53 +179,65 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
                 with open(full_path, 'r', encoding='utf-8') as f:
                     content = f.read()
             except Exception as e:
+                error_msg = f"[FILE READ ERROR] {full_path}: {str(e)}"
+                errors.append(error_msg)
+                if verbose:
+                    print(error_msg)
                 continue
             
-            meta, body = parse_yaml_front_matter(content)
-            word_count = count_words(body)
-            
-            # Filter: skip published, filter by word count
-            if is_published(meta):
-                continue
-            
-            if word_count < min_words or word_count > max_words:
-                continue
-            
-            # Filter: yaml type (case-insensitive)
-            if yaml_type:
-                doc_type = meta.get('type', '')
-                if isinstance(doc_type, list):
-                    doc_type = doc_type[0] if doc_type else ''
-                doc_type = str(doc_type).lower()
-                if doc_type != yaml_type.lower():
+            try:
+                meta, body = parse_yaml_front_matter(content)
+                word_count = count_words(body)
+                
+                # Filter: skip published, filter by word count
+                if is_published(meta):
                     continue
-            
-            # Score the candidate
-            completeness = score_completeness(meta, body, word_count)
-            
-            # Normalize type and status from potential list to string
-            doc_type = meta.get('type', 'Unknown')
-            if isinstance(doc_type, list):
-                doc_type = doc_type[0] if doc_type else 'Unknown'
-            doc_type = str(doc_type)
-            
-            doc_status = meta.get('status', 'Draft')
-            if isinstance(doc_status, list):
-                doc_status = doc_status[0] if doc_status else 'Draft'
-            doc_status = str(doc_status)
-            
-            record = {
-                'file': full_path,
-                'title': meta.get('title', ''),
-                'type': doc_type,
-                'status': doc_status,
-                'word_count': word_count,
-                'readability': calculate_readability_score(body),
-                'completeness': completeness,
-                'yaml_complete': bool(meta.get('title') and meta.get('tags')),
-            }
-            
-            records.append(record)
+                
+                if word_count < min_words or word_count > max_words:
+                    continue
+                
+                # Filter: yaml type (case-insensitive)
+                if yaml_type:
+                    doc_type = meta.get('type', '')
+                    if isinstance(doc_type, list):
+                        doc_type = doc_type[0] if doc_type else ''
+                    doc_type = str(doc_type).lower()
+                    if doc_type != yaml_type.lower():
+                        continue
+                
+                # Score the candidate
+                completeness = score_completeness(meta, body, word_count)
+                
+                # Normalize type and status from potential list to string
+                doc_type = meta.get('type', 'Unknown')
+                if isinstance(doc_type, list):
+                    doc_type = doc_type[0] if doc_type else 'Unknown'
+                doc_type = str(doc_type)
+                
+                doc_status = meta.get('status', 'Draft')
+                if isinstance(doc_status, list):
+                    doc_status = doc_status[0] if doc_status else 'Draft'
+                doc_status = str(doc_status)
+                
+                record = {
+                    'file': full_path,
+                    'title': meta.get('title', ''),
+                    'type': doc_type,
+                    'status': doc_status,
+                    'word_count': word_count,
+                    'readability': calculate_readability_score(body),
+                    'completeness': completeness,
+                    'yaml_complete': bool(meta.get('title') and meta.get('tags')),
+                }
+                
+                records.append(record)
+                
+            except Exception as e:
+                error_msg = f"[PARSE ERROR] {full_path}: {str(e)}"
+                errors.append(error_msg)
+                if verbose:
+                    print(error_msg)
+                continue
     
     # Convert to DataFrame
     if records:
@@ -227,6 +246,16 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
         df = df.sort_values('completeness', ascending=False).reset_index(drop=True)
     else:
         df = pd.DataFrame(columns=['file', 'title', 'type', 'status', 'word_count', 'readability', 'completeness', 'yaml_complete'])
+    
+    # Report errors if any
+    if errors:
+        print(f"\n⚠ {len(errors)} file(s) had errors (use --verbose to see details):\n")
+        if not verbose:
+            for error in errors[:5]:  # Show first 5 errors
+                print(f"  {error}")
+            if len(errors) > 5:
+                print(f"  ... and {len(errors) - 5} more")
+        print()
     
     return df
 
@@ -282,6 +311,8 @@ def main():
                         help='Maximum word count (default: 2500)')
     parser.add_argument('--yaml-type', type=str, default=None,
                         help='Filter by YAML type field (case-insensitive, e.g., "article")')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Show all errors and processing details')
     parser.add_argument('--json', action='store_true',
                         help='Output as JSON')
     
@@ -292,7 +323,7 @@ def main():
         sys.exit(1)
     
     print(f"Scanning {args.directory}...")
-    df = scan_directory(args.directory, args.min_words, args.max_words, args.yaml_type)
+    df = scan_directory(args.directory, args.min_words, args.max_words, args.yaml_type, args.verbose)
     
     if args.json:
         print(df.to_json(orient='records', indent=2))
