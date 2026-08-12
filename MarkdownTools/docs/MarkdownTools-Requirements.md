@@ -11,6 +11,8 @@
 - Scripts will all use the same stopword list. Include stop word dictionary in configuration so it only needs set once.
 - Compatibility with markdown repos managed by [Obsidian](https://obsidian.md/), [LogSeq](https://logseq.com/), [Zettlr](https://zettlr.com/), and [FOAM](https://marketplace.visualstudio.com/items?itemName=foam.foam-vscode).
 
+
+
 ## Stakeholders
 
 - Users of plain text and markdown note-taking applications,

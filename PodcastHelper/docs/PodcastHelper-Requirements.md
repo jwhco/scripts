@@ -70,6 +70,9 @@ Make it easier to publish all relevant media and handling large files associated
 - Be able to run the script from inside the media folder, or from tools root. Be careful about where the work is being done, define paths in advance. 
   - Paths can also be defined from the command line, however, that is not as practical as by a configuration file.
 
+- A script to determine if every `permalink` in an RSS feed is represented in a markdown notes repository. This could be used to audit WordPress sites or Podcast feeds.
+
+
 ## Stakeholders
 
 - Subject-matter expert,

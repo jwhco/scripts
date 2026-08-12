@@ -3,7 +3,7 @@ tags:
     - content-marketing
     - recycle-marketing
 service: Monetize Back Catalog
-script: find-mature-content.py
+script: find-ready-to-publish.py
 author: Justin Hitt
 date: 2026-03-17
 ---
@@ -18,6 +18,8 @@ date: 2026-03-17
 - Publish more, rather than writing so many dead end notes.
 
 ## Issues
+
+- There aren't any tools to mind notes to determine what content is ready to be finished. Draft articles get lost, ideas don't mature, and materials are missed.
 
 ## Requirements
 
@@ -62,8 +64,10 @@ After scanning a list of articles would present. From that list an article can b
 ### Judge Content Quality
 
 - Limit analysis to documents with 400 words or more of body copy. However, less than 2,500 words total.
+  - The `--max-wordcount` and `--min-wordcount` can govern the range of words. With some kind of max/min wordcount in code.
 - Use readability score to determine if content is meaningful. The more readable the better.
 - Observe the development of concept, including clarity of message and clear benefit to reader.
+- Content quality is about being ready to publish. What's on the page is thought out and meaningful in root-keyword context.
 
 ## Report Quality Content
 
