@@ -23,6 +23,14 @@ date: 2026-03-17
 
 ## Requirements
 
+
+	- What is "highly structured enough to publish"? Number of words. Structure of sentences. Readability. Size of paragraphs and grammar. 
+	- Evaluate clarity, structure, and strength of the arguments. Does the content make sense. Are there any python libraries to support this, minimal AI.
+	- Develop a checklist that includes analysis, review, and a punch list of items. Like how SEO analysis works.
+		- Zettlr editor has [readability algorithm](https://www.zettlr.com/readability) implementation. It's available during editing.
+
+- Use a dictionary to expand root keyword terms. For each word in phrase, or bi-gram, find synonoms to produce a search combination. Also find words near each other.
+
 - Determine if something is already published, so that it can be omited from analysis. 
   - If something is `type: Post` and contains a value in `permalink` YAML front matter. Then published.
   - If `status: S4-Publish` and a `permalink` exists in YAML front matter, then published.
@@ -31,6 +39,9 @@ date: 2026-03-17
 - Use algorithms to find content that is well written, but not yet published. Score "ready to publish".
 - Something is ready to publish if it is a certain length (400-800 words), 
 
+
+- If I was looking for a special report in draft, I could search `type: Report` with more than 2,500 words. That assumes the report hasn't been broken out into #StoryLine or #Scrivener. 
+  - To find reports, I may need to look for YAML front matter with `xelatex` as the pdf output mode. That's for a single file report likely referenced as manuscript from `type: Report` or `type: Proposal` note.
 
 ## Usage
 
