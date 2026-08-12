@@ -9,6 +9,7 @@ Usage:
   python3 find-ready-to-publish.py
   python3 find-ready-to-publish.py /path/to/markdown/repo
   python3 find-ready-to-publish.py . --min-words 400 --max-words 2500
+  python3 find-ready-to-publish.py . --yaml-type article
 """
 
 import os
@@ -135,8 +136,14 @@ def score_completeness(meta, body_text, word_count):
     return min(100, int(score))
 
 
-def scan_directory(root_dir, min_words=400, max_words=2500):
+def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None):
     """Scan directory for markdown candidates.
+    
+    Args:
+        root_dir: Directory to scan
+        min_words: Minimum word count
+        max_words: Maximum word count
+        yaml_type: Optional YAML type filter (case-insensitive)
     
     Returns list of dicts with file info and scores.
     """
@@ -164,6 +171,12 @@ def scan_directory(root_dir, min_words=400, max_words=2500):
             
             if word_count < min_words or word_count > max_words:
                 continue
+            
+            # Filter: yaml type (case-insensitive)
+            if yaml_type:
+                doc_type = meta.get('type', '').lower()
+                if doc_type != yaml_type.lower():
+                    continue
             
             # Score the candidate
             completeness = score_completeness(meta, body, word_count)
@@ -223,6 +236,8 @@ def main():
                         help='Minimum word count (default: 400)')
     parser.add_argument('--max-words', type=int, default=2500,
                         help='Maximum word count (default: 2500)')
+    parser.add_argument('--yaml-type', type=str, default=None,
+                        help='Filter by YAML type field (case-insensitive, e.g., "article")')
     parser.add_argument('--json', action='store_true',
                         help='Output as JSON')
     
@@ -233,7 +248,7 @@ def main():
         sys.exit(1)
     
     print(f"Scanning {args.directory}...")
-    candidates = scan_directory(args.directory, args.min_words, args.max_words)
+    candidates = scan_directory(args.directory, args.min_words, args.max_words, args.yaml_type)
     
     if args.json:
         import json
