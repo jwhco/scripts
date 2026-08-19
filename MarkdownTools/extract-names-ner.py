@@ -103,7 +103,7 @@ def clean_name(name):
 
 
 def scan_paths(paths, nlp):
-    people = defaultdict(lambda: {'count': 0, 'files': set()})
+    people = defaultdict(int)
     for path in paths:
         if not os.path.exists(path):
             continue
@@ -125,22 +125,18 @@ def scan_paths(paths, nlp):
                         name = clean_name(raw)
                         if not name:
                             continue
-                        people[name]['count'] += 1
-                        people[name]['files'].add(full)
+                        people[name] += 1
     return people
 
 
 def write_csv(people, outpath):
     os.makedirs(os.path.dirname(outpath) or '.', exist_ok=True)
     with open(outpath, 'w', newline='', encoding='utf-8') as csvf:
-        # write CSV manually so the `files` column is a single quoted semicolon-delimited string:
-        csvf.write('name,count,files\n')
-        for name, info in sorted(people.items(), key=lambda x: (-x[1]['count'], x[0])):
+        csvf.write('name,count\n')
+        for name, count in sorted(people.items(), key=lambda x: (-x[1], x[0])):
             # safely escape double quotes by doubling them according to CSV rules
             name_esc = '"' + name.replace('"', '""') + '"'
-            files_join = ';'.join(sorted(info['files']))
-            files_esc = '"' + files_join.replace('"', '""') + '"'
-            csvf.write(f'{name_esc},{info["count"]},{files_esc}\n')
+            csvf.write(f'{name_esc},{count}\n')
 
 
 def main():
@@ -170,7 +166,7 @@ def main():
     people = scan_paths([base], nlp)
 
     # filter by min_count
-    filtered = {name: info for name, info in people.items() if info['count'] >= args.min_count}
+    filtered = {name: count for name, count in people.items() if count >= args.min_count}
 
     # write csv
     outpath = args.out
@@ -178,10 +174,8 @@ def main():
 
     # print summary
     print('\nPeople found (sorted by frequency):\n')
-    for name, info in sorted(filtered.items(), key=lambda x: (-x[1]['count'], x[0])):
-        print(f"{name} — {info['count']} occurrence(s) — {len(info['files'])} file(s)")
-        for f in sorted(info['files']):
-            print(f"    {f}")
+    for name, count in sorted(filtered.items(), key=lambda x: (-x[1], x[0])):
+        print(f"{name} — {count} occurrence(s)")
     print(f"\nCSV written to: {outpath}\nTotal people: {len(filtered)}")
 
 
