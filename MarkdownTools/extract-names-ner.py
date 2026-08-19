@@ -150,19 +150,19 @@ def main():
 
     base = args.directory
 
-    print('Loading spaCy model...')
+    print('Loading spaCy model...', file=sys.stderr)
     nlp = load_model()
-    print('Model loaded.')
+    print('Model loaded.', file=sys.stderr)
 
     # Scan the provided base directory recursively for all Markdown files.
     # The previous behavior scanned `Draft` (and optionally `Notes`) subfolders;
     # this script now walks the entire base directory tree and processes all
     # files ending in `.md`.
     if not os.path.isdir(base):
-        print(f"Error: base directory not found: {base}")
+        print(f"Error: base directory not found: {base}", file=sys.stderr)
         sys.exit(1)
 
-    print('Scanning files...')
+    print('Scanning files...', file=sys.stderr)
     people = scan_paths([base], nlp)
 
     # filter by min_count
@@ -172,11 +172,8 @@ def main():
     outpath = args.out
     write_csv(filtered, outpath)
 
-    # print summary
-    print('\nPeople found (sorted by frequency):\n')
-    for name, count in sorted(filtered.items(), key=lambda x: (-x[1], x[0])):
-        print(f"{name} — {count} occurrence(s)")
-    print(f"\nCSV written to: {outpath}\nTotal people: {len(filtered)}")
+    # keep status on stderr so stdout remains clean for Unix-style pipelines
+    print(f"CSV written to: {outpath}", file=sys.stderr)
 
 
 if __name__ == '__main__':
