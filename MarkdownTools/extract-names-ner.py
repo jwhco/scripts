@@ -3,9 +3,9 @@
 Extract PERSON named entities from markdown drafts using spaCy.
 
 Usage:
-    python3 scripts/extract_names_ner.py
-    python3 scripts/extract_names_ner.py --include-notes  # also scan Notes under the base directory
-    python3 scripts/extract_names_ner.py --out outputs/people.csv
+    python3 MarkdownTools/extract_names_ner.py
+    python3 MarkdownTools/extract_names_ner.py --include-notes  # also scan Notes under the base directory
+    python3 MarkdownTools/extract_names_ner.py --out outputs/people.csv
 
 The script expects `spacy` and the `en_core_web_sm` model to be installed.
 It will produce a CSV at `outputs/people.csv` (default) and print a summary.

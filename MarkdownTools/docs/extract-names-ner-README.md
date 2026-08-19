@@ -18,9 +18,12 @@ python -m spacy download en_core_web_sm
 ## Requirements
 
 - Run script from root of Markdown book, repository, or directory structure. Allow scripts to be outside of working directory.
-- Script extracts PERSON named entities from markdown drafts. Find, extract, dedupe, and output to CSV report.
+- Script extracts PERSON named entities from markdown drafts. Find, extract, dedupe, and output to CSV report. 
 - Command line option `--dossier` to report as much contextual information about the individuals as Named Entity Recognition (NER) can provide.
-  - At a minimum, report Person, Organization, Location, as well as any contact details. There is no need to mention where the NER is located in notes. The purpose of this output is to identify NER, not inclusion.
+  - At a minimum, report PERSON, ORGANIZATION, LOCATION (CITY, STATE), as well as any contact details. There is no need to mention where the NER is located in notes. The purpose of this output is to identify NER, not inclusion.
+
+- Use `pandas` data frame to hold NER data table while doing counts and NER discovery. Hold this table as things progress, writing it at the end of processing.
+- In future versions of the script, as NER is extracted it will also pull email, phone, and postal address. Gather these details while moving through the files, choosing those elements most relevant to the PERSON.
 
 ## User Story
 
