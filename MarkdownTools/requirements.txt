@@ -1,13 +1,19 @@
 ipykernel
 
-# extract_names_ner.py
+# extract-names-ner.py
+# spacy is required. nltk supplies the given-name gazetteer and pyspellchecker
+# the English dictionary used to reject common-noun phrases; both are optional
+# and the script degrades to lower accuracy with a note on stderr if absent.
+# PyYAML is only needed for --config.
 spacy>=3.5
 
-# extract-hashtag-terms.py
+# extract-hashtag-terms.py, extract-names-ner.py (--config)
 PyYAML
+
+# extract-hashtag-terms.py, extract-names-ner.py (dictionary test)
 pyspellchecker
 
-# extract-ngram-phrases.py
+# extract-ngram-phrases.py, extract-names-ner.py (given-name gazetteer)
 nltk
 
 # visualize-content-clusters.py
