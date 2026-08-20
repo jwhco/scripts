@@ -120,7 +120,7 @@ ROLE_WORDS = {
 }
 
 # Stripped before the shape test so a credential does not disqualify a real
-# name: "David D Jones DDS" -> "David D Jones".
+# name: "Robert D Jones DDS" -> "David D Jones".
 HONORIFICS = {"mr", "mrs", "ms", "miss", "dr", "prof", "professor", "rev",
               "sen", "rep", "sir", "madam", "hon", "capt", "col", "gen", "lt"}
 CREDENTIALS = {"jr", "sr", "ii", "iii", "iv", "md", "dds", "phd", "esq", "cpa",
@@ -128,8 +128,8 @@ CREDENTIALS = {"jr", "sr", "ii", "iii", "iv", "md", "dds", "phd", "esq", "cpa",
 
 # A single name token. Permissive about the shapes real names take -- dotted
 # initials (E.J.), Mc/Mac, O', one internal capital (MaryEllen), hyphenated
-# givens (Li-Yu) -- because a naive ^[A-Z][a-z]+$ discards Li-Yu Chen,
-# Yo-Ray Hitt, John McCormick, MaryEllen Tribby and E.J. Troy. Still rejects
+# givens (Hay-Yu) -- because a naive ^[A-Z][a-z]+$ discards Hey-Yu Lee,
+# Leroy Biggens, John McGuire, MaryEllen Tribby and E.J. Troy. Still rejects
 # ALL-CAPS (HITT, MOC, NC, GPT, BS) and anything with a digit.
 NAME_TOKEN = re.compile(
     r"""^(?:
