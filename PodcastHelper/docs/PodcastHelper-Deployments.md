@@ -12,6 +12,17 @@
 
 - Script can run as a single thread, or multiple processors to run through volume quickly. 
 
+### Find And Audit Media Directory
+
+Purpose:
+- Determine which media is eligible to produce podcast.
+- Determine which media is already published and not.
+
+Steps:
+1. Run, `python3 PodcastHelper/discovery.py --media-root /mnt/e/Media/` to inventory. This builds the `index.csv` file.
+2. Run, `python3 PodcastHelper/inventory.py --index=/mnt/e/Media/index.csv --media-root=/mnt/e/Media/ --published false --content-root /mnt/c/Users/User/GitHub/obsidian/` to find unpublished materials.
+3. Upload everything that is mentioned as unpublished.
+
 ### Exporting Podcast Length Media
 
 1. Make sure media directory is online,
