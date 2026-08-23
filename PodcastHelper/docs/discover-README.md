@@ -12,6 +12,7 @@
 - Cache the directories so we aren't running down the entire media root everytime. Assume large number of media files in the tens of thousands.
 - When printing file names to screen, or saving them in a sidecar, use something that in a VsCode terminal will be clickable. Ctrl-click to open.
 
+
 ## User Story
 
 - Attaching an external drive of media, a User wants to quickly find media suitable for podcast episodes.
