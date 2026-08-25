@@ -93,6 +93,12 @@ Make it easier to publish all relevant media and handling large files associated
     - The reason these keys are there is to identify the origination point of content. Where the content was created so syndication coverage can be determined.
 - User runs the `update-podcast-source-index.py` 
 
+- All scripts have the same arguments, same modality for reading directories and each understand the format of the sidecar. Make the scripts work together like functions in a larger application.
+
+- Scripts are multithreaded, allow multiple files to be opened, read, and written because sidecar files are seperate from the media files which are read-only.
+- Use the `index.csv` as something that can be read into memory to make it faster to find files on disk. Use `pandas` dataframes, then work from memory the table, write it to disk at intervals. 
+- A lot of the YAML frontmatter can be stored in this dataframe or chunks as scripts are processing. Try to be memory efficient, while reducing the number of read writes on disk.
+- After `inventory.py` which produces an `index.csv`, the to `sidecar.py` which creates a sidecar markdown file.
 
 ## Stakeholders
 

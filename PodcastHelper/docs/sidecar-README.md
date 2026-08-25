@@ -6,7 +6,10 @@
 
 ## Requirements
 
+- The sidecar file will include the basename `filename` and the full `filepath` from media root. The `filename` is unique, so directory is only for a pick up reference.
 - The unique identifier is `permalink` representing a podcast episode in RSS as well as the markdown episode sidecar files. Must be able to match this link no matter how it is formatted in the YAML front matter.
+- Populate the sidecar `published` date, `permalink`, and `type` from the `--content-root` notes files. Search for the filename, then find these details in the YAML front matter.
+- For the sidecar, determine the `date` YAML front matter from the directory or filename. Give the filename `PXL_YYYYMMDD*.mp4` priority. The date format is `YYYY-MM-DD` which represents when the media was recorded.
 - The following YAML front matter values DO NOT have quotes around them. `date`, `permalink`, `download`, and `duration`.
     - According to the GitHub YAML frontmatter specification the text of a `title:` value doesn't have quotes. It is plain text title case.
 - Ignore any markdown sidecars with `Template` in the directory path or filename.
@@ -39,6 +42,8 @@
 - Environment variables for temporary folder will be `TEMP` or default as `/tmp`, where `TERM` is for terminal. And `TERM_PROGRAM=vscode` means session is running under VsCode. When possible print to screen in a way that works under SSH but doesn't require a specific environment.
 - If the `--directory` location isn't a GIT repo, then exit. The reason a git repository is desired is to recover from file creation or updates of front matter. Don't let the script run if there is no repo.
 - With SSH terminal outputs, ANSI escape codes should work. Do what works for Xterm. Keep it simple otherwise.
+- Be able to update sidecar files with `--content-root` to extract `permalink` from notes if it doesn't already exist.
+  - An absence of a `permalink` could mean the file hasn't been published yet. If it is not published, then it is a candidate for publication.
 
 ## User Story
 
