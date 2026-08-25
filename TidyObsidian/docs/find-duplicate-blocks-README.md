@@ -8,9 +8,23 @@ author: Justin Hitt
 
 ## Purpose
 
-- Sus out blocks of duplicate text across an entire directory tree.
+- Identify blocks of duplicate text across an entire directory tree.
 - Script works very well with any directory full of Markdown. Any file based note-taking.
 - Find thin content. Files that are pretty much empty will show up as duplicate.
+
+## Usage
+
+Go to working directly. Call script by full path.
+
+```bash
+python3 find_duplicate_blocks.py --ignore-wikilink --ignore-short-lines 20
+```
+
+Wait for report. Script will use as much processor as possible to finish quickly.
+
+- When a duplicate is found, search for it globally in your note-taking applications. Address on case-by-case basis.
+- Understand it is possible there are false positive matches. Unable to avoid when working with large files.
+
 
 ## Issues
 
@@ -42,17 +56,5 @@ author: Justin Hitt
 
 - Use stop words to skip tokenization of low value text. Overall reducing the number of tokens to compare.
 
-## Usage
-
-Go to working directly. Call script by full path.
-
-```bash
-python3 find_duplicate_blocks.py --ignore-wikilink --ignore-short-lines 20
-```
-
-Wait for report. Script will use as much processor as possible to finish quickly.
-
-- When a duplicate is found, search for it globally in your note-taking applications. Address on case-by-case basis.
-- Understand it is possible there are false positive matches. Unable to avoid when working with large files.
 
 /EOF/

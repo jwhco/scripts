@@ -2,20 +2,23 @@
 
 ## Functional
 
-- Tools specific for markdown in Obsidian, Zettlr, FOAM, and LogSeq. Focus on compatibility.
+- Tools specific for Markdown in Obsidian, Zettlr, FOAM, and LogSeq. Focus on compatibility.
 
 ### Procedural
 
+- When reducing duplicate content, start with low-hanging fruit like duplicate file names. Then do block level checks for duplicate content. Repair as much as possible, then when blocks are finished running fix that.
+  - It is possible to be busy enough fixing duplicate files names to never do a block level comparison of duplicates. That block level comparison is better in a document tree, rather than entire repo.
+
 - Be able to represent a Markdown task in several visual forms.
 - Allow editing of tasks in place, as well as in specific views.
-- Be able to extract YAML front matter and markdown seperately. Such as tags and hashtags which may impact context.
+- Be able to extract YAML front matter and markdown separately. Such as tags and hashtags which may impact context. The YAML front matter allows understanding a Markdown file without ingesting the entire document.
 
 ### Commands
 
 - `find_duplicate_blocks.py` Searches repo for blocks that are similar. This requires reading the entire directory structure to find markdown content.
 - `markdown_tasks_extract.py` Print to the screen standardized markdown tasks no matter where they are found in the markdown repo.
 - `markdown_tasks_quality.py` Run a set of QACM functions on markdown tasks across repo, report where there are defects. Provide enough context to search for string to fix.
-- `markdown_tasks_fixid.py` Adds ID to every task that doesn't already have while while cleaning up some formatting. Using Obsidian Dataview Tasks format.
+- `markdown_tasks_fixid.py` Adds ID to every task that doesn't already have while cleaning up some formatting. Using Obsidian Dataview Tasks format.
 
 ## Technical
 
