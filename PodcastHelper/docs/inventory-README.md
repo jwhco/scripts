@@ -2,6 +2,8 @@
 
 ## Requirements
 
+- A `--random` and `-limit N` arguments so for any other option a shorter list of filenames comes back. This will faciliate a sprint or working session while reducing overwhelm for user.
+
 - If `filename` is put in the YAML front matter, then it will be easier to find in notes and sidecar files.
   - When the `filename` is found in the body of the `--content-root` notes file, but not in the YAML front matter, then write to YAML front matter if it doesn't already exist.
   - When reading files, provide some kind of status on the screen so I can tell if the script is running. When files are modified, mention that, and use an output format similar to Unix log files.
