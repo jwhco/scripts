@@ -20,6 +20,21 @@
     Markdown task (`- [ ]`) is also treated as unpublished. Omit `--published` to retain the default
     inventory output.
 
+
+## Usage
+
+### Extraction of Filenames
+
+Print an inventory of available podcasts from media directory. Show only the filename.
+
+```bash
+python3 PodcastHelper/inventory.py --media-root /e/Media/ | awk -F' ' '{ print $1 }' | awk -F '/' '{ print $2 }'
+```
+
+If you are auditing media files, then pipe to `shuf -n 10` to see a few records. 
+
+After you audit that sample, then you might as well do something else. When `inventory.py` can show unpublished, this works better.
+
 ## User Story
 
 - User has already done a discovery, markdown sidecar files exist. Now they want to list certain files by status eligible to upload.
