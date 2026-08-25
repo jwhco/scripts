@@ -35,9 +35,10 @@ Make it easier to publish all relevant media and handling large files associated
 - Don't create final descriptions. Only background necessary to write descriptions. Use Obsidian for final.
 - Try to speed up process, gathering as much support details as possible with some search optimization.
 - Use AI to extract transcripts, write summaries, and initial social posts. Enough to manually finalize.
-- For every podcast, have five clips, ten social media, and two thumbnails. Have the script do the majority of the heavy lifting.
-- In the case of select podcasts, convert video to audio based on the sidecar designation. Use sidecar as configuration.
-
+- For every podcast, have five clips, ten social media, and two thumbnails. Have the script do the majority of the heavy lifting. When possible set up the use of specialized platforms. 
+  - Including manifests and moving files to drives and folders. For example, finding candidates then dropping them in Google Drive to kick off automation in the cloud.
+- In the case of select podcasts, convert video to audio based on the sidecar designation. Use sidecar as configuration. Try to make these one command to process a batch, or do files individually.
+- When possible work from the index rather than scanning the entire hard drive. If the user can quickly identify podcast episodes not yet published, they can start those uploads while working on everything else.
 
 ## Requirements
 
@@ -47,7 +48,9 @@ Make it easier to publish all relevant media and handling large files associated
 - All reports have context under VsCode terminal. A mention of media file, or markdown sidecar will be Ctrl-clickable to open. Use relative path so it may also work in Obsidian or Zettlr.
 - Use different sidecar files to represent workflow. Like Proposal --> Segement --> Description --> Transcript --> Promotion.
 
-- Scripts run under Make. This way, if sidecar or files exist, the work will be skipped.
+### Sidecar As State Reference
+
+
 - Video content recorded on Google Pixel 7a, stored in REPO by Adobe Bridge,
 - Once videos are found, a sidecar is produced, and then audio conversion.
 - After uploading to YouTube, Fabric extracts keynotes from the video. Add to sidecar.
@@ -63,14 +66,32 @@ Make it easier to publish all relevant media and handling large files associated
   - Be able to rebuild the index with the sidecar files. Never modify the index manually; it's a reference.
 - When editing the sidecar, use Markdown to change out sections. For example, after a transcript is downloaded, it is put in the sidecar, or saved in a directory as `{BASENAME}_transcript.md`, then flagged as complete in the sidecar. 
 
-- The `index.csv`  isn't meant to be human readable, it is a cache file for building sidecars. Maintain duration in minutes, reference file names, and use to allow multiple system processing. 
-  - The index is updated with all available scripts, as well as read. Placing it in the media home directory is best.
 
+### Building Cross-Script Inventory Index
+
+- The `index.csv`  isn't meant to be human-readable, it is a cache file for building sidecars. Maintain duration in minutes, reference file names, and use to allow multiple system processing. 
+  - The index is updated with all available scripts, as well as read. Placing it in the media home directory is best. Use the same index file for all `PodcastHelper` scripts, based on root of media folder.
+    - The goal is to make this index portable. In case media is on an external drive. This way drive can be plugged in, index read, and media found quickly.
+  - Headers include `path` which is root directory of media, `media` which is filename of media, `minutes` which is duration, `sidecar` which is the filename of the sidecar. Finally include `date` which is recording date derived from the filename.
+  - Include a `status` column that is updated when `filename` is found in `--content-root` markdown files. When the filename is found, it pulls status from the note to populate the index.
+- When searching on a `filename` from the index in the `--content-root`, where it is found in the body but not in the YAML front matter, then add to the front matter. What ever media filename being searched for gets adeed as `filename:` value.
+
+
+### Portability of Helper Scripts
 
 - Be able to run the script from inside the media folder, or from tools root. Be careful about where the work is being done, define paths in advance. 
   - Paths can also be defined from the command line, however, that is not as practical as by a configuration file.
 
 - A script to determine if every `permalink` in an RSS feed is represented in a markdown notes repository. This could be used to audit WordPress sites or Podcast feeds.
+- Scripts run under Make. This way, if sidecar or files exist, the work will be skipped.
+
+### Update Podcast Source Indexes
+
+- The `spreaker` and `youtube` YAML front matter in content markdown represent source of origination for most podcast episodes. If the `platform: Spreaker` and `permalink` exists, then `spreaker:` gets set from ID in the URL. Additional origination platforms can be added in a library.
+    - If the `platform: YouTube` and `permalink` exists, then extract `youtube:` key from the YouTube URL `https://youtu.be/{KEYVALUE}`. This would be in the same source library with patterns.
+    - If the `platform: Zoom Clips` and `permalink` exists, then extract `zoomclips:` key from URL in permalink. It is possible for a Zoom clip or meeting to be creation point of a podcast episode.
+    - The reason these keys are there is to identify the origination point of content. Where the content was created so syndication coverage can be determined.
+- User runs the `update-podcast-source-index.py` 
 
 
 ## Stakeholders
