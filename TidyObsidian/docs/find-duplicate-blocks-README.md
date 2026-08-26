@@ -40,6 +40,7 @@ Wait for report. Script will use as much processor as possible to finish quickly
 
 ## Requirements
 
+- There are certain files that will be exact duplicates. That includes files in similar root directories, one of which contains the word "Manuscript", or located in an "Export" directory. Skip over duplicates found in "Templates" too.
 - Determine which blocks in Markdown files are duplicate. Run through whole files first, then if desired run through individual files. When checking a whole file, a checksum is good enough.
 - Report of possible duplicate files, or percent duplicate. Report with "=== Similar files: %% match ===" then list of markdown files. That's enough for an operator to search on strings to find files.
 - Ignores headers `##` and `##` because those are likely to be similar in note-taking templates.
