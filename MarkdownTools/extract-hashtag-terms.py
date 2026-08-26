@@ -7,11 +7,6 @@ from pathlib import Path
 from itertools import islice
 from spellchecker import SpellChecker
 
-# Configuration
-# ZETTEL_ROOT = "/home/hittjw/Documents/GitHub/obsidian/Zettelkasten" # Ubuntu
-# ZETTEL_ROOT = "/workspaces/obsidian/Zettelkasten" # K8S
-ZETTEL_ROOT = "/mnt/c/Users/User/GitHub/obsidian/Zettelkasten" # WSL
-
 WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
@@ -156,7 +151,7 @@ def check_spelling_with_color(term_list):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract and normalize tags from Zettelkasten.")
-    parser.add_argument("directory", nargs="?", default=ZETTEL_ROOT)
+    parser.add_argument("directory", nargs="?", default=".")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--spellcheck", action="store_true")
     parser.add_argument("--errors", action="store_true", help="Only scan for formatting errors and exit")
