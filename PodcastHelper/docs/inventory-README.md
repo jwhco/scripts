@@ -3,6 +3,8 @@
 ## Requirements
 
 - A `--random` and `-limit N` arguments so for any other option a shorter list of filenames comes back. This will faciliate a sprint or working session while reducing overwhelm for user.
+  - The limit function in this case addresses how many filenames are printed to the screen, not what is written to index.
+  - A `--limit` by itself would limit the number of lines written to the index. This use is for testing, or catching most recent synced videos.
 
 - If `filename` is put in the YAML front matter, then it will be easier to find in notes and sidecar files.
   - When the `filename` is found in the body of the `--content-root` notes file, but not in the YAML front matter, then write to YAML front matter if it doesn't already exist.
