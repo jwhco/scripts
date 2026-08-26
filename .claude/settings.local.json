@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F'\",\"' 'NR>1' outputs/people.csv)",
+      "Bash(awk -F, 'NR>1{print $NF}' outputs/people.csv)",
+      "Bash(sort -k2 -n)",
+      "Bash(awk 'NR>1' outputs/people.csv)",
+      "Bash(awk -F, 'NR>1 && $NF==1' outputs/people.csv)",
+      "Bash(grep -E '^\"[A-Z][a-z]+ [A-Z][a-z]+\",\\([3-9]|[0-9]{2,}\\)$')"
+    ]
+  }
+}
