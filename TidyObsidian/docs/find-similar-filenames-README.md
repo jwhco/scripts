@@ -13,7 +13,7 @@ Steps:
 
 1. Open, VsCode on suitable platform. (Kubernetes, Local workstation)
    1. Open, Terminal in root Obsidian vault clone.
-   2. Run, `python3 ../scripts/TidyObsidian/find_similar_filenames.py`
+   2. Run, `python3 ../scripts/TidyObsidian/find-similar-filenames.py`
    3. Start at the bottom with similar filenames.
 2. Open, Obsidian vault Local workstation.
    1. Find suspected duplicate,
