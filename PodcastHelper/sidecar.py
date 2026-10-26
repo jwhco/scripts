@@ -431,7 +431,7 @@ def build_front_matter(rss_item: Dict[str, str], channel_title: str) -> Tuple[st
         'author': parse_author(rss_item.get('itunes_author', '')),
         'date': published_date,
         'created': '',
-        'published': '',
+        'published': published_date,
         'updated': '',
         'type': 'Podcast',
         'channel': rss_item.get('channel_abbreviation', ''),
@@ -443,6 +443,7 @@ def build_front_matter(rss_item: Dict[str, str], channel_title: str) -> Tuple[st
         'download': rss_item.get('enclosure_url', ''),
         'transcript': rss_item.get('transcript_url', ''),
         'title': rss_item.get('title', ''),
+        'status': 'S2-Review',
     }
 
 
@@ -468,6 +469,8 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
     
     lines.append(f'title: {safe_yaml_value(str(front.get("title", "")).title(), force_unquoted=True)}')
+
+    lines.append(f'status: {safe_yaml_value(str(front.get("status", "")))}')
     
     if str(front.get('transcript', '')).strip():
         lines.append(f'transcript: {safe_yaml_value(str(front.get("transcript", "")))}')
