@@ -21,7 +21,7 @@ def is_in_hidden_dir(path: Path) -> bool:
 
 def normalize(name: str) -> str:
     stem, dot, ext = name.lower().rpartition(".")
-    if not dot:
+    if not dot or ext == "json":
         return ""
 
     zettel_match = ZETTEL_RE.match(stem)

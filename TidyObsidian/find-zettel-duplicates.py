@@ -27,6 +27,9 @@ def find_markdown_files(root_dir):
 
 def extract_serial(filename):
     """Extract YYYYMMDDnnnn serial from filename."""
+    if Path(filename).suffix.lower() != '.md':
+        return None
+
     basename = os.path.basename(filename)
     match = SERIAL_PATTERN.match(basename)
     if match:
