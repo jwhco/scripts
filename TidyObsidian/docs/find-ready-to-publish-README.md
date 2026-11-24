@@ -23,6 +23,8 @@ date: 2026-03-17
 ## Issues
 
 - There aren't any tools to mind notes to determine what content is ready to be finished. Draft articles get lost, ideas don't mature, and materials are missed.
+- Document `type: Index` has a lot of references to content, even an outline of a larger report, however, the script doesn't follow wikilinks.
+  - Keep these in the scans. If they are significant enough to be picked up here, the references can be extracted once an outline of subheads and bullet lists form.
 
 ## Requirements
 
@@ -41,6 +43,8 @@ date: 2026-03-17
 - Use algorithms to find content that is well written, but not yet published. Score "ready to publish".
 - Something is ready to publish if it is a certain length (400-800 words), 
 
+
+- Determine if an outline is being build by looking at headers, subheads, and bullet points in those sections. A great outline (like "Map of Content") may identify a report in draft.
 
 - If I was looking for a special report in draft, I could search `type: Report` with more than 2,500 words. That assumes the report hasn't been broken out into #StoryLine or #Scrivener. 
   - To find reports, I may need to look for YAML front matter with `xelatex` as the pdf output mode. That's for a single file report likely referenced as manuscript from `type: Report` or `type: Proposal` note.
