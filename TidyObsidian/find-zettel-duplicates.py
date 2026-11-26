@@ -46,7 +46,14 @@ def main(argv=None):
         default=".",
         help="Directory to scan recursively (default: current working directory)",
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help="Limit the number of duplicate serial groups printed (all files are scanned)",
+    )
     args = parser.parse_args(argv)
+    if args.limit is not None and args.limit < 0:
+        parser.error("--limit must be zero or greater")
 
     root = Path(args.directory).expanduser().resolve()
     if not root.exists() or not root.is_dir():
@@ -74,7 +81,10 @@ def main(argv=None):
     print(f"Found {len(duplicates)} serial(s) with duplicates:\n")
     
     # Print clusters
+    printed_groups = 0
     for serial in sorted(duplicates.keys()):
+        if args.limit is not None and printed_groups >= args.limit:
+            break
         files = duplicates[serial]
         print(f"{'='*60}")
         print(f"Serial: {serial}")
@@ -85,6 +95,7 @@ def main(argv=None):
             rel_path = os.path.relpath(f, root)
             print(f"  {rel_path}")
         print()
+        printed_groups += 1
 
 if __name__ == '__main__':
     main(sys.argv[1:])
