@@ -10,7 +10,7 @@ Features:
 """
 
 import re
-import sys
+import argparse
 from pathlib import Path
 from collections import defaultdict
 
@@ -42,7 +42,7 @@ def normalize(name: str) -> str:
 
     return f"{stem.strip()}.{ext}"
 
-def main(root="."):
+def main(root=".", limit=None):
     groups = defaultdict(list)
 
     for path in Path(root).rglob("*"):
@@ -53,12 +53,21 @@ def main(root="."):
             if key:
                 groups[key].append(path)
 
+    printed_groups = 0
     for key, files in sorted(groups.items()):
         if len(files) > 1:
+            if limit is not None and printed_groups >= limit:
+                break
             print(f"\n=== Similar group: {key} ===")
             for f in files:
                 print(f"  {f}")
+            printed_groups += 1
 
 if __name__ == "__main__":
-    root = sys.argv[1] if len(sys.argv) > 1 else "."
-    main(root)
+    parser = argparse.ArgumentParser(description="Find groups of files with similar names.")
+    parser.add_argument("root", nargs="?", default=".", help="Directory tree to scan (default: current directory)")
+    parser.add_argument("--limit", type=int, help="Limit the number of similar groups printed")
+    args = parser.parse_args()
+    if args.limit is not None and args.limit < 0:
+        parser.error("--limit must be zero or greater")
+    main(args.root, args.limit)
