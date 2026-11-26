@@ -19,6 +19,9 @@ STRUCTURED_TIMESTAMP_RE = re.compile(
     r'^(?:\d{2}_)?(?P<timestamp>\d{4}(?:_\d{2}){4})(?:_\d{2})?$'
 )
 COMPACT_TIMESTAMP_RE = re.compile(r'^\d{12}$')
+DATE_TOKEN_RE = re.compile(
+    r'(?<!\d)(?:\d{4}[-_.]\d{2}[-_.]\d{2}|\d{8}(?:\d{4}(?:\d{2})?)?)(?!\d)'
+)
 
 def is_in_hidden_dir(path: Path) -> bool:
     return any(part.startswith(".") for part in path.parts)
@@ -42,8 +45,14 @@ def normalize(name: str) -> str:
         zettel_id, rest = zettel_match.groups()
         stem = f"{zettel_id} {rest}"
     else:
-        # Remove non-zettel numeric prefixes
-        stem = re.sub(r'^[\d\W_]+', '', stem)
+        date_match = DATE_TOKEN_RE.search(stem)
+        if date_match:
+            prefix = stem[:date_match.start()]
+            if prefix and re.fullmatch(r'[\d\W_]+', prefix):
+                stem = stem[date_match.start():]
+        else:
+            # Remove non-zettel numeric prefixes
+            stem = re.sub(r'^[\d\W_]+', '', stem)
 
     # Normalize separators
     stem = re.sub(r'[\s\-_]+', ' ', stem)
