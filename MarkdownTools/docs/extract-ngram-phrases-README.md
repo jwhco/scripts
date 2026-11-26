@@ -2,7 +2,7 @@
 
 ## Use Case
 
-- Extract from a file all of the ngrams (trigram by default), then print on the screen. Use to better understand a single file or a corpus of files.
+- Extract from a file all of the ngrams (trigram by default), then print on the screen. With no file argument, recursively process Markdown files from the current directory.
 - The n-grams can be piped into a script for further analysis, or handled by another tool for clustering. 
 
 ## Technical

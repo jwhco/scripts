@@ -7,6 +7,7 @@ and list them with counts. Present trigrams as default.
 
 Usage examples:
   extract-ngram-phrase.py filename.md --start "## Transcript" --end "## Reference" --top 50
+  extract-ngram-phrase.py  # recursively process Markdown files in the current directory
   extract-ngram-phrase.py filename.md --ngram-size 2 --min-count 2 --csv > bigrams.csv
   extract-ngram-phrase.py filename.md --ngram-size 4 --min-count 3  # 4-grams
 
@@ -16,6 +17,7 @@ import argparse
 import collections
 import re
 import sys
+from pathlib import Path
 from typing import List, Tuple
 
 from nltk.corpus import stopwords
@@ -124,8 +126,8 @@ def compute_ngrams(text: str, ngram_size: int = 3, min_nonstop: int = 2) -> Tupl
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description='Extract meaningful ngrams from a Markdown file and count occurrences.')
-    p.add_argument('file', help='Path to markdown file (or - for stdin)')
+    p = argparse.ArgumentParser(description='Extract meaningful ngrams from Markdown files and count occurrences.')
+    p.add_argument('file', nargs='?', help='Path to a Markdown file, or - for stdin (default: recursively scan the current directory)')
     p.add_argument('--start', help='Optional start marker (include text after first occurrence). Exact substring match.')
     p.add_argument('--end', help='Optional end marker (stop before this marker). Exact substring match.')
     p.add_argument('--ngram-size', type=int, default=3, help='Size of n-grams to extract (2 for bigrams, 3 for trigrams, 4 for 4-grams, etc.) (default 3)')
@@ -137,13 +139,30 @@ def main(argv=None):
     args = p.parse_args(argv)
 
     if args.file == '-':
-        data = sys.stdin.read()
+        documents = [sys.stdin.read()]
+    elif args.file:
+        documents = [Path(args.file)]
     else:
-        with open(args.file, 'r', encoding='utf-8') as f:
-            data = f.read()
+        documents = sorted(
+            (path for path in Path.cwd().rglob('*')
+             if path.is_file() and path.suffix.lower() == '.md'),
+            key=str,
+        )
 
-    region = extract_region(data, args.start, args.end)
-    counts, contexts = compute_ngrams(region, ngram_size=args.ngram_size, min_nonstop=args.min_nonstop)
+    counts = collections.Counter()
+    context_regions = []
+    for document in documents:
+        if isinstance(document, Path):
+            data = document.read_text(encoding='utf-8')
+        else:
+            data = document
+        region = extract_region(data, args.start, args.end)
+        document_counts, _ = compute_ngrams(
+            region, ngram_size=args.ngram_size, min_nonstop=args.min_nonstop
+        )
+        counts.update(document_counts)
+        if args.limit_context > 0:
+            context_regions.append(region)
 
     # filter by min_count and sort
     items = [ (k,v) for k,v in counts.items() if v >= args.min_count ]
@@ -162,7 +181,13 @@ def main(argv=None):
     for k,v in items:
         print(f'{v:5d}  {k}')
         if args.limit_context > 0:
-            samples = sample_contexts(region, k, max_samples=args.limit_context)
+            samples = []
+            for region in context_regions:
+                samples.extend(sample_contexts(
+                    region, k, max_samples=args.limit_context - len(samples)
+                ))
+                if len(samples) >= args.limit_context:
+                    break
             for s in samples:
                 print(f'       -> {s}')
 
