@@ -27,6 +27,7 @@ Stop words are used to reduce chunk sizes in duplicate detection.
 ## Requirements
 
 - Be able to provide a corpus of text via command line pipe. Process standard input to then report on combined ngrams.
+- Ignore YAML front matter except for `title` and `tags`; skip those values when they are too short to form the requested n-gram.
 
 
 ## User Story
