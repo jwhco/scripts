@@ -1,5 +1,16 @@
 # Extract Hashtag Terms
 
+## Usuage
+
+```bash
+python3 extract-hashtag-terms.py
+```
+
+Where:
+
+- `--parse-only` shows errors without printing hashtags.
+- `--errors` shows errors without printing hashtags.
+
 ## Requirements
 
 - [ ] Issue. Stop words are not being removed from the inventory of outputs. Stop words need to be removed before bi-grams are created. 
