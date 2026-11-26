@@ -27,7 +27,8 @@ Stop words are used to reduce chunk sizes in duplicate detection.
 ## Requirements
 
 - Be able to provide a corpus of text via command line pipe. Process standard input to then report on combined ngrams.
-- Ignore YAML front matter except for `title` and `tags`; skip those values when they are too short to form the requested n-gram.
+- Read YAML front matter as YAML, using text values from `title` and `tags` plus other text values longer than 65 characters. Ignore keys and non-text values, and skip retained values when they are too short to form the requested n-gram.
+- Template files and directories are skipped before YAML is read. Configure path fragments in `IGNORE_PATHS` and filename stem suffixes in `IGNORE_FILENAMES` in the script.
 
 
 ## User Story

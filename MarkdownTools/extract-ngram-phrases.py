@@ -15,13 +15,13 @@ Usage examples:
 
 import argparse
 import collections
-import json
 import re
 import sys
 from pathlib import Path
 from typing import List, Tuple
 
 from nltk.corpus import stopwords
+import yaml
 
 # NLTK English stopwords
 NLTK_STOPWORDS = set(stopwords.words('english'))
@@ -35,6 +35,10 @@ CUSTOM_STOPWORDS = {
 # Universal English stopwords (NLTK + custom)
 STOPWORDS = NLTK_STOPWORDS | CUSTOM_STOPWORDS
 
+# Add directory/path fragments and filename stem suffixes to these exclusions.
+IGNORE_PATHS = ('Templates',)
+IGNORE_FILENAMES = ('Template',)
+
 RE_CODEBLOCK = re.compile(r"```.*?```", re.S)
 RE_INLINE_CODE = re.compile(r"`[^`]*`")
 RE_IMAGE = re.compile(r"!\[[^\]]*\]\([^\)]*\)")
@@ -42,6 +46,20 @@ RE_LINK = re.compile(r"\[([^\]]+)\]\([^\)]*\)")
 RE_BRACKET_LINK = re.compile(r"\[\[([^\]]+)\]\]")
 RE_MARKDOWN = re.compile(r"(^>.*$|^\s*#.*$)", re.M)
 RE_NONWORD = re.compile(r"[^A-Za-z0-9' ]+")
+
+
+def should_ignore_path(path: Path) -> bool:
+    path_parts = tuple(part.casefold() for part in path.parts)
+    for ignored_path in IGNORE_PATHS:
+        ignored_parts = tuple(part.casefold() for part in Path(ignored_path).parts)
+        if ignored_parts and any(
+            path_parts[i:i + len(ignored_parts)] == ignored_parts
+            for i in range(len(path_parts) - len(ignored_parts) + 1)
+        ):
+            return True
+
+    stem = path.stem.casefold()
+    return any(stem.endswith(suffix.casefold()) for suffix in IGNORE_FILENAMES)
 
 
 def extract_region(text: str, start_marker: str, end_marker: str) -> str:
@@ -63,18 +81,14 @@ def extract_region(text: str, start_marker: str, end_marker: str) -> str:
     return text[start_idx:end_idx]
 
 
-def yaml_scalar_value(value: str) -> str:
-    value = value.strip()
-    quoted = re.match(r'"(?:\\.|[^"\\])*"|\'(?:\'\'|[^\'])*\'', value)
-    if quoted:
-        scalar = quoted.group(0)
-        if scalar.startswith('"'):
-            try:
-                return json.loads(scalar)
-            except json.JSONDecodeError:
-                return scalar[1:-1].replace('\\"', '"')
-        return scalar[1:-1].replace("''", "'")
-    return re.split(r'(?:^|\s+)#', value, maxsplit=1)[0].strip()
+def yaml_text_values(value: object) -> List[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [text for child in value.values() for text in yaml_text_values(child)]
+    if isinstance(value, list):
+        return [text for child in value for text in yaml_text_values(child)]
+    return []
 
 
 def extract_front_matter(text: str) -> Tuple[List[str], str]:
@@ -89,56 +103,23 @@ def extract_front_matter(text: str) -> Tuple[List[str], str]:
     if closing_index is None:
         return [], text
 
+    metadata = yaml.safe_load('\n'.join(lines[1:closing_index]))
     values = []
-    title_block = []
-    active_key = None
-    for line in lines[1:closing_index]:
-        if not line.strip() or line.lstrip().startswith('#'):
-            continue
-
-        field = re.match(r'^([A-Za-z0-9_-]+)\s*:\s*(.*)$', line)
-        if field:
-            if title_block:
-                values.append(' '.join(title_block))
-                title_block = []
-
-            key, value = field.groups()
-            active_key = None
-            if key.lower() == 'title':
-                title_value = yaml_scalar_value(value)
-                if title_value in ('|', '>', '|-', '>-', '|+', '>+'):
-                    active_key = 'title-block'
-                elif title_value:
-                    values.append(title_value)
-            elif key.lower() == 'tags':
-                tags_value = yaml_scalar_value(value)
-                if tags_value.startswith('[') and tags_value.endswith(']'):
-                    inline_tags = tags_value[1:-1]
-                    values.extend(
-                        yaml_scalar_value(tag)
-                        for tag in inline_tags.split(',')
-                        if tag.strip()
-                    )
-                elif tags_value:
-                    values.append(tags_value)
-                else:
-                    active_key = 'tags'
-            continue
-
-        if active_key == 'tags':
-            tag = re.match(r'^\s*-\s*(.*)$', line)
-            if tag:
-                values.append(yaml_scalar_value(tag.group(1)))
-            elif line.strip():
-                active_key = None
-        elif active_key == 'title-block':
-            if line.startswith((' ', '\t')):
-                title_block.append(line.strip())
-            elif line.strip():
-                active_key = None
-
-    if title_block:
-        values.append(' '.join(title_block))
+    if isinstance(metadata, dict):
+        for key, value in metadata.items():
+            text_values = yaml_text_values(value)
+            if str(key).lower() in {'title', 'tags'}:
+                values.extend(text_values)
+            else:
+                values.extend(
+                    text for text in text_values
+                    if len(text.strip()) > 65
+                )
+    else:
+        values.extend(
+            text for text in yaml_text_values(metadata)
+            if len(text.strip()) > 65
+        )
 
     body = '\n'.join(lines[closing_index + 1:])
     return values, body
@@ -225,11 +206,14 @@ def main(argv=None):
     if args.file == '-':
         documents = [sys.stdin.read()]
     elif args.file:
-        documents = [Path(args.file)]
+        file_path = Path(args.file)
+        documents = [] if should_ignore_path(file_path) else [file_path]
     else:
         documents = sorted(
             (path for path in Path.cwd().rglob('*')
-             if path.is_file() and path.suffix.lower() == '.md'),
+             if path.is_file()
+             and path.suffix.lower() == '.md'
+             and not should_ignore_path(path)),
             key=str,
         )
 
