@@ -38,6 +38,10 @@ def normalize(name: str) -> str:
     if COMPACT_TIMESTAMP_RE.fullmatch(stem):
         return f"{stem}.{ext}"
 
+    numeric_key = re.sub(r'[-_]', '', stem)
+    if numeric_key.isdigit():
+        return f"{numeric_key}.{ext}"
+
     zettel_match = ZETTEL_RE.match(stem)
 
     if zettel_match:
