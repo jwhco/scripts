@@ -17,6 +17,7 @@ import argparse
 import collections
 import re
 import sys
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import List, Tuple
 
@@ -46,6 +47,27 @@ RE_LINK = re.compile(r"\[([^\]]+)\]\([^\)]*\)")
 RE_BRACKET_LINK = re.compile(r"\[\[([^\]]+)\]\]")
 RE_MARKDOWN = re.compile(r"(^>.*$|^\s*#.*$)", re.M)
 RE_NONWORD = re.compile(r"[^A-Za-z0-9' ]+")
+
+
+class ReadableHTMLParser(HTMLParser):
+    SKIPPED_TAGS = {'script', 'style', 'template', 'noscript'}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.text_parts = []
+        self.skipped_tag = None
+
+    def handle_starttag(self, tag, attrs):
+        if self.skipped_tag is None and tag in self.SKIPPED_TAGS:
+            self.skipped_tag = tag
+
+    def handle_endtag(self, tag):
+        if tag == self.skipped_tag:
+            self.skipped_tag = None
+
+    def handle_data(self, data):
+        if self.skipped_tag is None:
+            self.text_parts.append(data)
 
 
 def should_ignore_path(path: Path) -> bool:
@@ -89,6 +111,13 @@ def yaml_text_values(value: object) -> List[str]:
     if isinstance(value, list):
         return [text for child in value for text in yaml_text_values(child)]
     return []
+
+
+def extract_readable_html(text: str) -> str:
+    parser = ReadableHTMLParser()
+    parser.feed(text)
+    parser.close()
+    return ' '.join(parser.text_parts)
 
 
 def extract_front_matter(text: str) -> Tuple[List[str], str]:
@@ -135,6 +164,8 @@ def clean_markdown(text: str) -> str:
     text = RE_LINK.sub(lambda m: m.group(1), text)
     # convert wiki links [[label]] -> label
     text = RE_BRACKET_LINK.sub(lambda m: m.group(1), text)
+    # retain readable HTML text, but discard markup and non-visible content
+    text = extract_readable_html(text)
     # remove headings/blockquote lines
     text = RE_MARKDOWN.sub(' ', text)
     # strip punctuation (keep apostrophes within words)
