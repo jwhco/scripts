@@ -2,6 +2,7 @@
 
 import argparse
 import html
+import json
 import os
 import random
 import re
@@ -468,7 +469,7 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")), force_unquoted=True)}')
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
     
-    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")).title(), force_unquoted=True)}')
+    lines.append(f'title: {json.dumps(str(front.get("title", "")).title(), ensure_ascii=False)}')
 
     lines.append(f'status: {safe_yaml_value(str(front.get("status", "")))}')
     
