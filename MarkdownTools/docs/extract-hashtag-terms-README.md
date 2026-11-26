@@ -34,6 +34,9 @@ Where:
 
 ## User Story
 
+
+- User wants to quick check parsing of YAML front matter, running the script with `--parse-only` scans the entire repository. Returns any parse errors but not the list of hash tags.
+
 - User wants proper spelling and consistency in hashtags.
   -  By running the script a list of n-gram phrases show normalized camel case hashtags, YAML front matter tags, and hashed catalog codes. 
   - User notices misspellings. They then search for those terms in their note-taking repository. Terms are corrected with a replacement.
