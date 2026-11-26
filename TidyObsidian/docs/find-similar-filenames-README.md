@@ -37,6 +37,7 @@ Steps:
 ## Requirements
 
 - Treat zettelkasten key as unique value. If it exists, even when keyword string is similar, the zettelkasten key will override. Filenames with duplicate zettelkasten keys, no matter how unique otherwise need to be looked at by the user.
+- Timestamp filenames are grouped only when their year, month, day, hour, and minute match exactly. For example, `04_2015_04_13_16_46_47.md` can match `201504131646.md`, but not a filename with a different minute.
 - Make sure the zettelkasten key is unique amoung all files in the repo. Have a specific warning about this when detecting duplicate file names. This is why `pandas` is so important. Either different hashs can be maintained, or a check can scan through the array of filenames.
 
 ## User Story

@@ -15,6 +15,10 @@ from pathlib import Path
 from collections import defaultdict
 
 ZETTEL_RE = re.compile(r'^(\d{12})[\s_-]+(.+)$')
+STRUCTURED_TIMESTAMP_RE = re.compile(
+    r'^(?:\d{2}_)?(?P<timestamp>\d{4}(?:_\d{2}){4})(?:_\d{2})?$'
+)
+COMPACT_TIMESTAMP_RE = re.compile(r'^\d{12}$')
 
 def is_in_hidden_dir(path: Path) -> bool:
     return any(part.startswith(".") for part in path.parts)
@@ -23,6 +27,13 @@ def normalize(name: str) -> str:
     stem, dot, ext = name.lower().rpartition(".")
     if not dot or ext == "json":
         return ""
+
+    timestamp_match = STRUCTURED_TIMESTAMP_RE.fullmatch(stem)
+    if timestamp_match:
+        timestamp = timestamp_match.group("timestamp").replace("_", "")
+        return f"{timestamp}.{ext}"
+    if COMPACT_TIMESTAMP_RE.fullmatch(stem):
+        return f"{stem}.{ext}"
 
     zettel_match = ZETTEL_RE.match(stem)
 
