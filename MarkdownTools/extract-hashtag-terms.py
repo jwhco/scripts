@@ -11,7 +11,7 @@ WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
     "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", "zoom",
-    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", 
+    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", "wpconsent", "wpforms", "wprssaggregator",
     "wintak", "civtak", "tumblr", "locals", "kubernetes", "DFARS", "CMMC", 
     "cyber", "aweber", "aioseo"
 }
