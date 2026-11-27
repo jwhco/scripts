@@ -1,5 +1,16 @@
 # Extract Hashtag Terms
 
+## Usuage
+
+```bash
+python3 extract-hashtag-terms.py
+```
+
+Where:
+
+- `--parse-only` shows errors without printing hashtags.
+- `--errors` shows errors without printing hashtags.
+
 ## Requirements
 
 - [ ] Issue. Stop words are not being removed from the inventory of outputs. Stop words need to be removed before bi-grams are created. 
@@ -22,6 +33,9 @@
 - [ ] An option to show not list but errors only, `--errors` to figure out YAML front matter and Markdown formatting problems as a dry run.
 
 ## User Story
+
+
+- User wants to quick check parsing of YAML front matter, running the script with `--parse-only` scans the entire repository. Returns any parse errors but not the list of hash tags.
 
 - User wants proper spelling and consistency in hashtags.
   -  By running the script a list of n-gram phrases show normalized camel case hashtags, YAML front matter tags, and hashed catalog codes. 

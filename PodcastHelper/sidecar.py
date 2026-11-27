@@ -2,6 +2,7 @@
 
 import argparse
 import html
+import json
 import os
 import random
 import re
@@ -441,6 +442,7 @@ def build_front_matter(rss_item: Dict[str, str], channel_title: str) -> Tuple[st
         'duration': format_duration(rss_item.get('itunes_duration', '')),
         'permalink': rss_item.get('link', ''),
         'download': rss_item.get('enclosure_url', ''),
+        'filename': basename_from_url(rss_item.get('enclosure_url', '')),
         'transcript': rss_item.get('transcript_url', ''),
         'title': rss_item.get('title', ''),
         'status': 'S2-Review',
@@ -467,8 +469,10 @@ def render_yaml(front: Dict[str, object]) -> str:
     lines.append(f'duration: {safe_yaml_value(str(front.get("duration", "")), force_unquoted=True)}')
     lines.append(f'permalink: {safe_yaml_value(str(front.get("permalink", "")), force_unquoted=True)}')
     lines.append(f'download: {safe_yaml_value(str(front.get("download", "")), force_unquoted=True)}')
+    if str(front.get('filename', '')).strip():
+        lines.append(f'filename: {safe_yaml_value(str(front["filename"]))}')
     
-    lines.append(f'title: {safe_yaml_value(str(front.get("title", "")).title(), force_unquoted=True)}')
+    lines.append(f'title: {json.dumps(str(front.get("title", "")).title(), ensure_ascii=False)}')
 
     lines.append(f'status: {safe_yaml_value(str(front.get("status", "")))}')
     
@@ -610,7 +614,7 @@ def report_sidecars(root: Path) -> None:
 def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> Tuple[Dict[str, object], List[str]]:
     updated = existing_metadata.copy()
     changes: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title', 'channel']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'filename', 'permalink', 'transcript', 'title', 'channel']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         
@@ -630,7 +634,7 @@ def build_update_plan(existing_metadata: Dict[str, object], rss_front: Dict[str,
 
 def detect_conflicts(existing_metadata: Dict[str, object], rss_front: Dict[str, object]) -> List[str]:
     conflicts: List[str] = []
-    for key in ['author', 'date', 'platform', 'duration', 'download', 'permalink', 'transcript', 'title', 'channel']:
+    for key in ['author', 'date', 'platform', 'duration', 'download', 'filename', 'permalink', 'transcript', 'title', 'channel']:
         rss_value = str(rss_front.get(key, '')).strip()
         existing_value = str(existing_metadata.get(key, '')).strip()
         

@@ -11,7 +11,7 @@ WHITELIST = {
     "vscode", "latex", "zettlr", "github", "obsidian", "python", "jupyter", 
     "linux", "linkedin", "facebook", "hubspot", "google", "grammarly", 
     "youtube", "zotero", "wordpress", "woocommerce", "pandoc", "shopify", "zoom",
-    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", 
+    "podcast", "logseq", "semrush", "spreaker", "ahrefs", "zettelkasten", "wpconsent", "wpforms", "wprssaggregator",
     "wintak", "civtak", "tumblr", "locals", "kubernetes", "DFARS", "CMMC", 
     "cyber", "aweber", "aioseo"
 }
@@ -155,6 +155,8 @@ if __name__ == "__main__":
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--spellcheck", action="store_true")
     parser.add_argument("--errors", action="store_true", help="Only scan for formatting errors and exit")
+    parser.add_argument("--parse-only", action="store_true",
+                        help="Only scan for parsing errors and exit without listing hashtags")
     args = parser.parse_args()
 
     if not os.path.isdir(args.directory):
@@ -165,8 +167,8 @@ if __name__ == "__main__":
     if args.limit:
         files_gen = islice(files_gen, args.limit)
 
-    # If --errors is passed, process_files will exit the script after the scan
-    results_raw = process_files(files_gen, error_only=args.errors)
+    # Scan-only modes exit after reporting issues and do not list extracted hashtags.
+    results_raw = process_files(files_gen, error_only=args.errors or args.parse_only)
     results = sorted(list(results_raw))
     
     if args.spellcheck:

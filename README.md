@@ -46,6 +46,7 @@ These labels represent application tags for reference on other platforms. Use Gi
 ## Guidelines
 
 - The standard for modules is camel case. For tool names it is kebab-case. Use snake_case for Python functions.
+- When setting up `python3 -m venv .venv` do so in root directory of scripting. This makes loading modules more consistent across overall installation.
 
 ## Warning
 

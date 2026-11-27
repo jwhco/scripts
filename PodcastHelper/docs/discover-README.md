@@ -11,7 +11,7 @@
 - Must work for all common media extensions. Anything that might be an audio or video podcast episode of desired length. Automatically use the right tool to pull metadata.
 - Cache the directories so we aren't running down the entire media root everytime. Assume large number of media files in the tens of thousands.
 - When printing file names to screen, or saving them in a sidecar, use something that in a VsCode terminal will be clickable. Ctrl-click to open.
-
+- Place the filename in YAML front matter using `filename:` attribute. This is to later audit files on disk verses those mentioned in sidecars to determine what hasn't been published yet.
 
 ## User Story
 

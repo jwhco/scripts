@@ -2,7 +2,7 @@
 
 ## Use Case
 
-- Extract from a file all of the ngrams (trigram by default), then print on the screen. Use to better understand a single file or a corpus of files.
+- Extract from a file all of the ngrams (trigram by default), then print on the screen. With no file argument, recursively process Markdown files from the current directory.
 - The n-grams can be piped into a script for further analysis, or handled by another tool for clustering. 
 
 ## Technical
@@ -27,6 +27,9 @@ Stop words are used to reduce chunk sizes in duplicate detection.
 ## Requirements
 
 - Be able to provide a corpus of text via command line pipe. Process standard input to then report on combined ngrams.
+- Read YAML front matter as YAML, using text values from `title` and `tags` plus other text values longer than 65 characters. Ignore keys and non-text values, and skip retained values when they are too short to form the requested n-gram.
+- Template files and directories are skipped before YAML is read. Configure path fragments in `IGNORE_PATHS` and filename stem suffixes in `IGNORE_FILENAMES` in the script.
+- Ignore HTML markup and attributes, keeping readable text while skipping `script`, `style`, `template`, and `noscript` content.
 
 
 ## User Story

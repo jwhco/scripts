@@ -7,6 +7,7 @@
 ## Requirements
 
 - The sidecar file will include the basename `filename` and the full `filepath` from media root. The `filename` is unique, so directory is only for a pick up reference.
+    - This `filename` is stored in the YAML front matter of the sidecar if the value doesn't already exist.
 - The unique identifier is `permalink` representing a podcast episode in RSS as well as the markdown episode sidecar files. Must be able to match this link no matter how it is formatted in the YAML front matter.
 - Populate the sidecar `published` date, `permalink`, and `type` from the `--content-root` notes files. Search for the filename, then find these details in the YAML front matter.
 - For the sidecar, determine the `date` YAML front matter from the directory or filename. Give the filename `PXL_YYYYMMDD*.mp4` priority. The date format is `YYYY-MM-DD` which represents when the media was recorded.
@@ -69,6 +70,7 @@
         - Use the `pages` directory in the root of the `directory` folder, error if it doesn't exist.
         - Create a filename based on the episode `pubDate` yet formatted in a zettelkasten key as `YYYYMMDDmmhh` followed a three word phrase derived from `title` (removing stop words).
         - The title will be in title case, capitalizing the first letter in each word. No numbers other than the zettelkasten key.
+        - The text of a title in YAML front matter must be in quotes, otherwise is causes parse issues later.
         - Use the first three meaningful words of the title when shortening the title into a three word phrase. If fewer than three words in the title, then use two. As long as the zettelkasten key exists.
     - Script builds YAML front matter, then follows with a `#` title, then description. Convert HTML description to markdown.
         - If there are any URL's where the `href` and text are the same, then only include the text.

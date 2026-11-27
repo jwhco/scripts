@@ -76,6 +76,14 @@ def is_published(meta):
     return False
 
 
+def is_source_material(meta):
+    """Check whether the YAML type marks the document as source material."""
+    doc_type = meta.get('type', '')
+    if isinstance(doc_type, list):
+        return any(str(value).strip().lower() == 'source' for value in doc_type)
+    return str(doc_type).strip().lower() == 'source'
+
+
 def calculate_readability_score(text):
     """Simple readability score (0-100).
     
@@ -158,6 +166,7 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None, verb
         max_words: Maximum word count
         yaml_type: Optional YAML type filter (case-insensitive)
         verbose: Show errors and skipped files
+        Source-type documents are always skipped.
     
     Returns pandas DataFrame with candidate articles and scores.
     """
@@ -187,6 +196,10 @@ def scan_directory(root_dir, min_words=400, max_words=2500, yaml_type=None, verb
             
             try:
                 meta, body = parse_yaml_front_matter(content)
+
+                if is_source_material(meta):
+                    continue
+
                 word_count = count_words(body)
                 
                 # Filter: skip published, filter by word count
